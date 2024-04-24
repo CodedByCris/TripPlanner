@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:trip_planner/presentation/screens/auth_screens/splash_screen.dart';
 import 'package:trip_planner/presentation/widgets/interface/bottom_widget.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
@@ -6,7 +7,7 @@ import '../../presentation/widgets/widgets.dart';
 
 // GoRouter configuration
 final appRouter = GoRouter(
-  initialLocation: "/login",
+  initialLocation: "/",
   routes: [
     //* Rutas para la barrita inferior
     GoRoute(
@@ -26,6 +27,10 @@ final appRouter = GoRouter(
     ),
 
     //* Auth Routes
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
