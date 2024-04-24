@@ -67,6 +67,13 @@ class _LoginForm extends ConsumerWidget {
     final textStyles = Theme.of(context).textTheme;
     final db = Mysql();
 
+    //* Guardo en la variable correo, el correo que tiene el usuario para hacer las queries
+    getToken().then((token) {
+      if (token != null) {
+        context.go('/home/0');
+      }
+    });
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(

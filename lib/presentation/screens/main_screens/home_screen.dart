@@ -20,7 +20,8 @@ class HomeScreen extends ConsumerWidget {
     final isDarkMode = ref.read(themeNotifierProvider).isDarkMode;
     final correo =
         ref.watch(tokenProvider); // Escucha los cambios en el estado del correo
-    final hasToken = correo != null && correo.isNotEmpty;
+    final hasToken = correo?.isNotEmpty ?? false;
+    print(correo);
 
     return NetworkSensitive(
       child: DefaultTabController(

@@ -7,14 +7,15 @@ class ComparadorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('EXPLOTO');
     return SingleChildScrollView(
       child: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
+            //image: DecorationImage(
+            //image: AssetImage("assets/images/background.jpg"),
+            //fit: BoxFit.cover,
+            //),
+            ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -22,7 +23,7 @@ class ComparadorWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Encuentra el viaje perfecto al mejor precio',
+                'Encuentra el viaje perfecto al mejor',
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

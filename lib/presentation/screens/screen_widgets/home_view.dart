@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
 import '../../functions/connections.dart';
@@ -28,35 +28,38 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> fetchData() async {
-    final db = Mysql();
-    final result = await db.getConnection().then((value) => value.query(
-        'SELECT * FROM Viaje INNER JOIN Usuario ON Viaje.idUsuario = Usuario.idUsuario WHERE Usuario.Correo = "$correo"'));
+    String? correoTemp = await getCorreo();
+    if (correoTemp != null) {
+      correo = correoTemp;
+      final db = Mysql();
+      final result = await db.getConnection().then((value) => value.query(
+          'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"'));
 
-    for (final row in result) {
-      setState(() {
-        origen = row[1];
-        destino = row[2];
-        fechaSalida = row[3];
-        fechaLlegada = row[4];
-      });
+      for (final row in result) {
+        setState(() {
+          print("resultados$result");
+          origen = row[0];
+          destino = row[1];
+          fechaSalida = row[2];
+          fechaLlegada = row[3];
+        });
+      }
+    } else {
+      print("Correo es nulo");
     }
-    correo = await getCorreo();
   }
 
   @override
   Widget build(BuildContext context) {
     return TabBarView(
       children: [
-        Tab(
-            child: ActualTravelCard(
+        ActualTravelCard(
           origen: origen,
           destino: destino,
           fechaSalida: fechaSalida,
           fechaLlegada: fechaLlegada,
-        )),
-        const Tab(
-          child: ComparadorWidget(),
         ),
+        const ComparadorWidget(),
       ],
     );
   }

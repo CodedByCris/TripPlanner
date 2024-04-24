@@ -24,9 +24,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     )..repeat();
 
     getToken().then((token) {
-      Future.delayed(const Duration(seconds: 30), () {
+      Future.delayed(const Duration(seconds: 3), () {
         if (token != null) {
-          context.go('/home/0');
+          getToken().then((token) {
+            if (token != null) {
+              context.go('/home/0');
+            }
+          });
         } else {
           context.go('/login');
         }
