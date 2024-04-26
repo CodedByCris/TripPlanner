@@ -17,6 +17,8 @@ class _HomeViewState extends State<HomeView> {
   //*Variables de la búsqueda de datos
   String origen = '';
   String destino = '';
+  double precioMin = 0.0;
+  double precioMax = 0.0;
   DateTime fechaSalida = DateTime.now();
   DateTime fechaLlegada = DateTime.now();
 
@@ -51,16 +53,11 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return TabBarView(
-      children: [
-        ActualTravelCard(
-          origen: origen,
-          destino: destino,
-          fechaSalida: fechaSalida,
-          fechaLlegada: fechaLlegada,
-        ),
-        const ComparadorWidget(),
-      ],
+    return ActualTravelCard(
+      origen: origen,
+      destino: destino,
+      fechaSalida: fechaSalida,
+      fechaLlegada: fechaLlegada,
     );
   }
 }
