@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 
 import '../../../conf/connectivity.dart';
@@ -19,6 +20,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
   late final TextEditingController fechaOrigenController;
   late final TextEditingController fechaLlegadaController;
   late final TextEditingController precioBilletesController;
+  late final TextEditingController notasController;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
     fechaOrigenController = TextEditingController();
     fechaLlegadaController = TextEditingController();
     precioBilletesController = TextEditingController();
+    notasController = TextEditingController();
   }
 
   @override
@@ -37,6 +40,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
     fechaOrigenController.dispose();
     fechaLlegadaController.dispose();
     precioBilletesController.dispose();
+    notasController.dispose();
   }
 
   @override
@@ -183,7 +187,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
               TextFormField(
                 controller: precioBilletesController,
                 decoration: const InputDecoration(
-                  labelText: 'Precio de los billetes',
+                  labelText: 'Precio de los billetes (opcional)',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.attach_money),
                 ),
@@ -194,9 +198,17 @@ class NewScreenState extends ConsumerState<NewScreen> {
                 height: 10.0,
               ),
 
-              //TODO: RUTA -> Ubicacion, notas (opcional), orden (opcional)
-              //TODO: VIAJE -> Notas (opcional)
-              //TODO: GASTOS -> Descripción, cantidad, fecha
+              //!Notas del viaje
+              TextFormField(
+                controller: notasController,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                  labelText: 'Notas del viaje (opcional)',
+                  prefixIcon: Icon(Icons.comment),
+                  border: OutlineInputBorder(),
+                ),
+              ),
 
               //! Botón para guardar los datos
               ElevatedButton(
@@ -209,12 +221,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
                     String fechaSalida = fechaOrigenController.text;
                     String fechaLlegada = fechaLlegadaController.text;
                     String precioBilletes = precioBilletesController.text;
-
-                    print('Origen: $origen');
-                    print('Destino: $destino');
-                    print('Fecha de salida: $fechaSalida');
-                    print('Fecha de llegada: $fechaLlegada');
-                    print('Precio de los billetes: $precioBilletes');
+                    String notas = notasController.text;
                     // Aquí puedes guardar los datos en la base de datos o en cualquier otro lugar
 
                     // Clear the text fields
@@ -223,27 +230,34 @@ class NewScreenState extends ConsumerState<NewScreen> {
                     fechaOrigenController.clear();
                     fechaLlegadaController.clear();
                     precioBilletesController.clear();
+                    notasController.clear();
 
+                    //! Insertar los datos en la base de datos
+
+                    //Mounted comprueba si el widget sigue en la pantalla
+                    if (mounted)
                     // Show a dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Viaje creado'),
-                          content: const Text(
-                              'El viaje ha sido creado exitosamente, puedes modificar sus datos en la ventana "Home".'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Aceptar'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                // Navigate to another screen
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Viaje creado'),
+                            content: const Text(
+                                'El viaje ha sido creado exitosamente, puedes modificar sus datos en la ventana "Home".'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Aceptar'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  GoRouter.of(context).go('/home/0');
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   }
                 },
               ),
