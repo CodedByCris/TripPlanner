@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
+import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../../conf/connectivity.dart';
+import '../../functions/alerts.dart';
+import '../../functions/connections.dart';
 import '../../widgets/widgets.dart';
 
 class NewScreen extends ConsumerStatefulWidget {
@@ -45,6 +49,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final db = Mysql();
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
@@ -83,8 +88,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
                   prefixIcon: Icon(Icons.location_on),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese un origen';
+                  if (value == null || value.isEmpty || value.length < 3) {
+                    return 'Por favor ingrese un origen válido';
                   }
                   return null;
                 },
@@ -103,8 +108,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
                   prefixIcon: Icon(Icons.location_on),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese un destino';
+                  if (value == null || value.isEmpty || value.length < 3) {
+                    return 'Por favor ingrese un destino válido';
                   }
                   return null;
                 },
@@ -173,6 +178,20 @@ class NewScreenState extends ConsumerState<NewScreen> {
                               date.toIso8601String().substring(0, 10);
                         }
                       },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return null;
+                        }
+                        DateTime fechaSalida =
+                            DateTime.parse(fechaOrigenController.text);
+                        DateTime fechaLlegada = DateTime.parse(value);
+
+                        if (fechaLlegada.isBefore(fechaSalida) &&
+                            value.isNotEmpty) {
+                          return 'La fecha de llegada debe ser posterior a la fecha de salida';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -193,6 +212,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
+                // validator: (value) {
+                //   if (value!.isNotEmpty) {
+                //     double.parse(value) < 0;
+                //     return 'Por favor ingrese un precio válido';
+                //   }
+                //   return null;
+                // },
               ),
               const SizedBox(
                 height: 10.0,
@@ -208,6 +234,12 @@ class NewScreenState extends ConsumerState<NewScreen> {
                   prefixIcon: Icon(Icons.comment),
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value!.length < 3 && value.isNotEmpty) {
+                    return 'Por favor ingrese una nota válida';
+                  }
+                  return null;
+                },
               ),
 
               //! Botón para guardar los datos
@@ -216,12 +248,12 @@ class NewScreenState extends ConsumerState<NewScreen> {
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     // Guarda los datos
-                    String origen = origenController.text;
-                    String destino = destinoController.text;
-                    String fechaSalida = fechaOrigenController.text;
-                    String fechaLlegada = fechaLlegadaController.text;
-                    String precioBilletes = precioBilletesController.text;
-                    String notas = notasController.text;
+                    String? origen = origenController.text;
+                    String? destino = destinoController.text;
+                    String? fechaSalida = fechaOrigenController.text;
+                    String? fechaLlegada = fechaLlegadaController.text;
+                    String? precioBilletes = precioBilletesController.text;
+                    String? notas = notasController.text;
                     // Aquí puedes guardar los datos en la base de datos o en cualquier otro lugar
 
                     // Clear the text fields
@@ -248,7 +280,57 @@ class NewScreenState extends ConsumerState<NewScreen> {
                             actions: <Widget>[
                               TextButton(
                                 child: const Text('Aceptar'),
-                                onPressed: () {
+                                //INSERT
+                                onPressed: () async {
+                                  //Comprobaciones
+                                  if (notas!.isEmpty) {
+                                    notas = 'Sin notas';
+                                  }
+                                  if (fechaLlegada!.isEmpty) {
+                                    fechaLlegada = DateTime.now()
+                                        .toIso8601String()
+                                        .substring(0, 10);
+                                  }
+                                  String sql =
+
+                                      //INSERTO LOS DATOS DEL VIAJE
+                                      'INSERT INTO Viaje(Origen, Destino, FechaSalida, FechaLlegada, NotasViaje, Correo) VALUES (?, ?, ?, ?, ?, ?)';
+                                  await db.getConnection().then((conn) async {
+                                    String? correo = await getCorreo();
+                                    await conn.query(sql, [
+                                      origen,
+                                      destino,
+                                      fechaSalida,
+                                      fechaLlegada,
+                                      notas,
+                                      correo
+                                    ]);
+
+                                    if (precioBilletes.isNotEmpty) {
+                                      //OBTENGO EL ID DEL VIAJE
+                                      sql =
+                                          "Select IdViaje from Viaje where Origen = '$origen' and Destino = '$destino' and FechaSalida = '$fechaSalida' and FechaLlegada = '$fechaLlegada' and NotasViaje = '$notas' and Correo = '$correo'";
+
+                                      Results result = await conn.query(sql);
+                                      int idViaje = result
+                                          .elementAt(result.length - 1)[0];
+
+                                      //INSERTO LOS DATOS DEL PRECIO
+                                      String sqlPrecio =
+                                          'INSERT INTO Gastos_del_Viaje(Descripción, Cantidad, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
+                                      await conn.query(sqlPrecio, [
+                                        "Gastos en los billetes",
+                                        precioBilletes,
+                                        DateTime.now()
+                                            .toIso8601String()
+                                            .substring(0, 10),
+                                        idViaje
+                                      ]);
+                                    }
+
+                                    Alerts().registerSuccessfully(context);
+                                    await conn.close();
+                                  });
                                   Navigator.of(context).pop();
                                   GoRouter.of(context).go('/home/0');
                                 },
@@ -267,4 +349,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
       ),
     );
   }
+}
+
+Future<String?> getCorreo() async {
+  return await getToken();
 }

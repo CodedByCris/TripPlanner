@@ -1,7 +1,6 @@
 export 'main_screens/favorites_screen.dart';
 export 'main_screens/historial_screen.dart';
 export 'main_screens/home_screen.dart';
-export 'main_screens/new_screen.dart';
 export 'main_screens/messages_screen.dart';
 export 'auth_screens/register_screen.dart';
 export 'auth_screens/login_screen.dart';
