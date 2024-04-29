@@ -10,6 +10,7 @@ class ComparadorWidget extends StatefulWidget {
 }
 
 class _ComparadorWidgetState extends State<ComparadorWidget> {
+  final formKey = GlobalKey<FormState>();
   final origenText = TextEditingController();
   final destinoText = TextEditingController();
   final precioMinText = TextEditingController();
@@ -25,6 +26,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            //!Titulo
             const Text(
               'Encuentra el viaje perfecto al mejor',
               style: TextStyle(
@@ -34,12 +36,16 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
+
+            //!Subtitulo
             const Text(
               'Introduce los detalles de tu viaje y descubre las mejores actividades y ofertas',
               style: TextStyle(fontSize: 16, color: Colors.black),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
+
+            //!Campo de texto origen
             TextFormField(
               controller: origenText,
               decoration: const InputDecoration(
@@ -47,8 +53,16 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                 prefixIcon: Icon(Icons.location_on),
                 border: OutlineInputBorder(),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una fecha de salida';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 20),
+
+            //!Campo de texto destino
             TextFormField(
               controller: destinoText,
               decoration: const InputDecoration(
@@ -58,9 +72,12 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               ),
             ),
             const SizedBox(height: 20),
+
+            //! Precio mínimo y máximo
             Row(
               children: [
                 Expanded(
+                  //*Minimo
                   child: TextFormField(
                     controller: precioMinText,
                     decoration: const InputDecoration(
@@ -72,6 +89,8 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                   ),
                 ),
                 const SizedBox(width: 20),
+
+                //*Maximo
                 Expanded(
                   child: TextFormField(
                     controller: precioMaxText,
@@ -86,9 +105,12 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               ],
             ),
             const SizedBox(height: 20),
+
+            //!Fecha de salida y llegada
             Row(
               children: [
                 Expanded(
+                  //*Salida
                   child: TextFormField(
                     controller: fechaSalidaText,
                     decoration: const InputDecoration(
@@ -100,6 +122,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                   ),
                 ),
                 const SizedBox(width: 20),
+                //*Llegada
                 Expanded(
                   child: TextFormField(
                     controller: fechaLlegadaText,
@@ -114,8 +137,20 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               ],
             ),
             const SizedBox(height: 50),
+
+            //!Botón de buscar
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  // Guarda los datos
+                  String origen = origenText.text;
+                  String destino = destinoText.text;
+                  String precioMin = precioMinText.text;
+                  String precioMax = precioMaxText.text;
+                  String fechaSalida = fechaSalidaText.text;
+                  String fechaLlegada = fechaLlegadaText.text;
+                }
+              },
               icon: const Icon(Icons.search),
               label: const Text("Buscar"),
               style: ElevatedButton.styleFrom(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class HistorialTravelCard extends StatelessWidget {
+class FavoriteTravelCard extends StatelessWidget {
   final String origen;
   final String destino;
   final DateTime fechaSalida;
   final DateTime fechaLlegada;
 
-  const HistorialTravelCard({
+  const FavoriteTravelCard({
     super.key,
     required this.origen,
     required this.destino,

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
 import '../../../conf/connectivity.dart';
 import '../../providers/theme_provider.dart';
 import '../../widgets/widgets.dart';
@@ -23,6 +21,21 @@ class FavoritesScreen extends ConsumerWidget {
             titulo: 'FAVORITOS',
           ),
         ),
+        body: ListView.builder(
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: HistorialTravelCard(
+                    origen: 'Origen',
+                    destino: 'destino',
+                    fechaSalida: DateTime.now(),
+                    fechaLlegada: DateTime.now()),
+                onTap: () {
+                  //TODO: Implementar la navegación a la pantalla de detalles del viaje favorito
+                  print('hola');
+                },
+              );
+            },
+            itemCount: 10),
       ),
     );
   }

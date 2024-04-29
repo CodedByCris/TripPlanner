@@ -36,8 +36,12 @@ class HomeScreen extends ConsumerWidget {
     print(correo);
 
     const Map<int, Widget> myTabs = <int, Widget>{
-      0: Text('VIAJE ACTUAL'),
-      1: Text('COMPARADOR DE VIAJES'),
+      0: Text('VIAJE ACTUAL', style: TextStyle(fontSize: 14)),
+      1: Text(
+        'COMPARADOR DE VIAJES',
+        style: TextStyle(fontSize: 14),
+        textAlign: TextAlign.center,
+      ),
     };
 
     final sharedValue = ref.watch(tabIndexProvider);
@@ -56,12 +60,14 @@ class HomeScreen extends ConsumerWidget {
                   preferredSize: const Size.fromHeight(50.0),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: CupertinoSegmentedControl<int>(
-                      children: myTabs,
-                      onValueChanged: (int val) {
-                        ref.read(tabIndexProvider.notifier).setIndex(val);
-                      },
-                      groupValue: sharedValue,
+                    child: Container(
+                      child: CupertinoSegmentedControl<int>(
+                        children: myTabs,
+                        onValueChanged: (int val) {
+                          ref.read(tabIndexProvider.notifier).setIndex(val);
+                        },
+                        groupValue: sharedValue,
+                      ),
                     ),
                   ),
                 )

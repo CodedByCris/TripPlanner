@@ -1,26 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../widgets/widgets.dart';
 
-class NewScreen extends ConsumerWidget {
+class NewScreen extends ConsumerStatefulWidget {
   const NewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  NewScreenState createState() => NewScreenState();
+}
+
+class NewScreenState extends ConsumerState<NewScreen> {
+  final formKey = GlobalKey<FormState>();
+  late final TextEditingController origenController;
+  late final TextEditingController destinoController;
+  late final TextEditingController fechaOrigenController;
+  late final TextEditingController fechaLlegadaController;
+  late final TextEditingController precioBilletesController;
+
+  @override
+  void initState() {
+    super.initState();
+    origenController = TextEditingController();
+    destinoController = TextEditingController();
+    fechaOrigenController = TextEditingController();
+    fechaLlegadaController = TextEditingController();
+    precioBilletesController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    origenController.dispose();
+    destinoController.dispose();
+    fechaOrigenController.dispose();
+    fechaLlegadaController.dispose();
+    precioBilletesController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
-
-    final formKey = GlobalKey<FormState>();
-    final origenController = TextEditingController();
-    final destinoController = TextEditingController();
-    final fechaOrigenController = TextEditingController();
-    final fechaLlegadaController = TextEditingController();
-    final precioBilletesController = TextEditingController();
-    List<TextEditingController> rutasControllers = [TextEditingController()];
 
     return NetworkSensitive(
       child: Scaffold(
@@ -37,12 +59,22 @@ class NewScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(8.0),
             children: <Widget>[
-              //ORIGEN
-
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  'Los campos * son obligatorios',
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w900,
+                      fontStyle: FontStyle.italic),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              //!ORIGEN
               TextFormField(
                 controller: origenController,
                 decoration: const InputDecoration(
-                  labelText: 'Origen',
+                  labelText: '* Origen',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.location_on),
                 ),
@@ -54,10 +86,15 @@ class NewScreen extends ConsumerWidget {
                 },
               ),
 
+              const SizedBox(
+                height: 10.0,
+              ),
+
+              //!Destino
               TextFormField(
                 controller: destinoController,
                 decoration: const InputDecoration(
-                  labelText: 'Destino',
+                  labelText: '* Destino',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.location_on),
                 ),
@@ -69,54 +106,80 @@ class NewScreen extends ConsumerWidget {
                 },
               ),
 
-              TextFormField(
-                controller: fechaOrigenController,
-                decoration: const InputDecoration(
-                  labelText: 'Fecha de salida',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
-                ),
-                onTap: () async {
-                  FocusScope.of(context).requestFocus(
-                      FocusNode()); // to prevent opening default keyboard
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  );
-                  if (date != null) {
-                    fechaOrigenController.text = date
-                        .toIso8601String()
-                        .substring(0, 10); // format the date as you want
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese una fecha de salida';
-                  }
-                  return null;
-                },
-              ),
-// Fecha de llegada
-              TextFormField(
-                controller: fechaLlegadaController,
-                decoration: const InputDecoration(
-                  labelText: 'Fecha de llegada',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
-                ),
-                onTap: () async {
-                  // existing code...
-                },
-                validator: (value) {
-                  return null;
-
-                  // existing code...
-                },
+              const SizedBox(
+                height: 10.0,
               ),
 
-// Precio de los billetes
+              Row(
+                children: [
+                  //!Fecha de origen
+                  Expanded(
+                    child: TextFormField(
+                      controller: fechaOrigenController,
+                      decoration: const InputDecoration(
+                        labelText: '* Fecha salida',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                      ),
+                      onTap: () async {
+                        FocusScope.of(context).requestFocus(
+                            FocusNode()); // to prevent opening default keyboard
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (date != null) {
+                          fechaOrigenController.text =
+                              date.toIso8601String().substring(0, 10);
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese una fecha de salida';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                  //! Fecha de llegada
+                  Expanded(
+                    child: TextFormField(
+                      controller: fechaLlegadaController,
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha llegada',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                      ),
+                      onTap: () async {
+                        FocusScope.of(context).requestFocus(
+                            FocusNode()); // to prevent opening default keyboard
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (date != null) {
+                          fechaLlegadaController.text =
+                              date.toIso8601String().substring(0, 10);
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10.0,
+              ),
+              //! Precio de los billetes
               TextFormField(
                 controller: precioBilletesController,
                 decoration: const InputDecoration(
@@ -126,59 +189,61 @@ class NewScreen extends ConsumerWidget {
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  return null;
-
-                  // existing code...
-                },
+              ),
+              const SizedBox(
+                height: 10.0,
               ),
 
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: rutasControllers.length,
-                itemBuilder: (context, index) {
-                  return TextFormField(
-                    controller: rutasControllers[index],
-                    decoration: InputDecoration(
-                      labelText: 'Ruta ${index + 1}',
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.map),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese una ruta';
-                      }
-                      return null;
-                    },
-                  );
-                },
-              ),
+              //TODO: RUTA -> Ubicacion, notas (opcional), orden (opcional)
+              //TODO: VIAJE -> Notas (opcional)
+              //TODO: GASTOS -> Descripción, cantidad, fecha
+
+              //! Botón para guardar los datos
               ElevatedButton(
-                child: const Text('Agregar ruta'),
-                onPressed: () {
-                  rutasControllers.add(TextEditingController());
-                },
-              ),
-              ElevatedButton(
-                child: const Text('Guardar'),
+                child: const Text('Crear viaje'),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     // Guarda los datos
                     String origen = origenController.text;
                     String destino = destinoController.text;
-                    String fechaSalida = destinoController.text;
-                    String fechaLlegada = destinoController.text;
-                    String precioBilletes = destinoController.text;
-                    List<String> rutas = rutasControllers
-                        .map((controller) => controller.text)
-                        .toList();
+                    String fechaSalida = fechaOrigenController.text;
+                    String fechaLlegada = fechaLlegadaController.text;
+                    String precioBilletes = precioBilletesController.text;
+
                     print('Origen: $origen');
                     print('Destino: $destino');
                     print('Fecha de salida: $fechaSalida');
                     print('Fecha de llegada: $fechaLlegada');
                     print('Precio de los billetes: $precioBilletes');
-                    print('Rutas: $rutas');
                     // Aquí puedes guardar los datos en la base de datos o en cualquier otro lugar
+
+                    // Clear the text fields
+                    origenController.clear();
+                    destinoController.clear();
+                    fechaOrigenController.clear();
+                    fechaLlegadaController.clear();
+                    precioBilletesController.clear();
+
+                    // Show a dialog
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Viaje creado'),
+                          content: const Text(
+                              'El viaje ha sido creado exitosamente, puedes modificar sus datos en la ventana "Home".'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Aceptar'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                // Navigate to another screen
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
                 },
               ),
