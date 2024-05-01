@@ -5,7 +5,7 @@ import 'package:trip_planner/presentation/functions/alerts.dart';
 import 'package:trip_planner/presentation/functions/errors.dart';
 
 import '../../../conf/connectivity.dart';
-import '../../functions/connections.dart';
+import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 import '../screens.dart';

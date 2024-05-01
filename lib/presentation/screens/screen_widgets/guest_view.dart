@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
-import '../../functions/connections.dart';
+import '../../Database/connections.dart';
 import '../../widgets/interface/comparador.dart';
 import '../../widgets/widgets.dart';
 

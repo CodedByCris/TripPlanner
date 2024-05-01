@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
-import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../functions/alerts.dart';
-import '../../functions/connections.dart';
+import '../../Database/connections.dart';
 import '../../widgets/widgets.dart';
 
 class NewScreen extends ConsumerStatefulWidget {
@@ -296,7 +295,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
                                       //INSERTO LOS DATOS DEL VIAJE
                                       'INSERT INTO Viaje(Origen, Destino, FechaSalida, FechaLlegada, NotasViaje, Correo) VALUES (?, ?, ?, ?, ?, ?)';
                                   await db.getConnection().then((conn) async {
-                                    String? correo = await getCorreo();
+                                    String? correo = await Mysql().getCorreo();
                                     await conn.query(sql, [
                                       origen,
                                       destino,
@@ -349,8 +348,4 @@ class NewScreenState extends ConsumerState<NewScreen> {
       ),
     );
   }
-}
-
-Future<String?> getCorreo() async {
-  return await getToken();
 }

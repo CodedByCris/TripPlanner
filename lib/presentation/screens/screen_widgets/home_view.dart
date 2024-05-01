@@ -3,8 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
-import '../../functions/connections.dart';
-import '../../widgets/interface/comparador.dart';
+import '../../Database/connections.dart';
 import '../../widgets/widgets.dart';
 
 class HomeView extends StatefulWidget {
@@ -33,20 +32,28 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> fetchData() async {
-    String? correoTemp = await getCorreo();
+    String? correoTemp = await Mysql().getCorreo();
     if (correoTemp != null) {
       correo = correoTemp;
       final db = Mysql();
       final result = await db.getConnection().then((value) => value.query(
           'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"'));
 
+      DateTime now = DateTime.now();
+
       for (final row in result) {
-        setState(() {
-          origen.add(row[0]);
-          destino.add(row[1]);
-          fechaSalida.add(row[2]);
-          fechaLlegada.add(row[3]);
-        });
+        DateTime fechaSalidaRow = row[2];
+        DateTime fechaLlegadaRow = row[3];
+
+        if ((now.isAfter(fechaSalidaRow) && now.isBefore(fechaLlegadaRow)) ||
+            now.isBefore(fechaSalidaRow)) {
+          setState(() {
+            origen.add(row[0]);
+            destino.add(row[1]);
+            fechaSalida.add(fechaSalidaRow);
+            fechaLlegada.add(fechaLlegadaRow);
+          });
+        }
       }
     } else {
       print("Correo es nulo");

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/functions/alerts.dart';
 
 import '../../../conf/connectivity.dart';
-import '../../functions/connections.dart';
+import '../../Database/connections.dart';
 import '../../functions/errors.dart';
 import '../../widgets/widgets.dart';
 

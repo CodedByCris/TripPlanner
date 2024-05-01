@@ -8,7 +8,6 @@ import '../../../conf/connectivity.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 import '../screen_widgets/home_view.dart';
-import '../screens.dart';
 
 String? correo;
 
@@ -60,14 +59,12 @@ class HomeScreen extends ConsumerWidget {
                   preferredSize: const Size.fromHeight(50.0),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      child: CupertinoSegmentedControl<int>(
-                        children: myTabs,
-                        onValueChanged: (int val) {
-                          ref.read(tabIndexProvider.notifier).setIndex(val);
-                        },
-                        groupValue: sharedValue,
-                      ),
+                    child: CupertinoSegmentedControl<int>(
+                      children: myTabs,
+                      onValueChanged: (int val) {
+                        ref.read(tabIndexProvider.notifier).setIndex(val);
+                      },
+                      groupValue: sharedValue,
                     ),
                   ),
                 )
@@ -83,12 +80,4 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-Future<String?> getCorreo() async {
-  return await getToken();
-}
-
-Future<String?> borrarCorreo() async {
-  return await deleteToken();
 }

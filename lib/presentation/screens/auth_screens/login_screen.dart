@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../conf/connectivity.dart';
-import '../../functions/connections.dart';
+import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 

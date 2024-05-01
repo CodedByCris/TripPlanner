@@ -1,4 +1,5 @@
 import 'package:mysql1/mysql1.dart';
+import 'package:trip_planner/presentation/screens/screens.dart';
 
 class Mysql {
   static String host = 'bdjpy89pmoprquu50mej-mysql.services.clever-cloud.com';
@@ -31,5 +32,13 @@ class Mysql {
       await _connection!.close();
       print('Conexion cerrada');
     }
+  }
+
+  Future<String?> getCorreo() async {
+    return await getToken();
+  }
+
+  Future<String?> borrarCorreo() async {
+    return await deleteToken();
   }
 }
