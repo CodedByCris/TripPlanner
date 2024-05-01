@@ -33,15 +33,3 @@ class Mysql {
     }
   }
 }
-
-
-//*Para realizar la conexión con la base de datos y realizar las consultas
-// db.getConnection().then((value) {
-//    String sql = 'select nombreUsuario from Usuario';
-//    value.query(sql).then((value) {
-//      for (final row in value) {
-//        correo.value = TextEditingValue(text: row[0]);
-//      }
-//    });
-//   });
-

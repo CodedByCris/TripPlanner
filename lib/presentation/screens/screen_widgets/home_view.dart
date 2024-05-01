@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
@@ -15,18 +16,20 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   //*Variables de la búsqueda de datos
-  String origen = '';
-  String destino = '';
-  double precioMin = 0.0;
-  double precioMax = 0.0;
-  DateTime fechaSalida = DateTime.now();
-  DateTime fechaLlegada = DateTime.now();
+
+  final db = Mysql();
+
+  List<String> origen = [];
+  List<String> destino = [];
+  List<double> precioMin = [];
+  List<double> precioMax = [];
+  List<DateTime> fechaSalida = [];
+  List<DateTime> fechaLlegada = [];
 
   @override
   void initState() {
     super.initState();
     fetchData();
-    print('HOME VIEW');
   }
 
   Future<void> fetchData() async {
@@ -39,11 +42,10 @@ class _HomeViewState extends State<HomeView> {
 
       for (final row in result) {
         setState(() {
-          print("resultados$result");
-          origen = row[0];
-          destino = row[1];
-          fechaSalida = row[2];
-          fechaLlegada = row[3];
+          origen.add(row[0]);
+          destino.add(row[1]);
+          fechaSalida.add(row[2]);
+          fechaLlegada.add(row[3]);
         });
       }
     } else {
@@ -53,11 +55,30 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return ActualTravelCard(
-      origen: origen,
-      destino: destino,
-      fechaSalida: fechaSalida,
-      fechaLlegada: fechaLlegada,
+    return Column(
+      children: [
+        const Text(
+          'Pulsa para modificar los datos del viaje',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 9, 61, 104),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: origen.length,
+            itemBuilder: (context, index) {
+              return ActualTravelCard(
+                origen: origen[index],
+                destino: destino[index],
+                fechaSalida: fechaSalida[index],
+                fechaLlegada: fechaLlegada[index],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

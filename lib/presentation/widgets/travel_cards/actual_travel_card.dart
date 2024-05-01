@@ -19,15 +19,6 @@ class ActualTravelCard extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 20),
-        const Text(
-          'Pulsa para modificar los datos del viaje',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 9, 61, 104),
-          ),
-        ),
-        const SizedBox(height: 20),
         SizedBox(
           height: 200,
           width: double.infinity,
@@ -55,13 +46,13 @@ class ActualTravelCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Fecha de salida: $fechaSalida',
+                    'Fecha de salida: ${fechaSalida.toString().split(' ')[0]}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
                   Text(
-                    'Fecha de llegada: $fechaLlegada',
+                    'Fecha de llegada: ${fechaLlegada.toString().split(' ')[0]}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),
