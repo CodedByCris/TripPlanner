@@ -63,7 +63,7 @@ class _HomeViewState extends ConsumerState<_UserView> {
           const SizedBox(height: 50),
 
           SizedBox(
-            height: 300,
+            height: MediaQuery.of(context).size.height * 0.5,
             child: ListView(
               children: [
                 ListTile(

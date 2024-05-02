@@ -19,6 +19,8 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   final fechaLlegadaText = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -48,10 +50,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
             //!Campo de texto origen
             TextFormField(
               controller: origenText,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'ORIGEN',
-                prefixIcon: Icon(Icons.location_on),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(
+                  Icons.location_on,
+                  color: colors.primary,
+                ),
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -65,10 +70,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
             //!Campo de texto destino
             TextFormField(
               controller: destinoText,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'DESTINO',
-                prefixIcon: Icon(Icons.location_on),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(
+                  Icons.location_on,
+                  color: colors.primary,
+                ),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
@@ -80,10 +88,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                   //*Minimo
                   child: TextFormField(
                     controller: precioMinText,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'PRECIO MIN',
-                      prefixIcon: Icon(Icons.attach_money),
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(
+                        Icons.attach_money,
+                        color: colors.primary,
+                      ),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -94,10 +105,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                 Expanded(
                   child: TextFormField(
                     controller: precioMaxText,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'PRECIO MAX',
-                      prefixIcon: Icon(Icons.attach_money),
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(
+                        Icons.attach_money,
+                        color: colors.primary,
+                      ),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -113,10 +127,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                   //*Salida
                   child: TextFormField(
                     controller: fechaSalidaText,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'FECHA SALIDA',
-                      prefixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(
+                        Icons.calendar_today,
+                        color: colors.primary,
+                      ),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
@@ -126,10 +143,13 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                 Expanded(
                   child: TextFormField(
                     controller: fechaLlegadaText,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'FECHA LLEGADA',
-                      prefixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(
+                        Icons.calendar_today,
+                        color: colors.primary,
+                      ),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
@@ -155,7 +175,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               label: const Text("Buscar"),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.blue, // foreground
+                backgroundColor: colors.primary, // foreground
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 textStyle: const TextStyle(fontSize: 20),

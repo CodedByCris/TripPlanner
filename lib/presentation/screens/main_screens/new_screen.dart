@@ -81,10 +81,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
               //!ORIGEN
               TextFormField(
                 controller: origenController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: '* Origen',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_on),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: colors.primary,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty || value.length < 3) {
@@ -101,10 +104,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
               //!Destino
               TextFormField(
                 controller: destinoController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: '* Destino',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_on),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: colors.primary,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty || value.length < 3) {
@@ -124,10 +130,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: fechaOrigenController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: '* Fecha salida',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.calendar_today),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: Icon(
+                          Icons.calendar_today,
+                          color: colors.primary,
+                        ),
                       ),
                       onTap: () async {
                         FocusScope.of(context).requestFocus(
@@ -158,10 +167,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: fechaLlegadaController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Fecha llegada',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.calendar_today),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: Icon(
+                          Icons.calendar_today,
+                          color: colors.primary,
+                        ),
                       ),
                       onTap: () async {
                         FocusScope.of(context).requestFocus(
@@ -204,20 +216,23 @@ class NewScreenState extends ConsumerState<NewScreen> {
               //! Precio de los billetes
               TextFormField(
                 controller: precioBilletesController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Precio de los billetes (opcional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.attach_money),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(
+                    Icons.attach_money,
+                    color: colors.primary,
+                  ),
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                // validator: (value) {
-                //   if (value!.isNotEmpty) {
-                //     double.parse(value) < 0;
-                //     return 'Por favor ingrese un precio válido';
-                //   }
-                //   return null;
-                // },
+                validator: (value) {
+                  if (value!.isNotEmpty) {
+                    double.parse(value) < 0;
+                    return 'Por favor ingrese un precio válido';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(
                 height: 10.0,
@@ -228,10 +243,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
                 controller: notasController,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Notas del viaje (opcional)',
-                  prefixIcon: Icon(Icons.comment),
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(
+                    Icons.comment,
+                    color: colors.primary,
+                  ),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value!.length < 3 && value.isNotEmpty) {
@@ -243,7 +261,13 @@ class NewScreenState extends ConsumerState<NewScreen> {
 
               //! Botón para guardar los datos
               ElevatedButton(
-                child: const Text('Crear viaje'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colors.primary,
+                ),
+                child: const Text(
+                  'Crear viaje',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     // Guarda los datos

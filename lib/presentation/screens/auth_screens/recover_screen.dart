@@ -98,18 +98,16 @@ class _RecoverForm extends ConsumerWidget {
                   String pass = password.text;
                   String repPass = repeatPassword.text;
                   bool loginSuccessful = false;
-                  int id = 0;
 
                   //* Consulta SQL
                   await db.getConnection().then((conn) async {
-                    String sql = 'select idUsuario, Correo from Usuario';
+                    String sql = 'select Correo from Usuario';
                     await conn.query(sql).then((result) {
                       for (final row in result) {
                         //* Comprobación de que el correo existe
-                        if (email == row[1]) {
+                        if (email == row[0]) {
                           if (pass == repPass) {
                             loginSuccessful = true;
-                            id = row[0];
                             break;
                           }
                         }
@@ -119,7 +117,7 @@ class _RecoverForm extends ConsumerWidget {
 
                     if (loginSuccessful) {
                       await conn.query(
-                        "UPDATE Usuario SET Password = $pass WHERE idUsuario = $id",
+                        "UPDATE Usuario SET Password = $pass WHERE correo = $email",
                       );
                       await conn.close();
                       Alerts().recoverySuccessfully(context);

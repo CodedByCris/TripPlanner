@@ -7,3 +7,4 @@ export 'auth_screens/login_screen.dart';
 export 'auth_screens/recover_screen.dart';
 export 'user_screens/theme_changer_screen.dart';
 export 'user_screens/configuration_screen.dart';
+export './details_screens/actual_details.dart';
