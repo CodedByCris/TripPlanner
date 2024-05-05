@@ -90,44 +90,7 @@ class _RecoverForm extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             height: 50,
-            child: CustomFilledButton(
-                text: 'Recuperar contraseña',
-                buttonColor: Colors.black,
-                onPressed: () async {
-                  String email = correo.text;
-                  String pass = password.text;
-                  String repPass = repeatPassword.text;
-                  bool loginSuccessful = false;
-
-                  //* Consulta SQL
-                  await db.getConnection().then((conn) async {
-                    String sql = 'select Correo from Usuario';
-                    await conn.query(sql).then((result) {
-                      for (final row in result) {
-                        //* Comprobación de que el correo existe
-                        if (email == row[0]) {
-                          if (pass == repPass) {
-                            loginSuccessful = true;
-                            break;
-                          }
-                        }
-                        //* Comprobación de las 2 contraseñas iguales
-                      }
-                    });
-
-                    if (loginSuccessful) {
-                      await conn.query(
-                        "UPDATE Usuario SET Password = $pass WHERE correo = $email",
-                      );
-                      await conn.close();
-                      Alerts().recoverySuccessfully(context);
-                      context.go('/login');
-                    } else {
-                      await conn.close();
-                      Errors().emailDontExist(context);
-                    }
-                  });
-                }),
+            child: _btnRecuperar(correo, password, repeatPassword, db, context),
           ),
           const SizedBox(height: 20),
           Row(
@@ -141,5 +104,51 @@ class _RecoverForm extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _btnRecuperar(
+      TextEditingController correo,
+      TextEditingController password,
+      TextEditingController repeatPassword,
+      Mysql db,
+      BuildContext context) {
+    return CustomFilledButton(
+        text: 'Recuperar contraseña',
+        buttonColor: Colors.black,
+        onPressed: () async {
+          String email = correo.text;
+          String pass = password.text;
+          String repPass = repeatPassword.text;
+          bool loginSuccessful = false;
+
+          //* Consulta SQL
+          await db.getConnection().then((conn) async {
+            String sql = 'select Correo from Usuario';
+            await conn.query(sql).then((result) {
+              for (final row in result) {
+                //* Comprobación de que el correo existe
+                if (email == row[0]) {
+                  if (pass == repPass) {
+                    loginSuccessful = true;
+                    break;
+                  }
+                }
+                //* Comprobación de las 2 contraseñas iguales
+              }
+            });
+
+            if (loginSuccessful) {
+              await conn.query(
+                "UPDATE Usuario SET Password = $pass WHERE correo = $email",
+              );
+              await conn.close();
+              Alerts().recoverySuccessfully(context);
+              context.go('/login');
+            } else {
+              await conn.close();
+              Errors().emailDontExist(context);
+            }
+          });
+        });
   }
 }

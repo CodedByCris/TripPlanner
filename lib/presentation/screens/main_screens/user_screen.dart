@@ -18,7 +18,7 @@ class UserScreen extends ConsumerWidget {
     return NetworkSensitive(
       child: Scaffold(
         appBar: AppBar(
-          title: customAppBar(
+          title: CustomAppBar(
             isDarkMode: isDarkMode,
             colors: colors,
             ref: ref,
@@ -26,24 +26,13 @@ class UserScreen extends ConsumerWidget {
           ),
         ),
         //*Cuerpo de la aplicación
-        body: const _UserView(),
+        body: _userView(ref, context),
       ),
     );
   }
-}
 
-class _UserView extends ConsumerStatefulWidget {
-  const _UserView();
-
-  @override
-  ConsumerState<_UserView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends ConsumerState<_UserView> {
-  @override
-  Widget build(BuildContext context) {
+  Widget _userView(WidgetRef ref, BuildContext context) {
     final List<Color> colors = ref.watch(colorListProvider);
-
     final int selectedColor = ref.watch(themeNotifierProvider).selectedColor;
 
     return SingleChildScrollView(
@@ -58,7 +47,7 @@ class _HomeViewState extends ConsumerState<_UserView> {
           const SizedBox(height: 50),
 
           //*LogOut
-          const LogOutButton(),
+          _logOutButton(context, ref),
 
           const SizedBox(height: 50),
 
@@ -66,91 +55,11 @@ class _HomeViewState extends ConsumerState<_UserView> {
             height: MediaQuery.of(context).size.height * 0.5,
             child: ListView(
               children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.person,
-                    color: colors[selectedColor],
-                    size: 30,
-                  ),
-                  title: const Text(
-                    "Nombre de usuario",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text(
-                    "Cris",
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.email,
-                    color: colors[selectedColor],
-                    size: 30,
-                  ),
-                  title: const Text(
-                    "Correo electrónico",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text("asdad@gmail.coim",
-                      style: TextStyle(
-                        fontSize: 15,
-                      )),
-                ),
-                //* Colores de la aplicación
-                ExpansionTile(
-                  leading: Icon(
-                    Icons.format_paint_sharp,
-                    color: colors[selectedColor],
-                    size: 30,
-                  ),
-                  title: const Text(
-                    "Apariencia de la aplicación",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  children: [
-                    SizedBox(
-                      height: 230,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final color = colors[index];
-                          return RadioListTile(
-                              subtitle: const Text('Click para cambiar'),
-                              title: Text(
-                                "Cambiar color",
-                                style: TextStyle(color: color),
-                              ),
-                              activeColor: color,
-                              value: index,
-                              groupValue: selectedColor,
-                              onChanged: (value) {
-                                ref
-                                    .read(themeNotifierProvider.notifier)
-                                    .changeColorIndex(index);
-                              });
-                        },
-                        itemCount: colors.length,
-                      ),
-                    ),
-                  ],
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.info,
-                    color: colors[selectedColor],
-                    size: 30,
-                  ),
-                  title: const Text(
-                    "Información de la app",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text("Version 1.0",
-                      style: TextStyle(
-                        fontSize: 15,
-                      )),
-                ),
+                _nombre(colors, selectedColor,
+                    'Cris'), //TODO CAMBIAR POR EL NOMBRE Y EL CORREO DEL USUARIO
+                _correo(colors, selectedColor, 'cris@gmail.com'),
+                _colores(colors, selectedColor, ref),
+                _informacion(colors, selectedColor),
               ],
             ),
           ),
@@ -158,13 +67,104 @@ class _HomeViewState extends ConsumerState<_UserView> {
       ),
     );
   }
-}
 
-class LogOutButton extends ConsumerWidget {
-  const LogOutButton({super.key});
+  Widget _informacion(List<Color> colors, int selectedColor) {
+    return ListTile(
+      leading: Icon(
+        Icons.info,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Información de la app",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: const Text("Version 1.0",
+          style: TextStyle(
+            fontSize: 15,
+          )),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget _colores(List<Color> colors, int selectedColor, WidgetRef ref) {
+    return ExpansionTile(
+      leading: Icon(
+        Icons.format_paint_sharp,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Apariencia de la aplicación",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      children: [
+        SizedBox(
+          height: 230,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              final color = colors[index];
+              return RadioListTile(
+                  subtitle: const Text('Click para cambiar'),
+                  title: Text(
+                    "Cambiar color",
+                    style: TextStyle(color: color),
+                  ),
+                  activeColor: color,
+                  value: index,
+                  groupValue: selectedColor,
+                  onChanged: (value) {
+                    ref
+                        .read(themeNotifierProvider.notifier)
+                        .changeColorIndex(index);
+                  });
+            },
+            itemCount: colors.length,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _correo(List<Color> colors, int selectedColor, String correo) {
+    return ListTile(
+      leading: Icon(
+        Icons.email,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Correo electrónico",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(correo,
+          style: const TextStyle(
+            fontSize: 15,
+          )),
+    );
+  }
+
+  Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
+    return ListTile(
+      leading: Icon(
+        Icons.person,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Nombre de usuario",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        nombre,
+        style: const TextStyle(
+          fontSize: 15,
+        ),
+      ),
+    );
+  }
+
+  Widget _logOutButton(BuildContext context, WidgetRef ref) {
     return ElevatedButton(
       onPressed: () {
         showDialog(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FavoriteTravelCard extends StatelessWidget {
+class FavoriteTravelCard extends StatefulWidget {
   final String origen;
   final String destino;
   final DateTime fechaSalida;
@@ -14,6 +14,11 @@ class FavoriteTravelCard extends StatelessWidget {
     required this.fechaLlegada,
   });
 
+  @override
+  State<FavoriteTravelCard> createState() => _FavoriteTravelCardState();
+}
+
+class _FavoriteTravelCardState extends State<FavoriteTravelCard> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,26 +38,26 @@ class FavoriteTravelCard extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
                   Text(
-                    'Origen: $origen',
+                    'Origen: ${widget.origen}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
                   Text(
-                    'Destino: $destino',
+                    'Destino: ${widget.destino}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Fecha de salida: $fechaSalida',
+                    'Fecha de salida: ${widget.fechaSalida}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
                   Text(
-                    'Fecha de llegada: $fechaLlegada',
+                    'Fecha de llegada: ${widget.fechaLlegada}',
                     style: const TextStyle(
                       fontSize: 14,
                     ),

@@ -1,5 +1,34 @@
+import 'dart:collection';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
+
+class ConnectionPool {
+  final int maxConnections;
+  int _openedConnections = 0;
+  final Queue<MySqlConnection> _connectionQueue = Queue<MySqlConnection>();
+
+  ConnectionPool({required this.maxConnections});
+
+  Future<MySqlConnection> getConnection(ConnectionSettings settings) async {
+    if (_connectionQueue.isNotEmpty) {
+      return _connectionQueue.removeFirst();
+    }
+
+    if (_openedConnections >= maxConnections) {
+      throw Exception('Max number of connections reached');
+    }
+
+    final conn = await MySqlConnection.connect(settings);
+    _openedConnections++;
+
+    return conn;
+  }
+
+  void releaseConnection(MySqlConnection conn) {
+    conn.close();
+    _connectionQueue.add(conn);
+  }
+}
 
 class Mysql {
   static String host = 'bdjpy89pmoprquu50mej-mysql.services.clever-cloud.com';
@@ -8,11 +37,7 @@ class Mysql {
   static String db = 'bdjpy89pmoprquu50mej';
   static int port = 3306;
 
-  MySqlConnection? _connection; // Store the connection instance
-
-  Mysql() {
-    // No need to create an instance on initialization
-  }
+  ConnectionPool pool = ConnectionPool(maxConnections: 5);
 
   Future<MySqlConnection> getConnection() async {
     ConnectionSettings settings = ConnectionSettings(
@@ -23,15 +48,16 @@ class Mysql {
       user: user,
     );
 
-    _connection = await MySqlConnection.connect(settings);
-    return _connection!; // Return the connection
+    try {
+      return pool.getConnection(settings);
+    } catch (e) {
+      print('Error al obtener la conexión: $e');
+      rethrow;
+    }
   }
 
-  Future<void> closeConnection() async {
-    if (_connection != null) {
-      await _connection!.close();
-      print('Conexion cerrada');
-    }
+  void closeConnection(MySqlConnection conn) {
+    pool.releaseConnection(conn);
   }
 
   Future<String?> getCorreo() async {

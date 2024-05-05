@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../providers/theme_provider.dart';
 
-class customAppBar extends StatelessWidget {
-  const customAppBar({
+class CustomAppBar extends StatefulWidget {
+  const CustomAppBar({
     super.key,
     required this.isDarkMode,
     required this.colors,
@@ -19,21 +19,28 @@ class customAppBar extends StatelessWidget {
   final String titulo;
 
   @override
+  State<CustomAppBar> createState() => _CustomAppBarState();
+}
+
+class _CustomAppBarState extends State<CustomAppBar> {
+  @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        titulo,
-        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+        widget.titulo,
+        style:
+            TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
       ),
       centerTitle: true,
       //* Modo nocturno
       leading: IconButton(
         onPressed: () {
-          ref.read(themeNotifierProvider.notifier).toggleDarkMode();
+          widget.ref.read(themeNotifierProvider.notifier).toggleDarkMode();
         },
-        icon: Icon(
-            isDarkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined),
-        color: colors.primary,
+        icon: Icon(widget.isDarkMode
+            ? Icons.dark_mode_outlined
+            : Icons.light_mode_outlined),
+        color: widget.colors.primary,
       ),
 
       //* Icono para las conversaciones
@@ -43,7 +50,7 @@ class customAppBar extends StatelessWidget {
             context.push('/messages');
           },
           icon: const Icon(Icons.message_outlined),
-          color: colors.primary,
+          color: widget.colors.primary,
         )
       ],
     );

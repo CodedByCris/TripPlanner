@@ -85,41 +85,7 @@ class _RegisterForm extends ConsumerWidget {
           SizedBox(
               width: double.infinity,
               height: 60,
-              child: CustomFilledButton(
-                  text: 'Crear cuenta',
-                  buttonColor: Colors.black,
-                  onPressed: () async {
-                    String email = correo.text;
-                    String pass = password.text;
-                    String name = nombre.text;
-
-                    bool loginSuccessful = true;
-                    await db.getConnection().then((conn) async {
-                      String sql = 'select Correo from Usuario';
-                      await conn.query(sql).then((result) {
-                        for (final row in result) {
-                          if (email == row[0]) {
-                            loginSuccessful = false;
-                            break;
-                          }
-                        }
-                      });
-
-                      if (loginSuccessful) {
-                        await conn.query(
-                            'INSERT INTO Usuario(NombreUsuario, Correo, Password) VALUES (?, ?, ?)',
-                            [name, email, pass]);
-                        Alerts().registerSuccessfully(context);
-                        await conn.close();
-                        storage.write(key: 'token', value: email);
-                        ref.read(tokenProvider.notifier).setToken(email);
-                        context.go('/home/0');
-                      } else {
-                        await conn.close();
-                        Errors().emailExist(context);
-                      }
-                    });
-                  })),
+              child: _btnCrear(correo, password, nombre, db, context, ref)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -133,5 +99,49 @@ class _RegisterForm extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _btnCrear(
+      TextEditingController correo,
+      TextEditingController password,
+      TextEditingController nombre,
+      Mysql db,
+      BuildContext context,
+      WidgetRef ref) {
+    return CustomFilledButton(
+        text: 'Crear cuenta',
+        buttonColor: Colors.black,
+        onPressed: () async {
+          String email = correo.text;
+          String pass = password.text;
+          String name = nombre.text;
+
+          bool loginSuccessful = true;
+          await db.getConnection().then((conn) async {
+            String sql = 'select Correo from Usuario';
+            await conn.query(sql).then((result) {
+              for (final row in result) {
+                if (email == row[0]) {
+                  loginSuccessful = false;
+                  break;
+                }
+              }
+            });
+
+            if (loginSuccessful) {
+              await conn.query(
+                  'INSERT INTO Usuario(NombreUsuario, Correo, Password) VALUES (?, ?, ?)',
+                  [name, email, pass]);
+              Alerts().registerSuccessfully(context);
+              await conn.close();
+              storage.write(key: 'token', value: email);
+              ref.read(tokenProvider.notifier).setToken(email);
+              context.go('/home/0');
+            } else {
+              await conn.close();
+              Errors().emailExist(context);
+            }
+          });
+        });
   }
 }

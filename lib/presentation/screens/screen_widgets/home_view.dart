@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trip_planner/presentation/screens/details_screens/actual_details.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
@@ -19,8 +20,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   //*Variables de la búsqueda de datos
 
-  final db = Mysql();
-
+  Mysql db = Mysql();
   List<String> origen = [];
   List<String> destino = [];
   List<double> precioMin = [];
@@ -94,7 +94,16 @@ class _HomeViewState extends State<HomeView> {
               ),
         Expanded(
           child: GestureDetector(
-            onTap: () => context.push('/actual_details'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ActualDetails(
+                      idViaje:
+                          4), //TODO: Cambiar por el id del viaje seleccionado
+                ),
+              );
+            },
             child: ListView.builder(
               itemCount: origen.length,
               itemBuilder: (context, index) {

@@ -2,8 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/screens/auth_screens/splash_screen.dart';
 import 'package:trip_planner/presentation/widgets/interface/bottom_widget.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
-
-import '../../presentation/screens/details_screens/historial_details.dart';
 import '../../presentation/widgets/widgets.dart';
 
 // GoRouter configuration
@@ -45,15 +43,10 @@ final appRouter = GoRouter(
       builder: (context, state) => const RecoverScreen(),
     ),
 
-    GoRoute(
-      path: '/actual_details',
-      builder: (context, state) => const ActualDetails(),
-    ),
-
-    GoRoute(
-      path: '/historial_details',
-      builder: (context, state) => const HistorialDetails(),
-    ),
+    // GoRoute(
+    //   path: '/actual_details',
+    //   builder: (context, state) => ActualDetails(),
+    // ),
 
     //* Ruta para las opciones de configuración del usuario
     GoRoute(

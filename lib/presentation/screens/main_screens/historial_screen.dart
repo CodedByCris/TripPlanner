@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mysql1/mysql1.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 
@@ -42,8 +43,12 @@ class _HistorialScreenState extends State<HistorialScreen> {
     if (correoTemp != null) {
       correo = correoTemp;
       final db = Mysql();
-      final result = await db.getConnection().then((value) => value.query(
-          'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"'));
+      MySqlConnection conn = await db.getConnection();
+
+      final result = await conn.query(
+          'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"');
+
+      db.closeConnection(conn);
 
       if (result.isEmpty) {
         setState(() {
@@ -78,7 +83,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         return NetworkSensitive(
           child: Scaffold(
             appBar: AppBar(
-              title: customAppBar(
+              title: CustomAppBar(
                 isDarkMode: isDarkMode,
                 colors: colors,
                 ref: ref,

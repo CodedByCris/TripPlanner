@@ -99,39 +99,7 @@ class _LoginForm extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             height: 60,
-            child: CustomFilledButton(
-              text: 'Iniciar sesión',
-              buttonColor: Colors.black,
-              onPressed: () async {
-                String email = correo.text;
-                String pass = password.text;
-                bool loginSuccessful = false;
-
-                await db.getConnection().then((conn) async {
-                  String sql = 'select Correo, Password from Usuario';
-                  await conn.query(sql).then((result) {
-                    for (final row in result) {
-                      if (email == row[0] && pass == row[1]) {
-                        loginSuccessful = true;
-                        break;
-                      }
-                    }
-                  });
-                  await conn.close();
-                });
-
-                if (loginSuccessful) {
-                  storage.write(key: 'token', value: email);
-                  ref.read(tokenProvider.notifier).setToken(email);
-
-                  context.go('/home/0');
-                } else {
-                  const snackbar =
-                      SnackBar(content: Text('El usuario no existe'));
-                  ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                }
-              },
-            ),
+            child: _btnIniciar(correo, password, db, ref, context),
           ),
           const SizedBox(
             height: 20,
@@ -180,6 +148,46 @@ class _LoginForm extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _btnIniciar(
+      TextEditingController correo,
+      TextEditingController password,
+      Mysql db,
+      WidgetRef ref,
+      BuildContext context) {
+    return CustomFilledButton(
+      text: 'Iniciar sesión',
+      buttonColor: Colors.black,
+      onPressed: () async {
+        String email = correo.text;
+        String pass = password.text;
+        bool loginSuccessful = false;
+
+        await db.getConnection().then((conn) async {
+          String sql = 'select Correo, Password from Usuario';
+          await conn.query(sql).then((result) {
+            for (final row in result) {
+              if (email == row[0] && pass == row[1]) {
+                loginSuccessful = true;
+                break;
+              }
+            }
+          });
+          await conn.close();
+        });
+
+        if (loginSuccessful) {
+          storage.write(key: 'token', value: email);
+          ref.read(tokenProvider.notifier).setToken(email);
+
+          context.go('/home/0');
+        } else {
+          const snackbar = SnackBar(content: Text('El usuario no existe'));
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+        }
+      },
     );
   }
 }

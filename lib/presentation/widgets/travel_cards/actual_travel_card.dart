@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ActualTravelCard extends StatelessWidget {
+class ActualTravelCard extends StatefulWidget {
   final String origen;
   final String destino;
   final DateTime fechaSalida;
@@ -15,47 +15,51 @@ class ActualTravelCard extends StatelessWidget {
   });
 
   @override
+  State<ActualTravelCard> createState() => _ActualTravelCardState();
+}
+
+class _ActualTravelCardState extends State<ActualTravelCard> {
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         SizedBox(
-          height: 200,
+          height: 120,
           width: double.infinity,
           child: Card(
-            elevation: 9,
-            margin: const EdgeInsets.all(10),
+            elevation: 5,
+            margin:
+                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    'Origen: $origen',
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(Icons.flight_takeoff),
+                      const SizedBox(width: 10),
+                      Text(
+                        ' ${widget.origen} - ${widget.destino}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Destino: $destino',
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Fecha de salida: ${fechaSalida.toString().split(' ')[0]}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    'Fecha de llegada: ${fechaLlegada.toString().split(' ')[0]}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(Icons.date_range),
+                      const SizedBox(width: 10),
+                      Text(
+                        ' ${widget.fechaSalida.toString().split(' ')[0]} - ${widget.fechaLlegada.toString().split(' ')[0]}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

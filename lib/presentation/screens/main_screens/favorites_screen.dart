@@ -14,7 +14,7 @@ class FavoritesScreen extends ConsumerWidget {
     return NetworkSensitive(
       child: Scaffold(
         appBar: AppBar(
-          title: customAppBar(
+          title: CustomAppBar(
             isDarkMode: isDarkMode,
             colors: colors,
             ref: ref,
@@ -24,7 +24,7 @@ class FavoritesScreen extends ConsumerWidget {
         body: ListView.builder(
             itemBuilder: (context, index) {
               return ListTile(
-                title: HistorialTravelCard(
+                title: FavoriteTravelCard(
                     origen: 'Origen',
                     destino: 'destino',
                     fechaSalida: DateTime.now(),

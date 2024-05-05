@@ -21,16 +21,11 @@ class ThemeChangerScreen extends ConsumerWidget {
               })
         ],
       ),
-      body: const _ThemeChangerView(),
+      body: _themeChangerView(context, ref),
     );
   }
-}
 
-class _ThemeChangerView extends ConsumerWidget {
-  const _ThemeChangerView();
-
-  @override
-  Widget build(BuildContext context, ref) {
+  Widget _themeChangerView(BuildContext context, ref) {
     final List<Color> colors = ref.watch(colorListProvider);
 
     final int selectedColor = ref.watch(themeNotifierProvider).selectedColor;

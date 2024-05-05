@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomTextFormField extends StatelessWidget {
+class CustomTextFormField extends StatefulWidget {
   final String? label;
   final String? hint;
   final String? errorMessage;
-  final controller;
+  final TextEditingController? controller;
   final bool obscureText;
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
@@ -24,6 +24,11 @@ class CustomTextFormField extends StatelessWidget {
     this.controller,
   });
 
+  @override
+  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
+}
+
+class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -49,12 +54,12 @@ class CustomTextFormField extends StatelessWidget {
                 offset: const Offset(0, 5))
           ]),
       child: TextFormField(
-        controller: controller,
-        onChanged: onChanged,
-        validator: validator,
-        onFieldSubmitted: onFieldSubmitted,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
+        controller: widget.controller,
+        onChanged: widget.onChanged,
+        validator: widget.validator,
+        onFieldSubmitted: widget.onFieldSubmitted,
+        obscureText: widget.obscureText,
+        keyboardType: widget.keyboardType,
         style: const TextStyle(fontSize: 20, color: Colors.black54),
         decoration: InputDecoration(
           floatingLabelStyle: const TextStyle(
@@ -66,9 +71,9 @@ class CustomTextFormField extends StatelessWidget {
           focusedErrorBorder: border.copyWith(
               borderSide: const BorderSide(color: Colors.transparent)),
           isDense: true,
-          label: label != null ? Text(label!) : null,
-          hintText: hint,
-          errorText: errorMessage,
+          label: widget.label != null ? Text(widget.label!) : null,
+          hintText: widget.hint,
+          errorText: widget.errorMessage,
           focusColor: colors.primary,
           // icon: Icon( Icons.supervised_user_circle_outlined, color: colors.primary, )
         ),
