@@ -98,9 +98,10 @@ class _HomeViewState extends State<HomeView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ActualDetails(
-                      idViaje:
-                          4), //TODO: Cambiar por el id del viaje seleccionado
+                  builder: (context) => ActualDetails(
+                    idViaje: 4,
+                    bd: db,
+                  ), //TODO: Cambiar por el id del viaje seleccionado
                 ),
               );
             },

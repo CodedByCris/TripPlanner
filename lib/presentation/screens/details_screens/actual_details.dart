@@ -4,7 +4,8 @@ import 'package:trip_planner/presentation/Database/connections.dart';
 
 class ActualDetails extends StatefulWidget {
   final int idViaje;
-  const ActualDetails({super.key, required this.idViaje});
+  final Mysql bd;
+  const ActualDetails({super.key, required this.idViaje, required this.bd});
 
   @override
   State<ActualDetails> createState() => _ActualDetailsState();
@@ -14,7 +15,6 @@ class _ActualDetailsState extends State<ActualDetails> {
   Results? resultViaje;
   Results? resultRuta;
   Results? resultGastos;
-  Mysql mysql = Mysql();
   MySqlConnection? conn;
 
   @override
@@ -26,12 +26,12 @@ class _ActualDetailsState extends State<ActualDetails> {
   }
 
   Future<void> setupConnection() async {
-    conn = await mysql.getConnection();
+    conn = await widget.bd.getConnection();
   }
 
   @override
   void dispose() {
-    mysql.closeConnection(conn!);
+    widget.bd.closeConnection(conn!);
     super.dispose();
   }
 
@@ -109,20 +109,30 @@ class _ActualDetailsState extends State<ActualDetails> {
         itemBuilder: (context, index) {
           ResultRow row = rows[index];
           return Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
+            elevation: 3,
+            margin: const EdgeInsets.all(10),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     '${row['Origen']} - ${row['Destino']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                    'Origen: ${row['FechaSalida'].toIso8601String().substring(0, 10)}, Destino: ${row['FechaLlegada'].toIso8601String().substring(0, 10)}'),
-                Text('Notas: ${row['NotasViaje']}'),
-              ],
+                  const SizedBox(height: 10),
+                  Text(
+                    '${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${row['NotasViaje']}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
           );
         },

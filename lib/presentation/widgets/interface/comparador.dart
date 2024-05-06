@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mysql1/mysql1.dart';
+
+import '../../Database/connections.dart';
 
 class ComparadorWidget extends StatefulWidget {
   const ComparadorWidget({
@@ -10,6 +13,9 @@ class ComparadorWidget extends StatefulWidget {
 }
 
 class _ComparadorWidgetState extends State<ComparadorWidget> {
+  Results? resultViaje;
+  MySqlConnection? conn;
+  Mysql? bd;
   GlobalKey<FormState>? formKey;
   TextEditingController? origenText;
   TextEditingController? destinoText;
@@ -75,7 +81,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               const SizedBox(height: 20),
 
               //!Fecha de salida y llegada
-              fechas(colors),
+              fechas(colors, context),
               const SizedBox(height: 50),
 
               //!Botón de buscar
@@ -94,6 +100,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           //*Minimo
           child: TextFormField(
             controller: precioMinText,
+            // validator: (value) {
+            //   if (value!.isNotEmpty) {
+            //     if (double.parse(value) < 0) {
+            //       return 'Por favor ingrese un precio válido';
+            //     }
+            //   }
+            //   return null;
+            // },
             decoration: InputDecoration(
               labelText: 'PRECIO MIN',
               prefixIcon: Icon(
@@ -128,7 +142,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
 
   Widget _btnBuscar(ColorScheme colors) {
     return ElevatedButton.icon(
-      onPressed: () {
+      onPressed: () async {
         if (formKey != null && formKey!.currentState!.validate()) {
           // Guarda los datos
           String origen = origenText!.text;
@@ -137,6 +151,22 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           String precioMax = precioMaxText!.text;
           String fechaSalida = fechaSalidaText!.text;
           String fechaLlegada = fechaLlegadaText!.text;
+
+          // Conecta a la base de datos
+          bd = Mysql();
+          conn = await bd!.getConnection();
+          resultViaje = await consultas(
+            origen: origen,
+            destino: destino.isNotEmpty ? destino : null,
+            fechaSalida:
+                fechaSalida.isNotEmpty ? DateTime.parse(fechaSalida) : null,
+            fechaLlegada:
+                fechaLlegada.isNotEmpty ? DateTime.parse(fechaLlegada) : null,
+            precioMin: precioMin.isNotEmpty ? double.parse(precioMin) : null,
+            precioMax: precioMax.isNotEmpty ? double.parse(precioMax) : null,
+          );
+          print(resultViaje);
+          bd!.closeConnection(conn!);
         }
       },
       icon: const Icon(Icons.search),
@@ -150,7 +180,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     );
   }
 
-  Widget fechas(ColorScheme colors) {
+  Widget fechas(ColorScheme colors, BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -158,14 +188,26 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: fechaSalidaText,
             decoration: InputDecoration(
-              labelText: 'FECHA SALIDA',
+              labelText: 'Fecha salida',
               prefixIcon: Icon(
-                Icons.calendar_today,
+                Icons.calendar_month,
                 color: colors.primary,
               ),
               border: const OutlineInputBorder(),
             ),
-            keyboardType: TextInputType.datetime,
+            onTap: () async {
+              FocusScope.of(context).requestFocus(
+                  FocusNode()); // to prevent opening default keyboard
+              final date = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (date != null) {
+                fechaSalidaText!.text = date.toIso8601String().substring(0, 10);
+              }
+            },
           ),
         ),
         const SizedBox(width: 20),
@@ -174,14 +216,27 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: fechaLlegadaText,
             decoration: InputDecoration(
-              labelText: 'FECHA LLEGADA',
+              labelText: 'Fecha llegada',
               prefixIcon: Icon(
-                Icons.calendar_today,
+                Icons.calendar_month,
                 color: colors.primary,
               ),
               border: const OutlineInputBorder(),
             ),
-            keyboardType: TextInputType.datetime,
+            onTap: () async {
+              FocusScope.of(context).requestFocus(
+                  FocusNode()); // to prevent opening default keyboard
+              final date = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (date != null) {
+                fechaLlegadaText!.text =
+                    date.toIso8601String().substring(0, 10);
+              }
+            },
           ),
         ),
       ],
@@ -220,5 +275,54 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
         return null;
       },
     );
+  }
+
+  //!Consultas
+  Future<Results> consultas(
+      {required String origen,
+      String? destino,
+      DateTime? fechaSalida,
+      DateTime? fechaLlegada,
+      double? precioMin,
+      double? precioMax}) async {
+    List<dynamic> parameters = [origen];
+    String query =
+        'SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?';
+
+    if (destino != null) {
+      query += ' AND Viaje.Destino = ?';
+      parameters.add(destino);
+    }
+
+    if (fechaSalida != null) {
+      query += ' AND Viaje.FechaSalida >= ?';
+      String fechaSalidaNormal = fechaSalida.toIso8601String().substring(0, 10);
+      parameters.add(fechaSalidaNormal);
+    }
+
+    if (fechaLlegada != null) {
+      query += ' AND Viaje.FechaLlegada <= ?';
+      String fechaLlegadaNormal =
+          fechaLlegada.toIso8601String().substring(0, 10);
+      parameters.add(fechaLlegadaNormal);
+    }
+
+    query += ' GROUP BY Viaje.IdViaje';
+
+    if (precioMin != null || precioMax != null) {
+      precioMin = precioMin ?? 0;
+      precioMax = precioMax ?? 999999;
+      query += ' HAVING SUM(Gastos_del_Viaje.Cantidad) BETWEEN ? AND ?';
+      parameters.addAll([precioMin, precioMax]);
+    }
+
+    print("origen $origen"
+        " __  destino $destino"
+        " __  fechaSalida $fechaSalida"
+        " __  fechaLlegada $fechaLlegada"
+        " __  precioMin $precioMin"
+        " __  precioMax $precioMax");
+
+    return resultViaje = await conn!.query(query, parameters);
   }
 }
