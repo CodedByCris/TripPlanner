@@ -133,8 +133,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
-          String? origen = origenController.text;
-          String? destino = destinoController.text;
+          String? origen = origenController.text.toUpperCase();
+          String? destino = destinoController.text.toUpperCase();
           String? fechaSalida = fechaOrigenController.text;
           String? fechaLlegada = fechaLlegadaController.text;
           String? precioBilletes = precioBilletesController.text;
