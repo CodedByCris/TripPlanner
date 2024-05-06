@@ -54,20 +54,14 @@ Future<String?> deleteToken() async {
 class _LoginForm extends ConsumerWidget {
   const _LoginForm();
 
-  void showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final correo = TextEditingController();
     final password = TextEditingController();
     final textStyles = Theme.of(context).textTheme;
     final db = Mysql();
+    final formKey = GlobalKey<FormState>(); // Agrega esta línea
 
-    //* Guardo en la variable correo, el correo que tiene el usuario para hacer las queries
     getToken().then((token) {
       if (token != null) {
         context.go('/home/0');
@@ -76,77 +70,96 @@ class _LoginForm extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        children: [
-          const SizedBox(height: 50),
-          Text('Login', style: textStyles.titleLarge),
-          const SizedBox(height: 50),
-          CustomTextFormField(
-            label: 'Correo',
-            keyboardType: TextInputType.emailAddress,
-            controller: correo,
-          ),
-          const SizedBox(height: 20),
-          CustomTextFormField(
-            label: 'Contraseña',
-            obscureText: true,
-            //validator: (p0)
-            controller: password,
-          ),
-
-          //! Botón de iniciar sesión
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: _btnIniciar(correo, password, db, ref, context),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-
-          //!Entrar como invitado
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor:
-                    const Color.fromARGB(176, 255, 0, 0), // Fondo blanco
-                side: const BorderSide(
-                    color: Colors.black, width: 2), // Borde negro
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Bordes redondeados
-                ),
-              ),
-              child: const Text(
-                'Entrar como invitado',
-                style: TextStyle(color: Colors.black), // Texto negro
-              ),
-              onPressed: () async {
-                context.go('/home/0');
+      child: Form(
+        // Agrega esta línea
+        key: formKey,
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            Text('Login', style: textStyles.titleLarge),
+            const SizedBox(height: 50),
+            CustomTextFormField(
+                label: 'Correo',
+                keyboardType: TextInputType.emailAddress,
+                controller: correo,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, ingrese su correo';
+                  } else if (!RegExp(
+                          r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                      .hasMatch(value)) {
+                    return 'Por favor, ingrese un correo válido';
+                  }
+                  return null;
+                }),
+            const SizedBox(height: 20),
+            CustomTextFormField(
+              label: 'Contraseña',
+              obscureText: true,
+              controller: password,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, ingrese su contraseña';
+                }
+                // Add password validation here
+                return null;
               },
             ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                  onPressed: () => context.push('/recover'),
-                  child: const Text('Recuperar contraseña'))
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('¿No tienes cuenta?'),
-              TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: const Text('Crea una aquí'))
-            ],
-          ),
-        ],
+
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: _btnIniciar(correo, password, db, ref, context, formKey),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+
+            //!Entrar como invitado
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor:
+                      const Color.fromARGB(176, 255, 0, 0), // Fondo blanco
+                  side: const BorderSide(
+                      color: Colors.black, width: 2), // Borde negro
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10), // Bordes redondeados
+                  ),
+                ),
+                child: const Text(
+                  'Entrar como invitado',
+                  style: TextStyle(color: Colors.black), // Texto negro
+                ),
+                onPressed: () async {
+                  context.go('/home/0');
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                    onPressed: () => context.push('/recover'),
+                    child: const Text('Recuperar contraseña'))
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('¿No tienes cuenta?'),
+                TextButton(
+                    onPressed: () => context.push('/register'),
+                    child: const Text('Crea una aquí'))
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -156,38 +169,43 @@ class _LoginForm extends ConsumerWidget {
       TextEditingController password,
       Mysql db,
       WidgetRef ref,
-      BuildContext context) {
+      BuildContext context,
+      GlobalKey<FormState> formKey) {
     return CustomFilledButton(
-      text: 'Iniciar sesión',
-      buttonColor: Colors.black,
-      onPressed: () async {
-        String email = correo.text;
-        String pass = password.text;
-        bool loginSuccessful = false;
+        text: 'Iniciar sesión',
+        buttonColor: Colors.black,
+        onPressed: () async {
+          // Validate the inputs
+          if (formKey.currentState!.validate()) {
+            {
+              // If the inputs are valid, do the login
+              String email = correo.text;
+              String pass = password.text;
+              bool loginSuccessful = false;
 
-        await db.getConnection().then((conn) async {
-          String sql = 'select Correo, Password from Usuario';
-          await conn.query(sql).then((result) {
-            for (final row in result) {
-              if (email == row[0] && pass == row[1]) {
-                loginSuccessful = true;
-                break;
+              await db.getConnection().then((conn) async {
+                String sql = 'select Correo, Password from Usuario';
+                await conn.query(sql).then((result) {
+                  for (final row in result) {
+                    if (email == row[0] && pass == row[1]) {
+                      loginSuccessful = true;
+                      break;
+                    }
+                  }
+                });
+                await conn.close();
+              });
+
+              if (loginSuccessful) {
+                storage.write(key: 'token', value: email.split("@")[0]);
+                context.go('/home/0');
+              } else {
+                const snackbar =
+                    SnackBar(content: Text('El usuario no existe'));
+                ScaffoldMessenger.of(context).showSnackBar(snackbar);
               }
             }
-          });
-          await conn.close();
+          }
         });
-
-        if (loginSuccessful) {
-          storage.write(key: 'token', value: email);
-          ref.read(tokenProvider.notifier).setToken(email);
-
-          context.go('/home/0');
-        } else {
-          const snackbar = SnackBar(content: Text('El usuario no existe'));
-          ScaffoldMessenger.of(context).showSnackBar(snackbar);
-        }
-      },
-    );
   }
 }

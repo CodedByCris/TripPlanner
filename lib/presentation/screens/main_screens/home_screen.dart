@@ -32,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
     final correo =
         ref.watch(tokenProvider); // Escucha los cambios en el estado del correo
     final hasToken = correo?.isNotEmpty ?? false;
-
+    print(correo);
     const Map<int, Widget> myTabs = <int, Widget>{
       0: Text('VIAJE ACTUAL', style: TextStyle(fontSize: 14)),
       1: Text(
