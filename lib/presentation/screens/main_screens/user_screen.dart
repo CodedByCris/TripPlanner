@@ -45,25 +45,41 @@ class UserScreen extends ConsumerWidget {
       children: [
         const SizedBox(height: 30),
         //* Foto del usuario
-        imagen != ""
-            ? Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colors[selectedColor],
-                    width: 3.0,
-                  ),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    imagen!,
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              )
-            : Icon(Icons.person, size: 100, color: colors[selectedColor]),
+        FutureBuilder<String>(
+          future:
+              Future.value(imagen ?? ''), // convert String? to Future<String>
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator(); // show loading spinner while waiting for image to load
+            } else {
+              if (snapshot.hasError) {
+                return const Icon(Icons
+                    .error); // show error icon if there was an error loading the image
+              } else {
+                return snapshot.data != ""
+                    ? Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: colors[selectedColor],
+                            width: 3.0,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.network(
+                            snapshot.data!,
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      )
+                    : Icon(Icons.person,
+                        size: 100, color: colors[selectedColor]);
+              }
+            }
+          },
+        ),
         const SizedBox(height: 50),
 
         SingleChildScrollView(
