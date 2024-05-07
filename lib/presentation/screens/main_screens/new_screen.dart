@@ -7,6 +7,7 @@ import 'package:trip_planner/presentation/providers/theme_provider.dart';
 import '../../../conf/connectivity.dart';
 import '../../functions/alerts.dart';
 import '../../Database/connections.dart';
+import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 
 class NewScreen extends ConsumerStatefulWidget {
@@ -83,11 +84,11 @@ class NewScreenState extends ConsumerState<NewScreen> {
               ),
               _origen(colors),
               const SizedBox(
-                height: 10.0,
+                height: 20.0,
               ),
               _destino(colors),
               const SizedBox(
-                height: 10.0,
+                height: 20.0,
               ),
               Row(
                 children: [
@@ -95,25 +96,28 @@ class NewScreenState extends ConsumerState<NewScreen> {
                     child: _fechaOrigen(colors, context),
                   ),
                   const SizedBox(
-                    width: 10.0,
+                    width: 20.0,
                   ),
                   Expanded(
                     child: _fechaLlegada(colors, context),
                   ),
                   const SizedBox(
-                    height: 10.0,
+                    height: 20.0,
                   ),
                 ],
               ),
               const SizedBox(
-                height: 10.0,
+                height: 20.0,
               ),
               _precioBilletes(colors),
               const SizedBox(
-                height: 10.0,
+                height: 20.0,
               ),
               _notas(colors),
-              _btnGuardar(colors, context, db),
+              const SizedBox(
+                height: 20.0,
+              ),
+              _btnGuardar(ref, colors, context, db),
             ],
           ),
         ),
@@ -121,7 +125,9 @@ class NewScreenState extends ConsumerState<NewScreen> {
     );
   }
 
-  Widget _btnGuardar(ColorScheme colors, BuildContext context, Mysql db) {
+  Widget _btnGuardar(
+      WidgetRef ref, ColorScheme colors, BuildContext context, Mysql db) {
+    final correo = ref.watch(tokenProvider);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: colors.primary,
@@ -150,7 +156,6 @@ class NewScreenState extends ConsumerState<NewScreen> {
           notasController.clear();
 
           //! Insertar los datos en la base de datos
-
           //Mounted comprueba si el widget sigue en la pantalla
           if (mounted)
           // Show a dialog
@@ -180,7 +185,6 @@ class NewScreenState extends ConsumerState<NewScreen> {
                             //INSERTO LOS DATOS DEL VIAJE
                             'INSERT INTO Viaje(Origen, Destino, FechaSalida, FechaLlegada, NotasViaje, Correo) VALUES (?, ?, ?, ?, ?, ?)';
                         await db.getConnection().then((conn) async {
-                          String? correo = await Mysql().getCorreo();
                           await conn.query(sql, [
                             origen,
                             destino,

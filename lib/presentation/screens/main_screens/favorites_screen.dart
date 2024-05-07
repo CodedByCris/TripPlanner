@@ -24,11 +24,14 @@ class FavoritesScreen extends ConsumerWidget {
         body: ListView.builder(
             itemBuilder: (context, index) {
               return ListTile(
-                title: FavoriteTravelCard(
-                    origen: 'Origen',
-                    destino: 'destino',
-                    fechaSalida: DateTime.now(),
-                    fechaLlegada: DateTime.now()),
+                title: ActualTravelCard(
+                  origen: 'Origen',
+                  destino: 'destino',
+                  fechaSalida: DateTime.now(),
+                  fechaLlegada: DateTime.now(),
+                  gastos: 20,
+                  numRutas: 3,
+                ),
                 onTap: () {
                   //TODO: Implementar la navegación a la pantalla de detalles del viaje favorito
                   print('hola');

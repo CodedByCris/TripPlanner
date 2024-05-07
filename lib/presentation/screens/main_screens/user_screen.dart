@@ -26,7 +26,10 @@ class UserScreen extends ConsumerWidget {
           ),
         ),
         //*Cuerpo de la aplicación
-        body: _userView(ref, context),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: _userView(ref, context),
+        ),
       ),
     );
   }
@@ -34,37 +37,53 @@ class UserScreen extends ConsumerWidget {
   Widget _userView(WidgetRef ref, BuildContext context) {
     final List<Color> colors = ref.watch(colorListProvider);
     final int selectedColor = ref.watch(themeNotifierProvider).selectedColor;
+    final correo = ref.watch(tokenProvider);
+    final nombre = ref.watch(userNameProvider);
+    final imagen = ref.watch(imageProvider);
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 50),
-          //* Foto del usuario
-          const Icon(
-            Icons.person,
-            size: 100,
-          ),
-          const SizedBox(height: 50),
+    return Column(
+      children: [
+        const SizedBox(height: 30),
+        //* Foto del usuario
+        imagen != ""
+            ? Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colors[selectedColor],
+                    width: 3.0,
+                  ),
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    imagen!,
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              )
+            : Icon(Icons.person, size: 100, color: colors[selectedColor]),
+        const SizedBox(height: 50),
 
-          //*LogOut
-          _logOutButton(context, ref),
-
-          const SizedBox(height: 50),
-
-          SizedBox(
+        SingleChildScrollView(
+          child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.5,
             child: ListView(
               children: [
-                _nombre(colors, selectedColor,
-                    'Cris'), //TODO CAMBIAR POR EL NOMBRE Y EL CORREO DEL USUARIO
-                _correo(colors, selectedColor, 'cris@gmail.com'),
+                nombre != null
+                    ? _nombre(colors, selectedColor, nombre)
+                    : _nombre(colors, selectedColor, "INVITADO"),
+                correo != null
+                    ? _correo(colors, selectedColor, correo)
+                    : _correo(colors, selectedColor, "INVITADO@gmail.com"),
                 _colores(colors, selectedColor, ref),
                 _informacion(colors, selectedColor),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -146,6 +165,7 @@ class UserScreen extends ConsumerWidget {
 
   Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
     return ListTile(
+      //TODO: Hacer una consulta a la base de datos para obtener el nombre del usuario con el correo
       leading: Icon(
         Icons.person,
         color: colors[selectedColor],

@@ -43,11 +43,6 @@ final appRouter = GoRouter(
       builder: (context, state) => const RecoverScreen(),
     ),
 
-    // GoRoute(
-    //   path: '/actual_details',
-    //   builder: (context, state) => ActualDetails(),
-    // ),
-
     //* Ruta para las opciones de configuración del usuario
     GoRoute(
       path: '/theme-changer',

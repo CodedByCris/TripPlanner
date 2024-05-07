@@ -100,7 +100,7 @@ class _ActualDetailsState extends State<ActualDetails> {
 // Crea un widget llamado viaje
   Widget viaje() {
     if (resultViaje == null || resultViaje!.isEmpty) {
-      return const Text('No hay datos de los gastos');
+      return const Text('No hay datos del viaje');
     } else {
       List<ResultRow> rows = resultViaje!.toList();
       return ListView.builder(
@@ -143,7 +143,7 @@ class _ActualDetailsState extends State<ActualDetails> {
 // Crea un widget llamado rutas
   Widget rutas() {
     if (resultRuta == null || resultRuta!.isEmpty) {
-      return const Text('No hay datos de los gastos');
+      return const Text('No hay datos de las rutas');
     } else {
       List<ResultRow> rows = resultRuta!.toList();
       return ListView.builder(

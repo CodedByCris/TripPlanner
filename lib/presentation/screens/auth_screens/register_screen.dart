@@ -50,7 +50,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Alerts().registerSuccessfully(context);
         }
         await conn.close();
-        ref.read(tokenProvider.notifier).setToken(correo.text.split("@")[0]);
+        ref.read(tokenProvider.notifier).setToken(correo.text);
         context.go('/home/0');
       } else {
         await conn.close();

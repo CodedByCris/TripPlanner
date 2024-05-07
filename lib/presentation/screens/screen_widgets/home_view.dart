@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/screens/details_screens/actual_details.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
+import 'package:trip_planner/presentation/widgets/travel_cards/actual_travel_card.dart';
 
 import '../../Database/connections.dart';
 import '../../widgets/widgets.dart';
@@ -23,6 +22,7 @@ class _HomeViewState extends State<HomeView> {
   Mysql db = Mysql();
   List<String> origen = [];
   List<String> destino = [];
+  List<int> idViaje = [];
   List<double> precioMin = [];
   List<double> precioMax = [];
   List<DateTime> fechaSalida = [];
@@ -40,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
       correo = correoTemp;
       final db = Mysql();
       final result = await db.getConnection().then((value) => value.query(
-          'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"'));
+          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo"'));
 
       DateTime now = DateTime.now();
       if (result.isEmpty) {
@@ -63,6 +63,7 @@ class _HomeViewState extends State<HomeView> {
             destino.add(row[1]);
             fechaSalida.add(fechaSalidaRow);
             fechaLlegada.add(fechaLlegadaRow);
+            idViaje.add(row[4]);
           });
         }
       }
@@ -93,29 +94,32 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
         Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ActualDetails(
-                    idViaje: 4,
-                    bd: db,
-                  ), //TODO: Cambiar por el id del viaje seleccionado
-                ),
-              );
-            },
-            child: ListView.builder(
-              itemCount: origen.length,
-              itemBuilder: (context, index) {
-                return ActualTravelCard(
+          child: ListView.builder(
+            itemCount: origen.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  print(idViaje[index]);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ActualDetails(
+                        idViaje: idViaje[index],
+                        bd: db,
+                      ),
+                    ),
+                  );
+                },
+                child: ActualTravelCard(
                   origen: origen[index],
                   destino: destino[index],
                   fechaSalida: fechaSalida[index],
                   fechaLlegada: fechaLlegada[index],
-                );
-              },
-            ),
+                  gastos: 20,
+                  numRutas: 3,
+                ),
+              );
+            },
           ),
         ),
       ],

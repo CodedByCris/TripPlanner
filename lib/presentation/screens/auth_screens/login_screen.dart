@@ -197,7 +197,8 @@ class _LoginForm extends ConsumerWidget {
               });
 
               if (loginSuccessful) {
-                storage.write(key: 'token', value: email.split("@")[0]);
+                storage.write(key: 'token', value: email);
+                print('Guardo el token');
                 context.go('/home/0');
               } else {
                 const snackbar =

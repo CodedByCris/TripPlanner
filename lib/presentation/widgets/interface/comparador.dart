@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:trip_planner/presentation/screens/screen_widgets/search_screen.dart';
 
 import '../../Database/connections.dart';
 
@@ -167,6 +169,37 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           );
           print(resultViaje);
           bd!.closeConnection(conn!);
+
+          // Comprueba si la consulta devuelve datos
+          if (resultViaje != null && resultViaje!.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchScreen(
+                  resultViaje: resultViaje!,
+                ),
+              ),
+            );
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('No se encontraron resultados'),
+                  content: const Text(
+                      'No se encontraron viajes con los criterios seleccionados.'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Cerrar'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
         }
       },
       icon: const Icon(Icons.search),
@@ -261,7 +294,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     return TextFormField(
       controller: origenText,
       decoration: InputDecoration(
-        labelText: 'ORIGEN',
+        labelText: '* ORIGEN',
         prefixIcon: Icon(
           Icons.location_on,
           color: colors.primary,
@@ -285,13 +318,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
       DateTime? fechaLlegada,
       double? precioMin,
       double? precioMax}) async {
-    List<dynamic> parameters = [origen];
+    List<dynamic> parameters = [origen.toUpperCase()];
     String query =
-        'SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?';
+        '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
+        LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?''';
 
     if (destino != null) {
       query += ' AND Viaje.Destino = ?';
-      parameters.add(destino);
+      parameters.add(destino.toUpperCase());
     }
 
     if (fechaSalida != null) {

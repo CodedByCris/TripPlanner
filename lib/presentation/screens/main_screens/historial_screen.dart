@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:trip_planner/presentation/providers/token_provider.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
+import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
@@ -28,6 +29,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
   List<String> origen = [];
   List<String> destino = [];
   List<double> precioMin = [];
+  List<int> idViaje = [];
   List<double> precioMax = [];
   List<DateTime> fechaSalida = [];
   List<DateTime> fechaLlegada = [];
@@ -46,7 +48,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       MySqlConnection conn = await db.getConnection();
 
       final result = await conn.query(
-          'SELECT origen, destino, fechaSalida, fechaLlegada FROM Viaje WHERE Correo = "$correo"');
+          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo"');
 
       db.closeConnection(conn);
 
@@ -67,6 +69,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         destino.add(row[1]);
         fechaSalida.add(fechaSalidaRow);
         fechaLlegada.add(fechaLlegadaRow);
+        idViaje.add(row[4]);
       }
     } else {
       print("Correo es nulo");
@@ -80,6 +83,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         final db = Mysql();
         final colors = Theme.of(context).colorScheme;
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+
         return NetworkSensitive(
           child: Scaffold(
             appBar: AppBar(
@@ -110,21 +114,34 @@ class _HistorialScreenState extends State<HistorialScreen> {
                         ),
                       ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => context.push('/historial_details'),
-                    child: ListView.builder(
-                      itemCount: origen.length,
-                      itemBuilder: (context, index) {
-                        return ActualTravelCard(
+                  child: ListView.builder(
+                    itemCount: origen.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          print(idViaje[index]);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ActualDetails(
+                                idViaje: idViaje[index],
+                                bd: db,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ActualTravelCard(
                           origen: origen[index],
                           destino: destino[index],
                           fechaSalida: fechaSalida[index],
                           fechaLlegada: fechaLlegada[index],
-                        );
-                      },
-                    ),
+                          gastos: 20,
+                          numRutas: 3,
+                        ),
+                      );
+                    },
                   ),
-                ),
+                )
               ],
             ),
           ),
