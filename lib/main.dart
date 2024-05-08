@@ -1,10 +1,13 @@
+//import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_planner/conf/theme/app_theme.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 import 'conf/router/app_router.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  //await Firebase.initializeApp();
   runApp(const ProviderScope(child: MainApp()));
 }
 
