@@ -1,6 +1,6 @@
 import 'dart:io';
 
-//import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -102,28 +102,28 @@ class UserScreen extends ConsumerWidget {
     });
   }
 
-  //Future<String> subirImagen(String rutaImagen) async {
-  //try {
-  // Crea una referencia a la ubicación a la que quieres subir en Firebase Storage
-  //firebase_storage.Reference ref =
-  //firebase_storage.FirebaseStorage.instance.ref('/$rutaImagen');
+  Future<String> subirImagen(String rutaImagen) async {
+    try {
+      //Crea una referencia a la ubicación a la que quieres subir en Firebase Storage
+      firebase_storage.Reference ref =
+          firebase_storage.FirebaseStorage.instance.ref('/$rutaImagen');
 
-  // Sube el archivo a Firebase Storage
-  //firebase_storage.UploadTask tareaSubida = ref.putFile(File(rutaImagen));
+      // Sube el archivo a Firebase Storage
+      firebase_storage.UploadTask tareaSubida = ref.putFile(File(rutaImagen));
 
-  // Espera hasta que el archivo se haya subido
-  //await tareaSubida.whenComplete(() => null);
+      // Espera hasta que el archivo se haya subido
+      await tareaSubida.whenComplete(() => null);
 
-  // Obtiene la URL del archivo subido
-  //String urlDescarga = await ref.getDownloadURL();
+      // Obtiene la URL del archivo subido
+      String urlDescarga = await ref.getDownloadURL();
 
-  //return urlDescarga;
-  //} on firebase_storage.FirebaseException catch (e) {
-  // Maneja cualquier error
-  //print(e);
-  //return '';
-  //}
-  //}
+      return urlDescarga;
+    } on firebase_storage.FirebaseException catch (e) {
+      // Maneja cualquier error
+      print(e);
+      return '';
+    }
+  }
 
   Widget _imagen(String? imagen, List<Color> colors, int selectedColor) {
     Mysql db = Mysql();
@@ -131,45 +131,51 @@ class UserScreen extends ConsumerWidget {
     return FutureBuilder<String>(
       future: Future.value(imagen ?? ''), // convert String? to Future<String>
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        Widget widget;
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(); // show loading spinner while waiting for image to load
+          widget =
+              const CircularProgressIndicator(); // show loading spinner while waiting for image to load
+        } else if (snapshot.hasError) {
+          widget = const Icon(Icons
+              .error); // show error icon if there was an error loading the image
         } else {
-          if (snapshot.hasError) {
-            return const Icon(Icons
-                .error); // show error icon if there was an error loading the image
+          if (snapshot.data != "") {
+            print('Image URL: ${snapshot.data}'); // print the image URL
+            widget = Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colors[selectedColor],
+                  width: 3.0,
+                ),
+              ),
+              child: ClipOval(
+                child: snapshot.data!.contains('http')
+                    ? Image.network(
+                        snapshot.data!,
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
+                    : Image(
+                        image: FileImage(File(snapshot.data!)),
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            );
           } else {
-            if (snapshot.data != "") {
-              print('Image URL: ${snapshot.data}'); // print the image URL
-              return Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colors[selectedColor],
-                    width: 3.0,
-                  ),
-                ),
-                child: ClipOval(
-                  child: snapshot.data!.contains('http')
-                      ? Image.network(
-                          snapshot.data!,
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        )
-                      : Image(
-                          image: FileImage(File(snapshot.data!)),
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              );
-            } else {
-              return Icon(Icons.person,
-                  size: 100, color: colors[selectedColor]);
-            }
+            widget =
+                Icon(Icons.person, size: 100, color: colors[selectedColor]);
           }
         }
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            widget,
+          ],
+        );
       },
     );
   }
@@ -188,15 +194,15 @@ class UserScreen extends ConsumerWidget {
           String rutaImagen = pickedFile.path;
 
           // Sube la imagen y obtén la URL
-          //String urlImagen = await subirImagen(rutaImagen);
+          String urlImagen = await subirImagen(rutaImagen);
 
-          //ref.read(imageProvider.notifier).state = urlImagen;
+          ref.read(imageProvider.notifier).state = urlImagen;
 
           // Obtiene el correo electrónico del usuario
           final correo = ref.watch(tokenProvider);
 
           // Actualiza la imagen en la base de datos
-          //updateImage(correo!, urlImagen, context);
+          updateImage(correo!, urlImagen, context);
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<ImageSource>>[
