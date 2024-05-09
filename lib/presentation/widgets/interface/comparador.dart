@@ -311,17 +311,18 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   }
 
   //!Consultas
-  Future<Results> consultas(
-      {required String origen,
-      String? destino,
-      DateTime? fechaSalida,
-      DateTime? fechaLlegada,
-      double? precioMin,
-      double? precioMax}) async {
+  Future<Results> consultas({
+    required String origen,
+    String? destino,
+    DateTime? fechaSalida,
+    DateTime? fechaLlegada,
+    double? precioMin,
+    double? precioMax,
+  }) async {
     List<dynamic> parameters = [origen.toUpperCase()];
     String query =
-        '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
-        LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?''';
+        '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
+    LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?''';
 
     if (destino != null) {
       query += ' AND Viaje.Destino = ?';
@@ -349,6 +350,8 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
       query += ' HAVING SUM(Gastos_del_Viaje.Cantidad) BETWEEN ? AND ?';
       parameters.addAll([precioMin, precioMax]);
     }
+
+    query += ' ORDER BY Viaje.FechaSalida ASC';
 
     print("origen $origen"
         " __  destino $destino"

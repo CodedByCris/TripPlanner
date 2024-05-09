@@ -49,6 +49,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
     fechaLlegadaController.dispose();
     precioBilletesController.dispose();
     notasController.dispose();
+    super.dispose(); // Add this line
   }
 
   @override
@@ -266,9 +267,12 @@ class NewScreenState extends ConsumerState<NewScreen> {
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       validator: (value) {
-        if (value!.isNotEmpty) {
-          double.parse(value) < 0;
-          return 'Por favor ingrese un precio válido';
+        String trimmedValue = value!.trim();
+        if (trimmedValue.isNotEmpty) {
+          var parsedValue = double.tryParse(trimmedValue);
+          if (parsedValue == null || parsedValue < 0.0) {
+            return 'Por favor ingrese un precio válido';
+          }
         }
         return null;
       },

@@ -117,49 +117,58 @@ class _LoginForm extends ConsumerWidget {
             ),
 
             //!Entrar como invitado
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor:
-                      const Color.fromARGB(176, 255, 0, 0), // Fondo blanco
-                  side: const BorderSide(
-                      color: Colors.black, width: 2), // Borde negro
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10), // Bordes redondeados
-                  ),
-                ),
-                child: const Text(
-                  'Entrar como invitado',
-                  style: TextStyle(color: Colors.black), // Texto negro
-                ),
-                onPressed: () async {
-                  context.go('/home/0');
-                },
-              ),
-            ),
+            _invitado(context),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () => context.push('/recover'),
-                    child: const Text('Recuperar contraseña'))
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('¿No tienes cuenta?'),
-                TextButton(
-                    onPressed: () => context.push('/register'),
-                    child: const Text('Crea una aquí'))
-              ],
-            ),
+            _recover(context),
+            register(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Row register(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text('¿No tienes cuenta?'),
+        TextButton(
+            onPressed: () => context.push('/register'),
+            child: const Text('Crea una aquí'))
+      ],
+    );
+  }
+
+  Row _recover(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton(
+            onPressed: () => context.push('/recover'),
+            child: const Text('Recuperar contraseña'))
+      ],
+    );
+  }
+
+  SizedBox _invitado(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(176, 255, 0, 0), // Fondo blanco
+          side: const BorderSide(color: Colors.black, width: 2), // Borde negro
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Bordes redondeados
+          ),
+        ),
+        child: const Text(
+          'Entrar como invitado',
+          style: TextStyle(color: Colors.black), // Texto negro
+        ),
+        onPressed: () async {
+          context.go('/home/0');
+        },
       ),
     );
   }
@@ -168,7 +177,7 @@ class _LoginForm extends ConsumerWidget {
       TextEditingController correo,
       TextEditingController password,
       Mysql db,
-      WidgetRef ref,
+      WidgetRef ref, // Agrega este parámetro
       BuildContext context,
       GlobalKey<FormState> formKey) {
     return CustomFilledButton(
@@ -177,34 +186,48 @@ class _LoginForm extends ConsumerWidget {
         onPressed: () async {
           // Validate the inputs
           if (formKey.currentState!.validate()) {
-            {
-              // If the inputs are valid, do the login
-              String email = correo.text;
-              String pass = password.text;
-              bool loginSuccessful = false;
+            // If the inputs are valid, do the login
+            String email = correo.text;
+            String pass = password.text;
+            bool loginSuccessful = false;
 
-              await db.getConnection().then((conn) async {
-                String sql = 'select Correo, Password from Usuario';
-                await conn.query(sql).then((result) {
-                  for (final row in result) {
-                    if (email == row[0] && pass == row[1]) {
-                      loginSuccessful = true;
-                      break;
+            await db.getConnection().then((conn) async {
+              String sql = 'select Correo, Password from Usuario';
+              await conn.query(sql).then((result) {
+                for (final row in result) {
+                  if (email == row[0] && pass == row[1]) {
+                    loginSuccessful = true;
+                    break;
+                  }
+                }
+              });
+              await conn.close();
+            });
+
+            if (loginSuccessful) {
+              await storage.write(key: 'token', value: email);
+              print('Guardo el token');
+
+              // Verificar el token después de escribirlo
+              getToken().then((token) {
+                if (token != null) {
+                  try {
+                    context.go('/home/0');
+                    // Notify the tokenProvider of the change
+                    ref.read(tokenProvider.notifier).setToken(
+                        token); // Usa ref.read en lugar de context.read
+                  } catch (e) {
+                    if (e is NoSuchMethodError) {
+                      // El widget ha sido desmontado, no hacer nada
+                    } else {
+                      rethrow;
                     }
                   }
-                });
-                await conn.close();
+                }
               });
-
-              if (loginSuccessful) {
-                storage.write(key: 'token', value: email);
-                print('Guardo el token');
-                context.go('/home/0');
-              } else {
-                const snackbar =
-                    SnackBar(content: Text('El usuario no existe'));
-                ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              }
+            } else {
+              const snackbar = SnackBar(content: Text('El usuario no existe'));
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
             }
           }
         });

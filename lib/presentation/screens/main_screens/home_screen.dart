@@ -22,6 +22,11 @@ class TabIndex extends StateNotifier<int> {
 final tabIndexProvider =
     StateNotifierProvider<TabIndex, int>((ref) => TabIndex());
 
+final tokenChangeProvider = Provider<bool>((ref) {
+  correo = ref.watch(tokenProvider);
+  return correo?.isNotEmpty ?? false;
+});
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -29,10 +34,9 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.read(themeNotifierProvider).isDarkMode;
-    final correo =
-        ref.watch(tokenProvider); // Escucha los cambios en el estado del correo
-    final hasToken = correo?.isNotEmpty ?? false;
+    final hasToken = ref.watch(tokenChangeProvider);
     print(correo);
+    print(hasToken);
     const Map<int, Widget> myTabs = <int, Widget>{
       0: Text('VIAJE ACTUAL', style: TextStyle(fontSize: 14)),
       1: Text(

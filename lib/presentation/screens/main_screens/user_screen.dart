@@ -89,42 +89,6 @@ class UserScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> updateImage(String email, String imageUrl, context) async {
-    Mysql db = Mysql();
-
-    await db.getConnection().then((conn) async {
-      await conn.query(
-        "UPDATE Usuario SET Imagen = ? WHERE Correo = ?",
-        [imageUrl, email],
-      );
-      await conn.close();
-      Alerts().recoverySuccessfully(context); //TODO: CAMBIAR EL MENSAJE
-    });
-  }
-
-  Future<String> subirImagen(String rutaImagen) async {
-    try {
-      //Crea una referencia a la ubicación a la que quieres subir en Firebase Storage
-      firebase_storage.Reference ref =
-          firebase_storage.FirebaseStorage.instance.ref('/$rutaImagen');
-
-      // Sube el archivo a Firebase Storage
-      firebase_storage.UploadTask tareaSubida = ref.putFile(File(rutaImagen));
-
-      // Espera hasta que el archivo se haya subido
-      await tareaSubida.whenComplete(() => null);
-
-      // Obtiene la URL del archivo subido
-      String urlDescarga = await ref.getDownloadURL();
-
-      return urlDescarga;
-    } on firebase_storage.FirebaseException catch (e) {
-      // Maneja cualquier error
-      print(e);
-      return '';
-    }
-  }
-
   Widget _imagen(String? imagen, List<Color> colors, int selectedColor) {
     Mysql db = Mysql();
 
@@ -178,6 +142,42 @@ class UserScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  Future<void> updateImage(String email, String imageUrl, context) async {
+    Mysql db = Mysql();
+
+    await db.getConnection().then((conn) async {
+      await conn.query(
+        "UPDATE Usuario SET Imagen = ? WHERE Correo = ?",
+        [imageUrl, email],
+      );
+      await conn.close();
+      Alerts().recoverySuccessfully(context); //TODO: CAMBIAR EL MENSAJE
+    });
+  }
+
+  Future<String> subirImagen(String rutaImagen) async {
+    try {
+      //Crea una referencia a la ubicación a la que quieres subir en Firebase Storage
+      firebase_storage.Reference ref =
+          firebase_storage.FirebaseStorage.instance.ref('/$rutaImagen');
+
+      // Sube el archivo a Firebase Storage
+      firebase_storage.UploadTask tareaSubida = ref.putFile(File(rutaImagen));
+
+      // Espera hasta que el archivo se haya subido
+      await tareaSubida.whenComplete(() => null);
+
+      // Obtiene la URL del archivo subido
+      String urlDescarga = await ref.getDownloadURL();
+
+      return urlDescarga;
+    } on firebase_storage.FirebaseException catch (e) {
+      // Maneja cualquier error
+      print(e);
+      return '';
+    }
   }
 
   Widget _logoCamara(WidgetRef ref, String correo, context) {

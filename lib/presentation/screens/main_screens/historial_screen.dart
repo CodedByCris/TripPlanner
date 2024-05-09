@@ -48,7 +48,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       MySqlConnection conn = await db.getConnection();
 
       final result = await conn.query(
-          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo"');
+          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" AND FechaLlegada < CURDATE()');
 
       db.closeConnection(conn);
 

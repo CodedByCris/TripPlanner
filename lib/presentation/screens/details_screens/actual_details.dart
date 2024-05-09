@@ -74,19 +74,23 @@ class _ActualDetailsState extends State<ActualDetails> {
               padding: const EdgeInsets.all(8.0),
               child: ListView(
                 children: [
+                  const SizedBox(height: 20),
                   const Text('Datos del viaje:',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
                   viaje(),
-                  const Divider(),
+                  const Divider(height: 40),
                   const Text('Rutas:',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
                   rutas(),
-                  const Divider(),
+                  const Divider(height: 40),
                   const Text('Gastos:',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
                   gastos(),
                 ],
               ),

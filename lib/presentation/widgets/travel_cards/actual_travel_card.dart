@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
 
 class ActualTravelCard extends StatefulWidget {
   final String origen;
@@ -30,17 +29,17 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
       children: [
         const SizedBox(height: 10),
         SizedBox(
-          height: 120,
+          height: 180,
           width: double.infinity,
           child: Card(
-            elevation: 5,
+            elevation: 3,
             margin:
                 const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
