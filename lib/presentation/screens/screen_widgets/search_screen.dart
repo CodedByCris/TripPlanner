@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/widgets/travel_cards/search_card.dart';
-import 'package:intl/intl.dart';
+
+import '../../functions/mes_mapa.dart';
 
 class SearchScreen extends StatefulWidget {
   final Results resultViaje;
@@ -12,33 +13,22 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late Map<String, List<ResultRow>> groupedData;
+  Map<String, List<ResultRow>> groupedData = {};
 
   @override
   void initState() {
     super.initState();
-    groupedData = _groupDataByMonth(widget.resultViaje);
-  }
-
-  Map<String, List<ResultRow>> _groupDataByMonth(Results results) {
-    final Map<String, List<ResultRow>> map = {};
-    for (var row in results) {
-      final date = row['FechaSalida'] as DateTime;
-      final month = DateFormat('MMMM', 'es_ES').format(date);
-      if (map[month] == null) {
-        map[month] = [];
-      }
-      map[month]!.add(row);
-    }
-    return map;
+    groupDataByMonth(widget.resultViaje).then((grouped) {
+      setState(() {
+        groupedData = grouped;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resultados de la consulta'),
-      ),
+      appBar: AppBar(),
       body: ListView.builder(
         itemCount: groupedData.length,
         itemBuilder: (context, index) {

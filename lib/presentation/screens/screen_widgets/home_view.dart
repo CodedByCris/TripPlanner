@@ -6,6 +6,9 @@ import 'package:trip_planner/presentation/widgets/travel_cards/actual_travel_car
 
 import '../../Database/connections.dart';
 import '../../widgets/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:mysql1/mysql1.dart';
 
 bool hayDatos = false;
 
@@ -20,13 +23,7 @@ class _HomeViewState extends State<HomeView> {
   //*Variables de la búsqueda de datos
 
   Mysql db = Mysql();
-  List<String> origen = [];
-  List<String> destino = [];
-  List<int> idViaje = [];
-  List<double> precioMin = [];
-  List<double> precioMax = [];
-  List<DateTime> fechaSalida = [];
-  List<DateTime> fechaLlegada = [];
+  Map<String, List<Map<String, dynamic>>> groupedData = {};
 
   @override
   void initState() {
@@ -40,8 +37,7 @@ class _HomeViewState extends State<HomeView> {
       correo = correoTemp;
       final db = Mysql();
       final result = await db.getConnection().then((value) => value.query(
-          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo"'));
-
+          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" ORDER BY FechaSalida ASC'));
       DateTime now = DateTime.now();
       if (result.isEmpty) {
         setState(() {
@@ -52,19 +48,27 @@ class _HomeViewState extends State<HomeView> {
           hayDatos = true;
         });
       }
-      for (final row in result) {
-        DateTime fechaSalidaRow = row[2];
-        DateTime fechaLlegadaRow = row[3];
+      final groupedResults = await groupDataByMonth(result);
+      for (final month in groupedResults.keys) {
+        for (final row in groupedResults[month]!) {
+          DateTime fechaSalidaRow = row['FechaSalida'];
+          DateTime fechaLlegadaRow = row['FechaLlegada'];
 
-        if ((now.isAfter(fechaSalidaRow) && now.isBefore(fechaLlegadaRow)) ||
-            now.isBefore(fechaSalidaRow)) {
-          setState(() {
-            origen.add(row[0]);
-            destino.add(row[1]);
-            fechaSalida.add(fechaSalidaRow);
-            fechaLlegada.add(fechaLlegadaRow);
-            idViaje.add(row[4]);
-          });
+          if ((now.isAfter(fechaSalidaRow) && now.isBefore(fechaLlegadaRow)) ||
+              now.isBefore(fechaSalidaRow)) {
+            setState(() {
+              if (!groupedData.containsKey(month)) {
+                groupedData[month] = [];
+              }
+              groupedData[month]!.add({
+                'origen': row['Origen'],
+                'destino': row['Destino'],
+                'fechaSalida': fechaSalidaRow,
+                'fechaLlegada': fechaLlegadaRow,
+                'idViaje': row['IdViaje'],
+              });
+            });
+          }
         }
       }
     } else {
@@ -72,10 +76,25 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  Future<Map<String, List<ResultRow>>> groupDataByMonth(Results results) async {
+    await initializeDateFormatting('es_ES', null);
+    final Map<String, List<ResultRow>> map = {};
+    for (var row in results) {
+      final date = row['FechaSalida'] as DateTime;
+      final month = DateFormat('MMMM', 'es_ES').format(date).toUpperCase();
+      if (map[month] == null) {
+        map[month] = [];
+      }
+      map[month]!.add(row);
+    }
+    return map;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 20),
         hayDatos
             ? const Text(
                 'Pulsa para modificar los datos del viaje',
@@ -93,31 +112,48 @@ class _HomeViewState extends State<HomeView> {
                   color: Color.fromARGB(255, 9, 61, 104),
                 ),
               ),
+        const SizedBox(height: 20),
         Expanded(
           child: ListView.builder(
-            itemCount: origen.length,
+            itemCount: groupedData.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  print(idViaje[index]);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ActualDetails(
-                        idViaje: idViaje[index],
-                        bd: db,
-                      ),
+              final month = groupedData.keys.elementAt(index);
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      month,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  );
-                },
-                child: ActualTravelCard(
-                  origen: origen[index],
-                  destino: destino[index],
-                  fechaSalida: fechaSalida[index],
-                  fechaLlegada: fechaLlegada[index],
-                  gastos: 20,
-                  numRutas: 3,
-                ),
+                  ),
+                  ...groupedData[month]!.map((viaje) {
+                    return GestureDetector(
+                      onTap: () {
+                        print(viaje['idViaje']);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActualDetails(
+                              idViaje: viaje['idViaje'],
+                              bd: db,
+                            ),
+                          ),
+                        );
+                      },
+                      child: ActualTravelCard(
+                        origen: viaje['origen'],
+                        destino: viaje['destino'],
+                        fechaSalida: viaje['fechaSalida'],
+                        fechaLlegada: viaje['fechaLlegada'],
+                        gastos: 20,
+                        numRutas: 3,
+                      ),
+                    );
+                  }),
+                ],
               );
             },
           ),

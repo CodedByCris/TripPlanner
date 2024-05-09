@@ -49,10 +49,15 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
                         children: [
                           const Icon(Icons.flight_takeoff),
                           const SizedBox(width: 10),
-                          Text(
-                            '${widget.origen} - ${widget.destino}',
-                            style: const TextStyle(
-                              fontSize: 16,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width *
+                                0.4, // Define your desired width here
+                            child: Text(
+                              '${widget.origen} - ${widget.destino}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -65,7 +70,7 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
                           Text(
                             "${widget.numRutas.toString()} Rutas",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -83,7 +88,7 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
                           Text(
                             '${widget.fechaSalida.toString().split(' ')[0]} - ${widget.fechaLlegada.toString().split(' ')[0]}',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -96,7 +101,7 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
                           Text(
                             "${widget.gastos.toString()} €",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
