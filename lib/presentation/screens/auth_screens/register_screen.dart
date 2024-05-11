@@ -8,24 +8,24 @@ import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
-import '../screens.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  RegisterScreen({super.key});
+
+  final formKey = GlobalKey<FormState>();
+  final correo = TextEditingController();
+  final nombre = TextEditingController();
+  final password = TextEditingController();
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final formKey = GlobalKey<FormState>();
-  final correo = TextEditingController();
-  final nombre = TextEditingController();
-  final password = TextEditingController();
   final db = Mysql();
 
   Future<void> registerUser() async {
-    if (!formKey.currentState!.validate()) {
+    if (!widget.formKey.currentState!.validate()) {
       return;
     }
 
@@ -34,7 +34,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       String sql = 'select Correo from Usuario';
       await conn.query(sql).then((result) {
         for (final row in result) {
-          if (correo.text == row[0]) {
+          if (widget.correo.text == row[0]) {
             loginSuccessful = false;
             break;
           }
@@ -42,15 +42,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       });
 
       if (loginSuccessful) {
+        print('Cuenta creada correctamente');
         await conn.query(
             'INSERT INTO Usuario(NombreUsuario, Correo, Password) VALUES (?, ?, ?)',
-            [nombre.text, correo.text, password.text]);
+            [widget.nombre.text, widget.correo.text, widget.password.text]);
         if (mounted) {
           // Check if the widget is still in the tree
           Alerts().registerSuccessfully(context);
         }
         await conn.close();
-        ref.read(tokenProvider.notifier).setToken(correo.text);
+        ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
       } else {
         await conn.close();
@@ -64,15 +65,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyles = Theme.of(context).textTheme;
-
     return NetworkSensitive(
       child: Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 100),
-              const _RegisterForm(),
+              _RegisterForm(widget.formKey, widget.nombre, widget.correo,
+                  widget.password),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -102,16 +102,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 }
 
 class _RegisterForm extends ConsumerWidget {
-  const _RegisterForm();
+  final GlobalKey<FormState> formKey;
+  final TextEditingController nombre;
+  final TextEditingController correo;
+  final TextEditingController password;
+
+  const _RegisterForm(this.formKey, this.nombre, this.correo, this.password);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final correo = TextEditingController();
-    final nombre = TextEditingController();
-    final password = TextEditingController();
     final textStyles = Theme.of(context).textTheme;
-
-    final formKey = GlobalKey<FormState>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
