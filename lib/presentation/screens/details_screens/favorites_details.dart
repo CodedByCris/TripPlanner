@@ -16,6 +16,7 @@ class FavoriteDetails extends StatefulWidget {
 }
 
 class _FavoriteDetailsState extends State<FavoriteDetails> {
+  String? miCorreo;
   Mysql bd = Mysql();
   Results? resultViaje;
   Results? resultRuta;
@@ -34,6 +35,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   Future<void> setupConnection() async {
     conn = await bd.getConnection();
+    miCorreo = await bd.getCorreo();
   }
 
   Future<void> checkFavorite() async {
@@ -62,7 +64,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   Future<void> addToFavorites() async {
     await conn!.query(
-        'INSERT INTO Favoritos (Correo, IdViaje) VALUES ("${widget.correo}", ${widget.idViaje})');
+        'INSERT INTO Favoritos (Correo, IdViaje) VALUES ("${miCorreo!}", ${widget.idViaje})');
     setState(() {
       isFavorite = true;
     });
@@ -70,7 +72,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   Future<void> removeFromFavorites() async {
     await conn!.query(
-        'DELETE FROM Favoritos WHERE Correo = "${widget.correo}" AND IdViaje = ${widget.idViaje}');
+        'DELETE FROM Favoritos WHERE Correo = "${miCorreo!}" AND IdViaje = ${widget.idViaje}');
     setState(() {
       isFavorite = false;
     });

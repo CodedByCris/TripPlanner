@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:trip_planner/presentation/screens/details_screens/favorites_details.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
-import 'package:trip_planner/presentation/widgets/travel_cards/search_card.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
@@ -76,47 +76,62 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ),
             ),
             body: hayDatoss
-                ? ListView.builder(
-                    itemCount: groupedData.length,
-                    itemBuilder: (context, index) {
-                      final month = groupedData.keys.elementAt(index);
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              month,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          ...groupedData[month]!.map((viaje) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ActualDetails(
-                                      idViaje: viaje['IdViaje'],
-                                    ),
+                ? Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "Pulsa para ver todos los datos del viaje",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: groupedData.length,
+                          itemBuilder: (context, index) {
+                            final month = groupedData.keys.elementAt(index);
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    month,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                );
-                              },
-                              child: SearchCard(
-                                correoUsuario: viaje['Correo'],
-                                origen: viaje['Origen'],
-                                destino: viaje['Destino'],
-                                fechaSalida: viaje['FechaSalida'],
-                                fechaLlegada: viaje['FechaLlegada'],
-                                gastos: 20,
-                                numRutas: 3,
-                              ),
+                                ),
+                                ...groupedData[month]!.map((viaje) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FavoriteDetails(
+                                            idViaje: viaje['IdViaje'],
+                                            correo: viaje['Correo'],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: ActualTravelCard(
+                                      origen: viaje['Origen'],
+                                      destino: viaje['Destino'],
+                                      fechaSalida: viaje['FechaSalida'],
+                                      fechaLlegada: viaje['FechaLlegada'],
+                                      gastos: 20,
+                                      numRutas: 3,
+                                    ),
+                                  );
+                                }),
+                              ],
                             );
-                          }),
-                        ],
-                      );
-                    },
+                          },
+                        ),
+                      ),
+                    ],
                   )
                 : const Center(
                     child: Text(

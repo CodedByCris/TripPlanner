@@ -321,7 +321,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   }) async {
     List<dynamic> parameters = [origen.toUpperCase()];
     String query =
-        '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
+        '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
     LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?''';
 
     if (destino != null) {

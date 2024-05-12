@@ -28,8 +28,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return AppBar(
       title: Text(
         widget.titulo,
-        style:
-            TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
+        style: TextStyle(
+            color: widget.isDarkMode ? Colors.white : Colors.black,
+            fontSize: 20),
       ),
       centerTitle: true,
       //* Modo nocturno

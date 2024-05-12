@@ -11,6 +11,7 @@ class SearchCard extends StatefulWidget {
   final double gastos;
   final int numRutas;
   final String correoUsuario;
+  final Map<String, dynamic> userData;
 
   const SearchCard({
     super.key,
@@ -21,6 +22,7 @@ class SearchCard extends StatefulWidget {
     required this.gastos,
     required this.numRutas,
     required this.correoUsuario,
+    required this.userData,
   });
 
   @override
@@ -35,6 +37,8 @@ class _SearchCardState extends State<SearchCard> {
   void initState() {
     super.initState();
     fetchUsuarioData();
+    nombreUsuario = widget.userData['NombreUsuario'] ?? "";
+    imagenUsuario = widget.userData['Imagen'] ?? "";
   }
 
   Future<void> fetchUsuarioData() async {
