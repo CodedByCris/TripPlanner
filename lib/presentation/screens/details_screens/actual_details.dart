@@ -84,15 +84,37 @@ class _ActualDetailsState extends State<ActualDetails> {
                   const SizedBox(height: 10),
                   viaje(resultViaje),
                   const Divider(height: 40),
-                  const Text('Rutas:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Rutas:',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          // Aquí va el código para agregar una ruta a la base de datos
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   rutas(resultRuta),
                   const Divider(height: 40),
-                  const Text('Gastos:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Gastos:',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          // Aquí va el código para agregar un gasto a la base de datos
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   gastos(resultGastos),
                 ],

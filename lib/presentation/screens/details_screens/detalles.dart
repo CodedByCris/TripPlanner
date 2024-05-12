@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
-import 'package:trip_planner/presentation/Database/connections.dart';
 
 Widget viaje(resultViaje) {
   if (resultViaje == null || resultViaje!.isEmpty) {
@@ -12,18 +11,39 @@ Widget viaje(resultViaje) {
       itemCount: rows.length,
       itemBuilder: (context, index) {
         ResultRow row = rows[index];
-        return Card(
-          elevation: 3,
-          margin: const EdgeInsets.all(10),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
+        return GestureDetector(
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('¿Qué quieres hacer?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Cancelar'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Modificar'),
+                      onPressed: () {
+                        // Aquí va el código para modificar el viaje
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: Card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '${row['Origen']} - ${row['Destino']}',
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 20),
+                      fontWeight: FontWeight.bold, fontSize: 19),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -55,17 +75,27 @@ Widget rutas(resultRuta) {
       itemCount: rows.length,
       itemBuilder: (context, index) {
         ResultRow row = rows[index];
-        return Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text('${row['Ubicacion']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 10),
-              Text('Notas: ${row['NotasRuta']}'),
-            ],
+        return GestureDetector(
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return _dialog(context);
+              },
+            );
+          },
+          child: Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text('${row['Ubicacion']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 10),
+                Text('Notas: ${row['NotasRuta']}'),
+              ],
+            ),
           ),
         );
       },
@@ -84,24 +114,58 @@ Widget gastos(resultGastos) {
       itemCount: rows.length,
       itemBuilder: (context, index) {
         ResultRow row = rows[index];
-        return Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                  child: Text(
-                '${row['Descripción']}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
-              const SizedBox(height: 10),
-              Text('Cantidad: ${row['Cantidad']}'),
-              row['FechaGasto'] == null
-                  ? const Text('Fecha: No hay fecha')
-                  : Text('Fecha: ${row['FechaGasto']}'),
-            ],
+        return GestureDetector(
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return _dialog(context);
+              },
+            );
+          },
+          child: Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text('${row['Concepto']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 10),
+                Text('Importe: ${row['Importe']}'),
+                Text('Fecha: ${row['Fecha']}'),
+                Text('Notas: ${row['NotasGasto']}'),
+              ],
+            ),
           ),
         );
       },
     );
   }
+}
+
+Widget _dialog(BuildContext context) {
+  return AlertDialog(
+    title: const Text('¿Qué quieres hacer?'),
+    actions: <Widget>[
+      TextButton(
+        child: const Text('Cancelar'),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      TextButton(
+        child: const Text('Modificar'),
+        onPressed: () {
+          // Aquí va el código para modificar la ruta
+        },
+      ),
+      TextButton(
+        child: const Text('Eliminar'),
+        onPressed: () {
+          // Aquí va el código para eliminar la ruta
+        },
+      ),
+    ],
+  );
 }
