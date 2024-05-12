@@ -95,7 +95,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => ActualDetails(
                                       idViaje: viaje['IdViaje'],
-                                      bd: db,
                                     ),
                                   ),
                                 );

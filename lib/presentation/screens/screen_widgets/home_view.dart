@@ -138,7 +138,6 @@ class _HomeViewState extends State<HomeView> {
                           MaterialPageRoute(
                             builder: (context) => ActualDetails(
                               idViaje: viaje['idViaje'],
-                              bd: db,
                             ),
                           ),
                         );

@@ -99,7 +99,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => ActualDetails(
                                       idViaje: viaje['IdViaje'],
-                                      bd: db,
                                     ),
                                   ),
                                 );

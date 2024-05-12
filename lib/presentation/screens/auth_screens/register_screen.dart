@@ -73,14 +73,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               const SizedBox(height: 100),
               _RegisterForm(widget.formKey, widget.nombre, widget.correo,
                   widget.password),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: CustomFilledButton(
-                  text: 'Crear cuenta',
-                  buttonColor: Colors.black,
-                  onPressed: registerUser,
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: CustomFilledButton(
+                    text: 'Crear cuenta',
+                    buttonColor: Colors.black,
+                    onPressed: registerUser,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
