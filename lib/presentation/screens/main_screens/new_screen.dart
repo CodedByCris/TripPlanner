@@ -216,7 +216,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
                           }
 
                           Alerts().registerSuccessfully(context);
-                          await conn.close();
+                          db.closeConnection(conn);
                         });
                         Navigator.of(context).pop();
                         GoRouter.of(context).go('/home/0');

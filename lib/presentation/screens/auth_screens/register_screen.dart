@@ -50,11 +50,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           // Check if the widget is still in the tree
           Alerts().registerSuccessfully(context);
         }
-        await conn.close();
+        db.closeConnection(conn);
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
       } else {
-        await conn.close();
+        db.closeConnection(conn);
         if (mounted) {
           // Check if the widget is still in the tree
           Errors().emailExist(context);

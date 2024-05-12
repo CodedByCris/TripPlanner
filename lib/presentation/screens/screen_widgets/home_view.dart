@@ -36,8 +36,9 @@ class _HomeViewState extends State<HomeView> {
     if (correoTemp != null) {
       correo = correoTemp;
       final db = Mysql();
-      final result = await db.getConnection().then((value) => value.query(
-          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" ORDER BY FechaSalida ASC'));
+      var conn = await db.getConnection();
+      final result = await conn.query(
+          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" ORDER BY FechaSalida ASC');
       DateTime now = DateTime.now();
       if (result.isEmpty) {
         setState(() {
@@ -71,6 +72,7 @@ class _HomeViewState extends State<HomeView> {
           }
         }
       }
+      db.closeConnection(conn);
     } else {
       print("Correo es nulo");
     }

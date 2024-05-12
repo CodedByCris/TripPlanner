@@ -201,7 +201,7 @@ class _LoginForm extends ConsumerWidget {
                   }
                 }
               });
-              await conn.close();
+              db.closeConnection(conn);
             });
 
             if (loginSuccessful) {

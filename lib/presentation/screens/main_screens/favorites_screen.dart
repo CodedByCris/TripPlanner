@@ -105,6 +105,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 ),
                                 ...groupedData[month]!.map((viaje) {
                                   return GestureDetector(
+                                    onLongPress: () async {
+                                      final conn = await db.getConnection();
+                                      await conn.query(
+                                          'DELETE FROM Favoritos WHERE Correo = ? AND IdViaje = ?',
+                                          [correo, viaje['IdViaje']]);
+                                      db.closeConnection(conn);
+                                    },
                                     onTap: () {
                                       Navigator.push(
                                         context,

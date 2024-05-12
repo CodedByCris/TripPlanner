@@ -32,8 +32,7 @@ class UserNameNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      await conn.close();
-
+      db.closeConnection(conn);
       print("Nombre del provider -> $userName");
       state = userName;
     });
@@ -60,7 +59,7 @@ class ImageNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      await conn.close();
+      db.closeConnection(conn);
 
       print("Imagen del provider -> $imagen");
       state = imagen;

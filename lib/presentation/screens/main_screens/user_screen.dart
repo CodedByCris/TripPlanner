@@ -73,8 +73,8 @@ class UserScreen extends ConsumerWidget {
             height: MediaQuery.of(context).size.height * 0.5,
             child: ListView(
               children: [
-                correo != null
-                    ? _nombre(colors, selectedColor, nombre!)
+                correo != null && nombre != null
+                    ? _nombre(colors, selectedColor, nombre)
                     : _nombre(colors, selectedColor, "INVITADO"),
                 correo != null
                     ? _correo(colors, selectedColor, correo)

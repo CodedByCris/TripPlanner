@@ -166,11 +166,11 @@ class _RecoverForm extends ConsumerWidget {
                   "UPDATE Usuario SET Password = ? WHERE Correo = ?",
                   [pass, email],
                 );
-                await conn.close();
+                db.closeConnection(conn);
                 Alerts().recoverySuccessfully(context);
                 context.go('/login');
               } else {
-                await conn.close();
+                db.closeConnection(conn);
                 Errors().emailDontExist(context);
               }
             });
