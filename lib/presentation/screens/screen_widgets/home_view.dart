@@ -20,7 +20,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  //*Variables de la búsqueda de datos
+  //Variables de la búsqueda de datos
 
   Mysql db = Mysql();
   Map<String, List<Map<String, dynamic>>> groupedData = {};
