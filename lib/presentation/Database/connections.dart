@@ -25,7 +25,6 @@ class ConnectionPool {
   }
 
   void releaseConnection(MySqlConnection conn) {
-    conn.close();
     _connectionQueue.add(conn);
   }
 }
