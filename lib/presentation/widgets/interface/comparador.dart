@@ -17,7 +17,7 @@ class ComparadorWidget extends StatefulWidget {
 class _ComparadorWidgetState extends State<ComparadorWidget> {
   Results? resultViaje;
   MySqlConnection? conn;
-  Mysql? bd;
+  DatabaseHelper? bd;
   GlobalKey<FormState>? formKey;
   TextEditingController? origenText;
   TextEditingController? destinoText;
@@ -155,7 +155,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           String fechaLlegada = fechaLlegadaText!.text;
 
           // Conecta a la base de datos
-          bd = Mysql();
+          bd = DatabaseHelper();
           conn = await bd!.getConnection();
           resultViaje = await consultas(
             origen: origen,
@@ -168,7 +168,6 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
             precioMax: precioMax.isNotEmpty ? double.parse(precioMax) : null,
           );
           print(resultViaje);
-          bd!.closeConnection(conn!);
 
           // Comprueba si la consulta devuelve datos
           if (resultViaje != null && resultViaje!.isNotEmpty) {

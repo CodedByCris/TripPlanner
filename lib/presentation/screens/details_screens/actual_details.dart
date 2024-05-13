@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
+import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
+import 'package:trip_planner/presentation/screens/screen_widgets/add_ruta.dart';
 
+import '../../../conf/router/app_router.dart';
 import 'detalles.dart';
 
 class ActualDetails extends StatefulWidget {
@@ -14,7 +17,7 @@ class ActualDetails extends StatefulWidget {
 }
 
 class _ActualDetailsState extends State<ActualDetails> {
-  Mysql bd = Mysql();
+  DatabaseHelper bd = DatabaseHelper();
   Results? resultViaje;
   Results? resultRuta;
   Results? resultGastos;
@@ -34,7 +37,6 @@ class _ActualDetailsState extends State<ActualDetails> {
 
   @override
   void dispose() {
-    bd.closeConnection(conn!);
     super.dispose();
   }
 
@@ -45,7 +47,7 @@ class _ActualDetailsState extends State<ActualDetails> {
     resultViaje = await conn!.query(
         'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
     resultRuta = await conn!.query(
-        'SELECT Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje}');
+        'SELECT Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden DESC');
     resultGastos = await conn!.query(
         'SELECT Descripción, Cantidad, FechaGasto FROM Gastos_del_Viaje WHERE idViaje = ${widget.idViaje}');
 
@@ -93,7 +95,14 @@ class _ActualDetailsState extends State<ActualDetails> {
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          // Aquí va el código para agregar una ruta a la base de datos
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddRuta(
+                                idViaje: widget.idViaje,
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -110,7 +119,14 @@ class _ActualDetailsState extends State<ActualDetails> {
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          // Aquí va el código para agregar un gasto a la base de datos
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddGasto(
+                                idViaje: widget.idViaje,
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],

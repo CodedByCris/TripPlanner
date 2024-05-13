@@ -19,7 +19,7 @@ class HistorialScreen extends StatefulWidget {
 }
 
 class _HistorialScreenState extends State<HistorialScreen> {
-  final db = Mysql();
+  final db = DatabaseHelper();
   Map<String, List<ResultRow>> groupedData = {};
 
   @override
@@ -29,14 +29,13 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   Future<void> fetchData() async {
-    String? correoTemp = await Mysql().getCorreo();
+    String? correoTemp = await DatabaseHelper().getCorreo();
     if (correoTemp != null) {
       correo = correoTemp;
       MySqlConnection conn = await db.getConnection();
 
       final result = await conn.query(
           'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" AND FechaLlegada < CURDATE() ORDER BY FechaSalida ASC');
-      db.closeConnection(conn);
 
       if (result.isEmpty) {
         setState(() {

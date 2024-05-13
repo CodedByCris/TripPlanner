@@ -59,7 +59,7 @@ class _LoginForm extends ConsumerWidget {
     final correo = TextEditingController();
     final password = TextEditingController();
     final textStyles = Theme.of(context).textTheme;
-    final db = Mysql();
+    final db = DatabaseHelper();
     final formKey = GlobalKey<FormState>(); // Agrega esta línea
 
     getToken().then((token) {
@@ -176,7 +176,7 @@ class _LoginForm extends ConsumerWidget {
   Widget _btnIniciar(
       TextEditingController correo,
       TextEditingController password,
-      Mysql db,
+      DatabaseHelper db,
       WidgetRef ref, // Agrega este parámetro
       BuildContext context,
       GlobalKey<FormState> formKey) {
@@ -201,7 +201,6 @@ class _LoginForm extends ConsumerWidget {
                   }
                 }
               });
-              db.closeConnection(conn);
             });
 
             if (loginSuccessful) {

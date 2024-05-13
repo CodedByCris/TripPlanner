@@ -17,7 +17,7 @@ class FavoriteDetails extends StatefulWidget {
 
 class _FavoriteDetailsState extends State<FavoriteDetails> {
   String? miCorreo;
-  Mysql bd = Mysql();
+  DatabaseHelper bd = DatabaseHelper();
   Results? resultViaje;
   Results? resultRuta;
   Results? resultGastos;
@@ -48,7 +48,6 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   @override
   void dispose() {
-    bd.closeConnection(conn!);
     super.dispose();
   }
 

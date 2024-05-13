@@ -22,7 +22,7 @@ class UserNameNotifier extends StateNotifier<String?> {
     String userName = "";
     final correo = await getToken();
     print("Correo del provider -> $correo");
-    Mysql db = Mysql();
+    DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
       String sql = 'select NombreUsuario from Usuario Where Correo="$correo"';
@@ -32,7 +32,6 @@ class UserNameNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      db.closeConnection(conn);
       print("Nombre del provider -> $userName");
       state = userName;
     });
@@ -49,7 +48,7 @@ class ImageNotifier extends StateNotifier<String?> {
     String? imagen;
     final correo = await getToken();
     print("Correo del provider -> $correo");
-    Mysql db = Mysql();
+    DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
       String sql = 'select Imagen from Usuario Where Correo="$correo"';
@@ -59,7 +58,6 @@ class ImageNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      db.closeConnection(conn);
 
       print("Imagen del provider -> $imagen");
       state = imagen;

@@ -52,7 +52,7 @@ class _RecoverForm extends ConsumerWidget {
     final correo = TextEditingController();
     final password = TextEditingController();
     final repeatPassword = TextEditingController();
-    final db = Mysql();
+    final db = DatabaseHelper();
     final formKey = GlobalKey<FormState>(); // Agrega esta línea
 
     final textStyles = Theme.of(context).textTheme;
@@ -130,7 +130,7 @@ class _RecoverForm extends ConsumerWidget {
       TextEditingController correo,
       TextEditingController password,
       TextEditingController repeatPassword,
-      Mysql db,
+      DatabaseHelper db,
       BuildContext context,
       GlobalKey<FormState> formKey) {
     // Agrega este parámetro
@@ -166,11 +166,9 @@ class _RecoverForm extends ConsumerWidget {
                   "UPDATE Usuario SET Password = ? WHERE Correo = ?",
                   [pass, email],
                 );
-                db.closeConnection(conn);
                 Alerts().recoverySuccessfully(context);
                 context.go('/login');
               } else {
-                db.closeConnection(conn);
                 Errors().emailDontExist(context);
               }
             });

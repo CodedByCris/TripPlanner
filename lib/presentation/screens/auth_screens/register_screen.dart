@@ -22,7 +22,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final db = Mysql();
+  final db = DatabaseHelper();
 
   Future<void> registerUser() async {
     if (!widget.formKey.currentState!.validate()) {
@@ -50,11 +50,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           // Check if the widget is still in the tree
           Alerts().registerSuccessfully(context);
         }
-        db.closeConnection(conn);
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
       } else {
-        db.closeConnection(conn);
         if (mounted) {
           // Check if the widget is still in the tree
           Errors().emailExist(context);

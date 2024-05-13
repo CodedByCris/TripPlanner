@@ -25,14 +25,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> fetchData() async {
-    final db = Mysql();
+    final db = DatabaseHelper();
     MySqlConnection conn = await db.getConnection();
 
     // Obtén todos los datos de los usuarios de una vez
     final result =
         await conn.query('SELECT Correo, NombreUsuario, Imagen FROM Usuario');
-
-    db.closeConnection(conn);
 
     if (result.isNotEmpty) {
       for (var row in result) {

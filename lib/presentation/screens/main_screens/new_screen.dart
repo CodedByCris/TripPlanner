@@ -18,7 +18,7 @@ class NewScreen extends ConsumerStatefulWidget {
 }
 
 class NewScreenState extends ConsumerState<NewScreen> {
-  Mysql db = Mysql();
+  DatabaseHelper db = DatabaseHelper();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController origenController = TextEditingController();
@@ -31,7 +31,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
   @override
   void initState() {
     super.initState();
-    db = Mysql();
+    db = DatabaseHelper();
     formKey = GlobalKey<FormState>();
     origenController = TextEditingController();
     destinoController = TextEditingController();
@@ -126,8 +126,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
     );
   }
 
-  Widget _btnGuardar(
-      WidgetRef ref, ColorScheme colors, BuildContext context, Mysql db) {
+  Widget _btnGuardar(WidgetRef ref, ColorScheme colors, BuildContext context,
+      DatabaseHelper db) {
     final correo = ref.watch(tokenProvider);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -216,7 +216,6 @@ class NewScreenState extends ConsumerState<NewScreen> {
                           }
 
                           Alerts().registerSuccessfully(context);
-                          db.closeConnection(conn);
                         });
                         Navigator.of(context).pop();
                         GoRouter.of(context).go('/home/0');

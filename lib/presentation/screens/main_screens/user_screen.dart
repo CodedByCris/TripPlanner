@@ -91,7 +91,7 @@ class UserScreen extends ConsumerWidget {
   }
 
   Widget _imagen(String? imagen, List<Color> colors, int selectedColor) {
-    Mysql db = Mysql();
+    DatabaseHelper db = DatabaseHelper();
 
     return FutureBuilder<String>(
       future: Future.value(imagen ?? ''), // convert String? to Future<String>
@@ -146,7 +146,7 @@ class UserScreen extends ConsumerWidget {
   }
 
   Future<void> updateImage(String email, String imageUrl, context) async {
-    Mysql db = Mysql();
+    DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
       await conn.query(

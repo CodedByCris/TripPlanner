@@ -22,7 +22,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   //Variables de la búsqueda de datos
 
-  Mysql db = Mysql();
+  DatabaseHelper db = DatabaseHelper();
   Map<String, List<Map<String, dynamic>>> groupedData = {};
 
   @override
@@ -32,10 +32,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> fetchData() async {
-    String? correoTemp = await Mysql().getCorreo();
+    String? correoTemp = await DatabaseHelper().getCorreo();
     if (correoTemp != null) {
       correo = correoTemp;
-      final db = Mysql();
+      final db = DatabaseHelper();
       var conn = await db.getConnection();
       final result = await conn.query(
           'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" ORDER BY FechaSalida ASC');
@@ -72,7 +72,6 @@ class _HomeViewState extends State<HomeView> {
           }
         }
       }
-      db.closeConnection(conn);
     } else {
       print("Correo es nulo");
     }

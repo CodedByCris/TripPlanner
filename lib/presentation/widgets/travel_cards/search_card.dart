@@ -42,14 +42,11 @@ class _SearchCardState extends State<SearchCard> {
   }
 
   Future<void> fetchUsuarioData() async {
-    final db = Mysql();
-    MySqlConnection conn = await db.getConnection();
-
+    final db = DatabaseHelper();
+    var conn = await db.getConnection();
     final result = await conn.query(
         'SELECT NombreUsuario, Imagen FROM Usuario WHERE Correo = ?',
         [widget.correoUsuario]);
-
-    db.closeConnection(conn);
 
     if (result.isNotEmpty) {
       setState(() {

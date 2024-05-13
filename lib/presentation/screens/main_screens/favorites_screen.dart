@@ -1,31 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/details_screens/favorites_details.dart';
+import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../../conf/connectivity.dart';
-import '../../providers/providers.dart';
+import '../../Database/connections.dart';
+import '../../functions/mes_mapa.dart';
 import '../../providers/theme_provider.dart';
 import '../../widgets/widgets.dart';
 
-class FavoritesScreen extends ConsumerStatefulWidget {
+bool hayDatoss = false;
+
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
-  _FavoritesScreenState createState() => _FavoritesScreenState();
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
-class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  final db = DatabaseHelper();
+  Map<String, List<ResultRow>> groupedData = {};
+
   @override
   void initState() {
     super.initState();
-    ref.read(travelDataProvider.notifier).fetchData();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    String? correoTemp = await DatabaseHelper().getCorreo();
+    if (correoTemp != null) {
+      correo = correoTemp;
+      MySqlConnection conn = await db.getConnection();
+
+      // Use JOIN to combine Favoritos and Viaje tables
+      final result = await conn.query(
+          'SELECT Viaje.Origen, Viaje.Destino, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.IdViaje, Viaje.Correo FROM Favoritos JOIN Viaje ON Favoritos.IdViaje = Viaje.IdViaje WHERE Favoritos.Correo = ?',
+          [correo]);
+
+      if (result.isEmpty) {
+        setState(() {
+          hayDatoss = false;
+        });
+      } else {
+        setState(() {
+          hayDatoss = true;
+        });
+
+        groupedData = await groupDataByMonth(result);
+      }
+    } else {
+      print("Correo es nulo");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        final groupedData = ref.watch(travelDataProvider);
         final colors = Theme.of(context).colorScheme;
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
@@ -39,7 +73,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 titulo: 'FAVORITOS',
               ),
             ),
-            body: groupedData.isNotEmpty
+            body: hayDatoss
                 ? Column(
                     children: [
                       const Padding(
@@ -70,41 +104,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                                 ...groupedData[month]!.map((viaje) {
                                   return GestureDetector(
                                     onLongPress: () async {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Confirmación'),
-                                            content: const Text(
-                                                '¿Estás seguro de que quieres eliminar este viaje?'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text('Cancelar'),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                              TextButton(
-                                                child: const Text('Aceptar'),
-                                                onPressed: () async {
-                                                  Navigator.of(context).pop();
-                                                  await ref
-                                                      .read(travelDataProvider
-                                                          .notifier)
-                                                      .deleteTravel(
-                                                          viaje['IdViaje']);
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                            "Viaje eliminado de favoritos")),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
+                                      final conn = await db.getConnection();
+                                      await conn.query(
+                                          'DELETE FROM Favoritos WHERE Correo = ? AND IdViaje = ?',
+                                          [correo, viaje['IdViaje']]);
                                     },
                                     onTap: () {
                                       Navigator.push(
@@ -134,34 +137,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       ),
                     ],
                   )
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'No tienes viajes favoritos',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 9, 61, 104),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  padding: EdgeInsets.only(bottom: 30),
-                                  content: Text(
-                                    "Buscando nuevos datos",
-                                    textAlign: TextAlign.center,
-                                  )),
-                            );
-                            ref.read(travelDataProvider.notifier).fetchData();
-                          },
-                          child: const Text('Buscar más...'),
-                        ),
-                      ],
+                : const Center(
+                    child: Text(
+                      'No tienes viajes favoritos',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 9, 61, 104),
+                      ),
                     ),
                   ),
           ),
