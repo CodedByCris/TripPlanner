@@ -23,7 +23,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   //Variables de la búsqueda de datos
-
+  bool isLoading = false;
   DatabaseHelper db = DatabaseHelper();
   Map<String, List<Map<String, dynamic>>> groupedData = {};
 
@@ -34,6 +34,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> fetchData() async {
+    setState(() {
+      isLoading =
+          true; // Establecer isLoading en true antes de cargar los datos
+    });
     String? correoTemp = await DatabaseHelper().getCorreo();
     if (correoTemp != null) {
       correo = correoTemp;
@@ -77,6 +81,10 @@ class _HomeViewState extends State<HomeView> {
     } else {
       print("Correo es nulo");
     }
+    setState(() {
+      isLoading =
+          false; // Establecer isLoading en false después de cargar los datos
+    });
   }
 
   Future<Map<String, List<ResultRow>>> groupDataByMonth(Results results) async {
@@ -98,68 +106,94 @@ class _HomeViewState extends State<HomeView> {
     return Column(
       children: [
         const SizedBox(height: 20),
-        hayDatos
-            ? const Text(
+        !hayDatos
+            ? Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'No tienes viajes programados',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 9, 61, 104),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isLoading = true; // Comienza la carga
+                              });
+                              fetchData().then((_) {
+                                setState(() {
+                                  isLoading = false; // Termina la carga
+                                });
+                              });
+                            },
+                            child: const Text('Buscar viajes...'),
+                          ),
+                  ],
+                ),
+              )
+            : const Text(
                 'Pulsa para modificar los datos del viaje',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 9, 61, 104),
                 ),
-              )
-            : const Text(
-                'No tienes viajes programados',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 9, 61, 104),
-                ),
               ),
+
         const SizedBox(height: 20),
-        Expanded(
-          child: ListView.builder(
-            itemCount: groupedData.length,
-            itemBuilder: (context, index) {
-              final month = groupedData.keys.elementAt(index);
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      month,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ...groupedData[month]!.map((viaje) {
-                    return GestureDetector(
-                      onTap: () {
-                        print(viaje['idViaje']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActualDetails(
-                              idViaje: viaje['idViaje'],
-                            ),
+        hayDatos
+            ? Expanded(
+                child: ListView.builder(
+                  itemCount: groupedData.length,
+                  itemBuilder: (context, index) {
+                    final month = groupedData.keys.elementAt(index);
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            month,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                        );
-                      },
-                      child: ActualTravelCard(
-                        origen: viaje['origen'],
-                        destino: viaje['destino'],
-                        fechaSalida: viaje['fechaSalida'],
-                        fechaLlegada: viaje['fechaLlegada'],
-                        gastos: 20,
-                        numRutas: 3,
-                      ),
+                        ),
+                        ...groupedData[month]!.map((viaje) {
+                          return GestureDetector(
+                            onTap: () {
+                              print(viaje['idViaje']);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ActualDetails(
+                                    idViaje: viaje['idViaje'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ActualTravelCard(
+                              origen: viaje['origen'],
+                              destino: viaje['destino'],
+                              fechaSalida: viaje['fechaSalida'],
+                              fechaLlegada: viaje['fechaLlegada'],
+                              gastos: 20,
+                              numRutas: 3,
+                            ),
+                          );
+                        }),
+                      ],
                     );
-                  }),
-                ],
-              );
-            },
-          ),
-        ),
+                  },
+                ),
+              )
+            : Container(), // Si no hay datos, muestra un contenedor vacío
       ],
     );
   }

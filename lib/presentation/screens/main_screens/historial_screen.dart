@@ -20,6 +20,7 @@ class HistorialScreen extends StatefulWidget {
 
 class _HistorialScreenState extends State<HistorialScreen> {
   final db = DatabaseHelper();
+  bool isLoading = false;
   Map<String, List<ResultRow>> groupedData = {};
 
   @override
@@ -29,6 +30,10 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   Future<void> fetchData() async {
+    setState(() {
+      isLoading =
+          true; // Establecer isLoading en true antes de cargar los datos
+    });
     String? correoTemp = await DatabaseHelper().getCorreo();
     if (correoTemp != null) {
       correo = correoTemp;
@@ -50,6 +55,10 @@ class _HistorialScreenState extends State<HistorialScreen> {
     } else {
       print("Correo es nulo");
     }
+    setState(() {
+      isLoading =
+          false; // Establecer isLoading en false después de cargar los datos
+    });
   }
 
   @override
@@ -69,74 +78,87 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 titulo: 'HISTORIAL',
               ),
             ),
-            body: hayDatos
-                ? Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          "Pulsa para ver todos los datos del viaje",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: groupedData.length,
-                          itemBuilder: (context, index) {
-                            final month = groupedData.keys.elementAt(index);
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    month,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                ...groupedData[month]!.map((viaje) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      print(viaje['IdViaje']);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ActualDetails(
-                                            idViaje: viaje['IdViaje'],
-                                          ),
+            body: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : hayDatos
+                    ? Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              "Pulsa para ver todos los datos del viaje",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: groupedData.length,
+                              itemBuilder: (context, index) {
+                                final month = groupedData.keys.elementAt(index);
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        month,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    ...groupedData[month]!.map((viaje) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          print(viaje['IdViaje']);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ActualDetails(
+                                                idViaje: viaje['IdViaje'],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: ActualTravelCard(
+                                          origen: viaje['Origen'],
+                                          destino: viaje['Destino'],
+                                          fechaSalida: viaje['FechaSalida'],
+                                          fechaLlegada: viaje['FechaLlegada'],
+                                          gastos: 20,
+                                          numRutas: 3,
                                         ),
                                       );
-                                    },
-                                    child: ActualTravelCard(
-                                      origen: viaje['Origen'],
-                                      destino: viaje['Destino'],
-                                      fechaSalida: viaje['FechaSalida'],
-                                      fechaLlegada: viaje['FechaLlegada'],
-                                      gastos: 20,
-                                      numRutas: 3,
-                                    ),
-                                  );
-                                }),
-                              ],
-                            );
-                          },
+                                    }),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'No tienes viajes en tu historial',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 9, 61, 104),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: fetchData,
+                              child: const Text('Refrescar'),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  )
-                : const Center(
-                    child: Text(
-                      'No tienes viajes en tu historial',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 9, 61, 104),
-                      ),
-                    ),
-                  ),
           ),
         );
       },
