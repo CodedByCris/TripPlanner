@@ -4,7 +4,6 @@ import 'package:trip_planner/presentation/Database/connections.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_ruta.dart';
 
-import '../../../conf/router/app_router.dart';
 import 'detalles.dart';
 
 class ActualDetails extends StatefulWidget {

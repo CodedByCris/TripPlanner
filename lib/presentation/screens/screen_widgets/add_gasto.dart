@@ -17,25 +17,25 @@ class NewScreenState extends ConsumerState<AddGasto> {
   DatabaseHelper db = DatabaseHelper();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController ubicacionController = TextEditingController();
-  TextEditingController notasController = TextEditingController();
-  TextEditingController ordenController = TextEditingController();
+  TextEditingController cantidadController = TextEditingController();
+  TextEditingController descripcionController = TextEditingController();
+  TextEditingController fechaController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     db = DatabaseHelper();
     formKey = GlobalKey<FormState>();
-    ubicacionController = TextEditingController();
-    notasController = TextEditingController();
-    ordenController = TextEditingController();
+    cantidadController = TextEditingController();
+    descripcionController = TextEditingController();
+    fechaController = TextEditingController();
   }
 
   @override
   void dispose() {
-    ubicacionController.dispose();
-    notasController.dispose();
-    ordenController.dispose();
+    cantidadController.dispose();
+    descripcionController.dispose();
+    fechaController.dispose();
     super.dispose(); // Add this line
   }
 
@@ -64,15 +64,15 @@ class NewScreenState extends ConsumerState<AddGasto> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              _ubicacion(colors),
+              _cantidad(colors),
               const SizedBox(
                 height: 20.0,
               ),
-              _notas(colors),
+              _descripcion(colors),
               const SizedBox(
                 height: 20.0,
               ),
-              _orden(colors),
+              _fechaGasto(colors),
               const SizedBox(
                 height: 20.0,
               ),
@@ -97,14 +97,14 @@ class NewScreenState extends ConsumerState<AddGasto> {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
-          String? ubicacion = ubicacionController.text.toUpperCase();
-          String? notas = notasController.text;
-          String? orden = ordenController.text;
+          String? cantidad = cantidadController.text.toUpperCase();
+          String? descr = descripcionController.text;
+          String? fecha = fechaController.text;
 
           // Clear the text fields
-          ubicacionController.clear();
-          notasController.clear();
-          ordenController.clear();
+          cantidadController.clear();
+          descripcionController.clear();
+          fechaController.clear();
 
           //! Insertar los datos en la base de datos
           //Mounted comprueba si el widget sigue en la pantalla
@@ -117,18 +117,18 @@ class NewScreenState extends ConsumerState<AddGasto> {
                 return AlertDialog(
                   title: const Text('Ruta creado'),
                   content: const Text(
-                      'La ruta ha sido creada correctamente, ¿desea añadir otra ruta?'),
+                      'El gasto ha sido creada correctamente, ¿desea añadir otro gasto?'),
                   actions: <Widget>[
                     TextButton(
                       child: const Text('Salir'),
                       //INSERT
                       onPressed: () async {
                         //Comprobaciones
-                        if (notas!.isEmpty) {
-                          notas = 'Sin notas';
+                        if (descr!.isEmpty) {
+                          descr = 'Sin descripción';
                         }
-                        if (orden!.isEmpty) {
-                          orden = '0';
+                        if (fecha!.isEmpty) {
+                          fecha = DateTime.now().toString();
                         }
                         String sql =
 
@@ -136,7 +136,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
                             'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
                         await db.getConnection().then((conn) async {
                           await conn.query(
-                              sql, [ubicacion, notas, orden, widget.idViaje]);
+                              sql, [cantidad, descr, fecha, widget.idViaje]);
                         });
                         Navigator.of(context).pop();
                         GoRouter.of(context).go(
@@ -148,19 +148,19 @@ class NewScreenState extends ConsumerState<AddGasto> {
                       //INSERT
                       onPressed: () async {
                         //Comprobaciones
-                        if (notas!.isEmpty) {
-                          notas = 'Sin notas';
+                        if (descr!.isEmpty) {
+                          descr = 'Sin descripción';
                         }
-                        if (orden!.isEmpty) {
-                          orden = '0';
+                        if (fecha!.isEmpty) {
+                          fecha = DateTime.now().toString();
                         }
                         String sql =
 
                             //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
+                            'INSERT INTO Gastos_del_Viaje(Cantidad, Descripción, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
                         await db.getConnection().then((conn) async {
                           await conn.query(
-                              sql, [ubicacion, notas, orden, widget.idViaje]);
+                              sql, [cantidad, descr, fecha, widget.idViaje]);
                         });
                         Navigator.of(context).pop();
                       },
@@ -175,11 +175,11 @@ class NewScreenState extends ConsumerState<AddGasto> {
     );
   }
 
-  Widget _ubicacion(ColorScheme colors) {
+  Widget _cantidad(ColorScheme colors) {
     return TextFormField(
-      controller: ubicacionController,
+      controller: cantidadController,
       decoration: InputDecoration(
-        labelText: '* Ubicación (Torre Eiffel, Atocha, etc)',
+        labelText: '* Cantidad',
         border: const OutlineInputBorder(),
         prefixIcon: Icon(
           Icons.location_on,
@@ -195,13 +195,13 @@ class NewScreenState extends ConsumerState<AddGasto> {
     );
   }
 
-  Widget _notas(ColorScheme colors) {
+  Widget _descripcion(ColorScheme colors) {
     return TextFormField(
-      controller: notasController,
+      controller: descripcionController,
       maxLines: null,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
-        labelText: 'Notas del viaje',
+        labelText: 'Descripción',
         prefixIcon: Icon(
           Icons.comment,
           color: colors.primary,
@@ -217,13 +217,15 @@ class NewScreenState extends ConsumerState<AddGasto> {
     );
   }
 
-  Widget _orden(ColorScheme colors) {
+//TODO: CAMBIAR A TIPO FECHA
+//TODO: TIENE QUE SER >= AL INICIO DEL VIAJE Y <= AL FINAL DEL VIAJE
+  Widget _fechaGasto(ColorScheme colors) {
     return TextFormField(
-      controller: ordenController,
+      controller: fechaController,
       keyboardType:
           TextInputType.number, // Cambia el tipo de teclado a numérico
       decoration: InputDecoration(
-        labelText: 'Orden (1, 2, 3, etc)',
+        labelText: 'Fecha del gasto',
         border: const OutlineInputBorder(),
         prefixIcon: Icon(
           Icons.numbers,

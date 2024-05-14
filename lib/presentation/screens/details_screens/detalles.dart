@@ -88,12 +88,16 @@ Widget rutas(resultRuta) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Text('${row['Ubicacion']}',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  '${row['Ubicacion']}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 19),
                 ),
                 const SizedBox(height: 10),
-                Text('Notas: ${row['NotasRuta']}'),
+                Text(
+                  'Notas: ${row['NotasRuta']}',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ),
@@ -127,14 +131,26 @@ Widget gastos(resultGastos) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Text('${row['Concepto']}',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  '${row['Concepto']}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 19),
                 ),
                 const SizedBox(height: 10),
-                Text('Importe: ${row['Importe']}'),
-                Text('Fecha: ${row['Fecha']}'),
-                Text('Notas: ${row['NotasGasto']}'),
+                Text(
+                  'Importe: ${row['Importe']}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Fecha: ${row['Fecha']}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Notas: ${row['NotasGasto']}',
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
               ],
             ),
           ),

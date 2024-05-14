@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
@@ -139,8 +138,8 @@ class NewScreenState extends ConsumerState<AddRuta> {
                               sql, [ubicacion, notas, orden, widget.idViaje]);
                         });
                         Navigator.of(context).pop();
-                        GoRouter.of(context).go(
-                            '/home/0'); //TODO: CAMBIAR POR LA CARD DEL VIAJE ACTUAL
+                        // GoRouter.of(context).go(
+                        //     '/home/0'); //TODO: CAMBIAR POR LA CARD DEL VIAJE ACTUAL
                       },
                     ),
                     TextButton(
