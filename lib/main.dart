@@ -7,12 +7,35 @@ import 'package:trip_planner/presentation/providers/theme_provider.dart';
 import 'conf/router/app_router.dart';
 import 'presentation/Database/connections.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await DatabaseHelper()
-      .getConnection(); // Inicializa la conexión a la base de datos
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(const App());
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      // Initialize Firebase and Database connection
+      future: _initializeApp(),
+      builder: (context, snapshot) {
+        // Once complete, show your application
+        if (snapshot.connectionState == ConnectionState.done) {
+          return const ProviderScope(child: MainApp());
+        }
+
+        // Otherwise, show something whilst waiting for initialization to complete
+        return Container();
+      },
+    );
+  }
+
+  Future _initializeApp() async {
+    await Firebase.initializeApp();
+    await DatabaseHelper().getConnection();
+  }
 }
 
 class MainApp extends ConsumerWidget {

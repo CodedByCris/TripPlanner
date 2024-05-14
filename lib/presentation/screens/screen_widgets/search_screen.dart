@@ -50,6 +50,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('SEARCH SCREEN');
     return Scaffold(
       appBar: AppBar(),
       body: ListView.builder(

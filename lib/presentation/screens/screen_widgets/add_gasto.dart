@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 
 class AddGasto extends ConsumerStatefulWidget {
+  final DateTime fechaInicio;
+  final DateTime fechaFin;
   final int idViaje;
-  const AddGasto({super.key, required this.idViaje});
+  const AddGasto(
+      {super.key,
+      required this.idViaje,
+      required this.fechaInicio,
+      required this.fechaFin});
 
   @override
   NewScreenState createState() => NewScreenState();
@@ -41,6 +48,8 @@ class NewScreenState extends ConsumerState<AddGasto> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.fechaInicio);
+    print(widget.fechaFin);
     final colors = Theme.of(context).colorScheme;
 
     return NetworkSensitive(
@@ -72,7 +81,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
               const SizedBox(
                 height: 20.0,
               ),
-              _fechaGasto(colors),
+              _fechaGasto(colors, widget.fechaInicio, widget.fechaFin),
               const SizedBox(
                 height: 20.0,
               ),
@@ -133,7 +142,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
                         String sql =
 
                             //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
+                            'INSERT INTO Gastos_del_Viaje(Cantidad, Descripción, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
                         await db.getConnection().then((conn) async {
                           await conn.query(
                               sql, [cantidad, descr, fecha, widget.idViaje]);
@@ -154,6 +163,10 @@ class NewScreenState extends ConsumerState<AddGasto> {
                         if (fecha!.isEmpty) {
                           fecha = DateTime.now().toString();
                         }
+                        print("CANTIDAD: $cantidad");
+                        print("DESCRIPCION: $descr");
+                        print("FECHA: $fecha");
+                        print("ID VIAJE: ${widget.idViaje}");
                         String sql =
 
                             //INSERTO LOS DATOS DEL VIAJE
@@ -178,17 +191,21 @@ class NewScreenState extends ConsumerState<AddGasto> {
   Widget _cantidad(ColorScheme colors) {
     return TextFormField(
       controller: cantidadController,
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: '* Cantidad',
         border: const OutlineInputBorder(),
         prefixIcon: Icon(
-          Icons.location_on,
+          Icons.attach_money_outlined,
           color: colors.primary,
         ),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty || value.length < 3) {
-          return 'Por favor ingrese una ubicación válida';
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingrese una cantidad';
+        }
+        if (double.tryParse(value) == null || double.parse(value) <= 0) {
+          return 'Por favor ingrese una cantidad válida mayor a 0';
         }
         return null;
       },
@@ -217,26 +234,38 @@ class NewScreenState extends ConsumerState<AddGasto> {
     );
   }
 
-//TODO: CAMBIAR A TIPO FECHA
-//TODO: TIENE QUE SER >= AL INICIO DEL VIAJE Y <= AL FINAL DEL VIAJE
-  Widget _fechaGasto(ColorScheme colors) {
+  Widget _fechaGasto(
+      ColorScheme colors, DateTime inicioViaje, DateTime finalViaje) {
     return TextFormField(
       controller: fechaController,
-      keyboardType:
-          TextInputType.number, // Cambia el tipo de teclado a numérico
+      readOnly: true,
       decoration: InputDecoration(
         labelText: 'Fecha del gasto',
         border: const OutlineInputBorder(),
-        prefixIcon: Icon(
-          Icons.numbers,
-          color: colors.primary,
+        prefixIcon: IconButton(
+          icon: Icon(
+            Icons.date_range,
+            color: colors.primary,
+          ),
+          onPressed: () async {
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: inicioViaje,
+              lastDate: finalViaje,
+            );
+            if (picked != null) {
+              fechaController.text = DateFormat('yyyy-MM-dd').format(picked);
+            }
+          },
         ),
       ),
       validator: (value) {
         if (value!.isNotEmpty) {
-          int? number = int.tryParse(value);
-          if (number == null || number <= 0) {
-            return 'Por favor ingrese un número mayor a 0';
+          DateTime? fecha = DateFormat('yyyy-MM-dd').parse(value, true);
+          if (fecha.isBefore(widget.fechaInicio) ||
+              fecha.isAfter(widget.fechaFin)) {
+            return 'Por favor ingrese una fecha entre ${DateFormat('yyyy-MM-dd').format(widget.fechaInicio)} y ${DateFormat('yyyy-MM-dd').format(widget.fechaFin)}';
           }
         }
         return null;

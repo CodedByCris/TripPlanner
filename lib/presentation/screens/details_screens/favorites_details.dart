@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 
-import 'detalles.dart';
-
 class FavoriteDetails extends StatefulWidget {
   final int idViaje;
   final String correo;
@@ -79,6 +77,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   @override
   Widget build(BuildContext context) {
+    print('FAVORITOS_DETAILS');
     return FutureBuilder(
       future: setupConnection().then((_) => fetchData()),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -138,5 +137,156 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
         }
       },
     );
+  }
+
+  Widget viaje(resultViaje) {
+    if (resultViaje == null || resultViaje!.isEmpty) {
+      return const Text('No hay datos del viaje');
+    } else {
+      List<ResultRow> rows = resultViaje!.toList();
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: rows.length,
+        itemBuilder: (context, index) {
+          ResultRow row = rows[index];
+          return GestureDetector(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListTile(
+                    leading: const Icon(Icons.flight,
+                        size: 40.0), // Add your icon here
+                    title: Text(
+                      '${row['Origen']} - ${row['Destino']}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 19),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Text(
+                          '${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          '${row['NotasViaje']}',
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+// Crea un widget llamado rutas
+  Widget rutas(resultRuta) {
+    if (resultRuta == null || resultRuta!.isEmpty) {
+      return const Text('No hay datos de las rutas');
+    } else {
+      List<ResultRow> rows = resultRuta!.toList();
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 300),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: rows.length,
+          itemBuilder: (context, index) {
+            ResultRow row = rows[index];
+            return GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.map, size: 40.0),
+                      title: Text(
+                        '${row['Ubicacion']}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          Text(
+                            'Notas: ${row['NotasRuta']}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+  }
+
+// Crea un widget llamado gastos
+  Widget gastos(resultGastos) {
+    if (resultGastos == null || resultGastos!.isEmpty) {
+      return const Text('No hay datos de los gastos');
+    } else {
+      List<ResultRow> rows = resultGastos!.toList();
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 300),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: rows.length,
+          itemBuilder: (context, index) {
+            ResultRow row = rows[index];
+            return GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.money,
+                          size: 40.0), // Add your icon here
+                      title: Text(
+                        'Importe: ${row['Cantidad']}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          Text(
+                            'Notas: ${row['Descripción']}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
   }
 }

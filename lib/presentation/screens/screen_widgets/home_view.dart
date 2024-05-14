@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mysql1/mysql1.dart';
 
+import '../details_screens/favorites_details.dart';
+
 bool hayDatos = false;
 
 class HomeView extends StatefulWidget {

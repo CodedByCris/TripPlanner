@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/search_screen.dart';
+import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../Database/connections.dart';
 
@@ -143,6 +144,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   }
 
   Widget _btnBuscar(ColorScheme colors) {
+    print("Correo$correo");
     return ElevatedButton.icon(
       onPressed: () async {
         if (formKey != null && formKey!.currentState!.validate()) {
@@ -318,10 +320,10 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     double? precioMin,
     double? precioMax,
   }) async {
-    List<dynamic> parameters = [origen.toUpperCase()];
+    List<dynamic> parameters = [origen.toUpperCase(), correo];
     String query =
         '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
-    LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ?''';
+    LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ? AND Viaje.Correo != ?''';
 
     if (destino != null) {
       query += ' AND Viaje.Destino = ?';
