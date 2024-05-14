@@ -3,6 +3,7 @@ import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_ruta.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ActualDetails extends StatefulWidget {
   final int idViaje;
@@ -63,6 +64,14 @@ class _ActualDetailsState extends State<ActualDetails> {
             appBar: AppBar(
               centerTitle: true,
               title: const Text('DETALLES DEL VIAJE'),
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () {
+                    shareData();
+                  },
+                ),
+              ],
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
@@ -368,5 +377,46 @@ class _ActualDetailsState extends State<ActualDetails> {
         ),
       ],
     );
+  }
+
+  void shareData() {
+    String data = "";
+
+    // Añade los datos del viaje
+    if (resultViaje != null && resultViaje!.isNotEmpty) {
+      data += "Datos del viaje:\n";
+      for (var row in resultViaje!) {
+        data += "${row['Origen']} - ${row['Destino']}\n";
+        data +=
+            "${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}\n";
+        data += "${row['NotasViaje']}\n";
+      }
+      data += "\n";
+    }
+
+    // Añade los datos de las rutas
+    if (resultRuta != null && resultRuta!.isNotEmpty) {
+      data += "Rutas:\n";
+      for (var row in resultRuta!) {
+        data += "${row['Ubicacion']}\n";
+        data += "Notas: ${row['NotasRuta']}\n";
+      }
+      data += "\n";
+    }
+
+    // Añade los datos de los gastos
+    if (resultGastos != null && resultGastos!.isNotEmpty) {
+      data += "Gastos:\n";
+      for (var row in resultGastos!) {
+        data += "Importe: ${row['Cantidad']}\n";
+        data += "Notas: ${row['Descripción']}\n";
+        data +=
+            "Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}\n";
+      }
+      data += "\n";
+    }
+
+    // Comparte los datos
+    Share.share(data);
   }
 }
