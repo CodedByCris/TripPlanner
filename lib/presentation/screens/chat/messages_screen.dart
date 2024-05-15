@@ -5,6 +5,7 @@ import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../Database/connections.dart';
 import '../../providers/theme_provider.dart';
+import 'add_group_screen.dart';
 
 bool hayDatosss = false;
 
@@ -28,43 +29,53 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   Future<void> fetchData() async {
     setState(() {
-      isLoading =
-          true; // Establecer isLoading en true antes de cargar los datos
+      isLoading = true; // Set isLoading to true before loading the data
     });
-    String? correoTemp = await DatabaseHelper().getCorreo();
-    if (correoTemp != null) {
-      correo = correoTemp;
-      MySqlConnection conn = await db.getConnection();
+    MySqlConnection conn = await db.getConnection();
 
-      // Consulta a la tabla Usuario_GrupoViaje
-      final result = await conn.query(
-          'SELECT IdGrupo FROM Usuario_GrupoViaje WHERE Correo = ?', [correo]);
+    // Query the Usuario_GrupoViaje table
+    final result = await conn.query(
+        'SELECT IdGrupo FROM Usuario_GrupoViaje WHERE Correo = ?', [correo]);
 
-      if (result.isEmpty) {
-        setState(() {
-          hayDatosss = false;
-        });
-      } else {
-        setState(() {
-          hayDatosss = true;
-        });
+    if (result.isEmpty) {
+      setState(() {
+        hayDatosss = false;
+      });
+    } else {
+      setState(() {
+        hayDatosss = true;
+      });
 
-        // Realizar una segunda consulta a la tabla Grupos de Viaje
-        for (var row in result) {
-          final grupoResult = await conn.query(
-              'SELECT Descripcion, FechaCreacion, NombreGrupo, TipoGrupo FROM Grupos de Viaje WHERE IdGrupo = ?',
-              [row['IdGrupo']]);
+      // Perform a second query to the Grupos_de_Viaje table
+      for (var row in result) {
+        final grupoResult = await conn.query(
+            'SELECT Descripción, FechaCreacion, NombreGrupo, TipoGrupo FROM Grupos_de_Viaje WHERE IdGrupo = ?',
+            [row['IdGrupo']]);
 
-          // Aquí puedes procesar los resultados de la consulta a Grupos de Viaje
-          // Por ejemplo, podrías agregarlos a una lista o a un mapa
+        // If there is no NombreGrupo or Descripción, it's a private chat
+        if (grupoResult.first['NombreGrupo'] == null ||
+            grupoResult.first['Descripción'] == null) {
+          // Query the Usuario_GrupoViaje table to get the Correo of the other user in the group
+          final otherUserResult = await conn.query(
+              'SELECT Correo FROM Usuario_GrupoViaje WHERE IdGrupo = ? AND Correo != ?',
+              [row['IdGrupo'], correo]);
+
+          // Query the Usuario table to get the NombreUsuario and Imagen of the other user
+          final usuarioResult = await conn.query(
+              'SELECT NombreUsuario, Imagen FROM Usuario WHERE Correo = ?',
+              [otherUserResult.first['Correo']]);
+
+          // Add the results to the groupedData map
+          groupedData[row['IdGrupo'].toString()] = usuarioResult.toList();
+        } else {
+          // Add the results of the Grupos_de_Viaje query to the groupedData map
+          groupedData[row['IdGrupo'].toString()] = grupoResult.toList();
         }
       }
-    } else {
-      print("Correo es nulo");
     }
+
     setState(() {
-      isLoading =
-          false; // Establecer isLoading en false después de cargar los datos
+      isLoading = false; // Set isLoading to false after loading the data
     });
   }
 
@@ -77,8 +88,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
         return Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             title: Text(
-              'Mensajes',
+              'MENSAJES',
               style: TextStyle(
                 color: isDarkMode ? colors.secondary : colors.primary,
               ),
@@ -86,18 +98,49 @@ class _MessagesScreenState extends State<MessagesScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddGroupScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
           body: hayDatosss
-              ? Expanded(
-                  child: ListView.builder(
-                    itemCount: groupedData.length,
-                    itemBuilder: (context, index) {
-                      return null;
-                    },
-                  ),
+              ? ListView.builder(
+                  itemCount: groupedData.length,
+                  itemBuilder: (context, index) {
+                    String key = groupedData.keys.elementAt(index);
+                    var data = groupedData[key]![0];
+                    if (data['NombreGrupo'] == null ||
+                        data['Descripción'] == null) {
+                      print("Imagen ${data['Imagen']}");
+                      print("Imagen ${data['NombreUsuario']}");
+                      print("Imagen ${data['Correo']}");
+                      print("Imagen ${data['NombreGrupo']}");
+                      print("Imagen ${data['Descripción']}");
+                      // It's a private chat, display the NombreUsuario and Imagen
+                      return Card(
+                        child: ListTile(
+                          leading: Image.network(data['Imagen']
+                              .toString()), // Display the user's image
+                          title: Text(data['NombreUsuario']
+                              .toString()), // Display the user's name
+                        ),
+                      );
+                    } else {
+                      // It's a group chat, display the NombreGrupo and Descripción
+                      return Card(
+                        child: ListTile(
+                          title: Text(data['NombreGrupo'].toString()),
+                          subtitle: Text(data['Descripción'].toString()),
+                        ),
+                      );
+                    }
+                  },
                 )
               : const Center(
                   child: Text(
