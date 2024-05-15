@@ -53,8 +53,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
             [row['IdGrupo']]);
 
         // If there is no NombreGrupo or Descripción, it's a private chat
-        if (grupoResult.first['NombreGrupo'] == null ||
-            grupoResult.first['Descripción'] == null) {
+        if (grupoResult.first['NombreGrupo'] == "" ||
+            grupoResult.first['Descripción'] == "") {
           // Query the Usuario_GrupoViaje table to get the Correo of the other user in the group
           final otherUserResult = await conn.query(
               'SELECT Correo FROM Usuario_GrupoViaje WHERE IdGrupo = ? AND Correo != ?',
@@ -81,6 +81,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("Resultados $groupedData");
     return Consumer(
       builder: (context, ref, child) {
         final colors = Theme.of(context).colorScheme;
@@ -115,28 +116,50 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   itemBuilder: (context, index) {
                     String key = groupedData.keys.elementAt(index);
                     var data = groupedData[key]![0];
-                    if (data['NombreGrupo'] == null ||
-                        data['Descripción'] == null) {
-                      print("Imagen ${data['Imagen']}");
-                      print("Imagen ${data['NombreUsuario']}");
-                      print("Imagen ${data['Correo']}");
-                      print("Imagen ${data['NombreGrupo']}");
-                      print("Imagen ${data['Descripción']}");
-                      // It's a private chat, display the NombreUsuario and Imagen
-                      return Card(
+                    String imageUrl = data.fields['Imagen'].toString();
+                    Widget leadingWidget;
+
+                    if (imageUrl.isEmpty || imageUrl == 'null') {
+                      leadingWidget = const Icon(Icons.person);
+                    } else {
+                      leadingWidget = Image.network(imageUrl);
+                    }
+
+                    if (data.fields['NombreUsuario'] != null) {
+                      // It's a private chat, display the NombreUsuario and leadingWidget
+                      return SizedBox(
+                        height: 120, // Adjust the height of the ListTile
                         child: ListTile(
-                          leading: Image.network(data['Imagen']
-                              .toString()), // Display the user's image
-                          title: Text(data['NombreUsuario']
-                              .toString()), // Display the user's name
+                          onTap: () => print('Go to chat screen'),
+                          leading: CircleAvatar(
+                            radius: 50, // Adjust the size of the image
+                            backgroundImage: NetworkImage(imageUrl),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          title: Text(
+                            data.fields['NombreUsuario'].toString(),
+                            style: const TextStyle(
+                              fontSize: 20, // Adjust the size of the title
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       );
                     } else {
                       // It's a group chat, display the NombreGrupo and Descripción
-                      return Card(
+                      return SizedBox(
+                        height: 120,
                         child: ListTile(
-                          title: Text(data['NombreGrupo'].toString()),
-                          subtitle: Text(data['Descripción'].toString()),
+                          onTap: () => print('Go to chat screen'),
+                          leading: CircleAvatar(
+                            radius: 50, // Adjust the size of the image
+                            backgroundImage: NetworkImage(imageUrl),
+                            backgroundColor: Colors.transparent,
+                          ), // Display the group's image or icon
+                          title: Text(data.fields['NombreGrupo']
+                              .toString()), // Display the group's name
+                          subtitle: Text(data.fields['Descripción']
+                              .toString()), // Display the group's description
                         ),
                       );
                     }

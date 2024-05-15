@@ -151,7 +151,6 @@ class UserScreen extends ConsumerWidget {
         "UPDATE Usuario SET Imagen = ? WHERE Correo = ?",
         [imageUrl, email],
       );
-      await conn.close();
       Alerts().recoverySuccessfully(context); //TODO: CAMBIAR EL MENSAJE
     });
   }

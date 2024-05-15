@@ -131,6 +131,10 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
+                    // Get the selected user's email
+                    String selectedUserEmail = users[selectedUser]!;
+
+                    // Insert the new group
                     var result = await conn!.query(
                       'INSERT INTO Grupos_de_Viaje (Descripción, FechaCreacion, NombreGrupo, TipoGrupo) VALUES (?, ?, ?, ?)',
                       [
@@ -147,17 +151,30 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
 
                     var idGrupo = result.insertId;
 
-                    // Get the selected user's email
-                    String selectedUserEmail = users[selectedUser]!;
+                    // Check if a private conversation between the two users already exists
+                    var checkResult = await conn!.query(
+                      'SELECT * FROM Usuario_GrupoViaje WHERE Correo IN (?, ?) AND IdGrupo IN (SELECT IdGrupo FROM Usuario_GrupoViaje WHERE Correo IN (?, ?) GROUP BY IdGrupo HAVING COUNT(*) > 1)',
+                      [correo, selectedUserEmail, correo, selectedUserEmail],
+                    );
 
-                    await conn!.query(
-                      'INSERT INTO Usuario_GrupoViaje (Correo, IdGrupo) VALUES (?, ?)',
-                      [correo, idGrupo],
-                    );
-                    await conn!.query(
-                      'INSERT INTO Usuario_GrupoViaje (Correo, IdGrupo) VALUES (?, ?)',
-                      [selectedUserEmail, idGrupo],
-                    );
+                    // If the group type is 1 (private conversation), we only allow one group for the same users
+                    if (groupTypes.indexOf(selectedGroupType!) + 1 != 1 ||
+                        checkResult.isEmpty) {
+                      await conn!.query(
+                        'INSERT INTO Usuario_GrupoViaje (Correo, IdGrupo) VALUES (?, ?)',
+                        [correo, idGrupo],
+                      );
+                      await conn!.query(
+                        'INSERT INTO Usuario_GrupoViaje (Correo, IdGrupo) VALUES (?, ?)',
+                        [selectedUserEmail, idGrupo],
+                      );
+                    } else {
+                      // If a private conversation already exists, delete the newly created group
+                      await conn!.query(
+                        'DELETE FROM Grupos_de_Viaje WHERE IdGrupo = ?',
+                        [idGrupo],
+                      );
+                    }
                   }
                   Navigator.pop(context);
                 },
