@@ -45,9 +45,9 @@ class _ActualDetailsState extends State<ActualDetails> {
     resultViaje = await conn!.query(
         'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
     resultRuta = await conn!.query(
-        'SELECT Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden DESC');
+        'SELECT IdRuta, Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden DESC');
     resultGastos = await conn!.query(
-        'SELECT Descripción, Cantidad, FechaGasto FROM Gastos_del_Viaje WHERE idViaje = ${widget.idViaje}');
+        'SELECT IdGasto, Descripción, Cantidad, FechaGasto FROM Gastos_del_Viaje WHERE idViaje = ${widget.idViaje}');
 
     print(resultViaje);
     print(resultRuta);
@@ -82,7 +82,7 @@ class _ActualDetailsState extends State<ActualDetails> {
                 IconButton(
                   icon: const Icon(Icons.share),
                   onPressed: () {
-                    shareData();
+                    shareData(resultViaje);
                   },
                 ),
               ],
@@ -196,7 +196,69 @@ class _ActualDetailsState extends State<ActualDetails> {
                       TextButton(
                         child: const Text('Modificar'),
                         onPressed: () {
-                          // Aquí va el código para modificar el viaje
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Modificar Viaje'),
+                                content: SingleChildScrollView(
+                                  child: Wrap(
+                                    children: <Widget>[
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: row['Origen']),
+                                        decoration: const InputDecoration(
+                                            labelText: 'Origen'),
+                                      ),
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: row['Destino']),
+                                        decoration: const InputDecoration(
+                                            labelText: 'Destino'),
+                                      ),
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: row['FechaSalida']
+                                                .toIso8601String()
+                                                .substring(0, 10)),
+                                        decoration: const InputDecoration(
+                                            labelText: 'Fecha de Salida'),
+                                      ),
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: row['FechaLlegada']
+                                                .toIso8601String()
+                                                .substring(0, 10)),
+                                        decoration: const InputDecoration(
+                                            labelText: 'Fecha de Llegada'),
+                                      ),
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: row['NotasViaje']),
+                                        decoration: const InputDecoration(
+                                            labelText: 'Notas del Viaje'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('Cancelar'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('Aceptar'),
+                                    onPressed: () {
+                                      //TODO: UPDATE EN LA BASE DE DATOS
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                       ),
                     ],
@@ -261,7 +323,7 @@ class _ActualDetailsState extends State<ActualDetails> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return _dialog(context);
+                    return _dialog(context, 'ruta', row);
                   },
                 );
               },
@@ -316,7 +378,7 @@ class _ActualDetailsState extends State<ActualDetails> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return _dialog(context);
+                    return _dialog(context, 'gasto', row);
                   },
                 );
               },
@@ -360,7 +422,20 @@ class _ActualDetailsState extends State<ActualDetails> {
     }
   }
 
-  Widget _dialog(BuildContext context) {
+  Widget _dialog(BuildContext context, String tipo, result) {
+    TextEditingController locationController =
+        TextEditingController(text: result['Ubicacion']);
+    TextEditingController notesController =
+        TextEditingController(text: result['NotasRuta']);
+    TextEditingController orderController =
+        TextEditingController(text: result['Orden'].toString());
+    TextEditingController amountController =
+        TextEditingController(text: result['Cantidad'].toString());
+    TextEditingController descriptionController =
+        TextEditingController(text: result['Descripción']);
+    TextEditingController dateController = TextEditingController(
+        text: result['FechaGasto'].toString().split(" ")[0]);
+
     return AlertDialog(
       title: const Text('¿Qué quieres hacer?'),
       actions: <Widget>[
@@ -373,57 +448,122 @@ class _ActualDetailsState extends State<ActualDetails> {
         TextButton(
           child: const Text('Modificar'),
           onPressed: () {
-            // Aquí va el código para modificar la ruta
+            tipo.compareTo('ruta') == 0
+                ? showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Modificar $tipo'),
+                        content: SingleChildScrollView(
+                          child: Wrap(
+                            children: <Widget>[
+                              TextField(
+                                controller: locationController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Ubicación'),
+                              ),
+                              TextField(
+                                controller: notesController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Notas'),
+                              ),
+                              TextField(
+                                controller: orderController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Orden'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancelar'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Aceptar'),
+                            onPressed: () {
+                              //TODO: UPDATE EN LA BASE DE DATOS DE RUTAS
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                : showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Modificar $tipo'),
+                        content: SingleChildScrollView(
+                          child: Wrap(
+                            children: <Widget>[
+                              TextField(
+                                controller: amountController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Cantidad'),
+                              ),
+                              TextField(
+                                controller: descriptionController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Descripción'),
+                              ),
+                              TextField(
+                                controller: dateController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Fecha'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancelar'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Aceptar'),
+                            onPressed: () {
+                              //TODO: UPDATE EN LA BASE DE DATOS DE GASTOS
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
           },
         ),
         TextButton(
+          //TODO:FALTA QUE SE RECARGUE LA PÁGINA
           child: const Text('Eliminar'),
           onPressed: () {
-            // Aquí va el código para eliminar la ruta
+            String tableName =
+                tipo.compareTo('ruta') == 0 ? 'Ruta' : 'Gastos_del_Viaje';
+            String idField = tipo.compareTo('ruta') == 0 ? 'IdRuta' : 'IdGasto';
+            int id = tipo.compareTo('ruta') == 0
+                ? result['IdRuta']
+                : result['IdGasto'];
+
+            String sql = 'DELETE FROM $tableName WHERE $idField = $id';
+
+            conn!.query(sql);
+            Navigator.of(context).pop();
           },
         ),
       ],
     );
   }
 
-  void shareData() {
-    String data = "";
+  void shareData(row) {
+    // TODO: INTENTAR QUE FUNCIONE PARA ABRIR LA APP
+    String deepLink = "tripPlanner://viaje/${widget.idViaje}";
 
-    // Añade los datos del viaje
-    if (resultViaje != null && resultViaje!.isNotEmpty) {
-      data += "\n*Datos del viaje:*\n";
-      for (var row in resultViaje!) {
-        data += "\n*${row['Origen']} - ${row['Destino']}*\n";
-        data +=
-            "${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}\n";
-        data += "${row['NotasViaje']}\n";
-      }
-      data += "\n";
-    }
-
-    // Añade los datos de las rutas
-    if (resultRuta != null && resultRuta!.isNotEmpty) {
-      data += "\n*Rutas:*\n";
-      for (var row in resultRuta!) {
-        data += "\n*${row['Ubicacion']}*\n";
-        data += "*Notas:* ${row['NotasRuta']}\n";
-      }
-      data += "\n";
-    }
-
-    // Añade los datos de los gastos
-    if (resultGastos != null && resultGastos!.isNotEmpty) {
-      data += "\n*Gastos:*\n";
-      for (var row in resultGastos!) {
-        data += "\n*Importe: ${row['Cantidad']}*\n";
-        data += "*Notas:* ${row['Descripción']}\n";
-        data +=
-            "*Fecha:* ${row['FechaGasto'].toIso8601String().substring(0, 10)}\n";
-      }
-      data += "\n";
-    }
-
-    // Comparte los datos
-    Share.share(data);
+    // Comparte el enlace
+    Share.share('Mira este viaje en mi aplicación: $deepLink');
   }
 }
