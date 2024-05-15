@@ -100,7 +100,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
         backgroundColor: colors.primary,
       ),
       child: const Text(
-        'Añadir Ruta',
+        'Añadir Gasto',
         style: TextStyle(color: Colors.white),
       ),
       onPressed: () {

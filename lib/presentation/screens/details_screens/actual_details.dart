@@ -63,7 +63,10 @@ class _ActualDetailsState extends State<ActualDetails> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('DETALLES DEL VIAJE'),
+              title: const Text(
+                'DETALLES DEL VIAJE',
+                style: TextStyle(fontSize: 20),
+              ),
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
@@ -71,7 +74,10 @@ class _ActualDetailsState extends State<ActualDetails> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('DETALLES DEL VIAJE'),
+              title: const Text(
+                'DETALLES DEL VIAJE',
+                style: TextStyle(fontSize: 20),
+              ),
               actions: <Widget>[
                 IconButton(
                   icon: const Icon(Icons.share),
@@ -88,7 +94,8 @@ class _ActualDetailsState extends State<ActualDetails> {
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      "Presiona sobre las tarjetas para interactuar.",
+                      "Mantén pulsado sobre las tarjetas para interactuar.",
+                      textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -384,9 +391,9 @@ class _ActualDetailsState extends State<ActualDetails> {
 
     // Añade los datos del viaje
     if (resultViaje != null && resultViaje!.isNotEmpty) {
-      data += "\nDatos del viaje:\n";
+      data += "\n*Datos del viaje:*\n";
       for (var row in resultViaje!) {
-        data += "\n${row['Origen']} - ${row['Destino']}\n";
+        data += "\n*${row['Origen']} - ${row['Destino']}*\n";
         data +=
             "${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}\n";
         data += "${row['NotasViaje']}\n";
@@ -396,22 +403,22 @@ class _ActualDetailsState extends State<ActualDetails> {
 
     // Añade los datos de las rutas
     if (resultRuta != null && resultRuta!.isNotEmpty) {
-      data += "\nRutas:\n";
+      data += "\n*Rutas:*\n";
       for (var row in resultRuta!) {
-        data += "\n${row['Ubicacion']}\n";
-        data += "Notas: ${row['NotasRuta']}\n";
+        data += "\n*${row['Ubicacion']}*\n";
+        data += "*Notas:* ${row['NotasRuta']}\n";
       }
       data += "\n";
     }
 
     // Añade los datos de los gastos
     if (resultGastos != null && resultGastos!.isNotEmpty) {
-      data += "\nGastos:\n";
+      data += "\n*Gastos:*\n";
       for (var row in resultGastos!) {
-        data += "\nImporte: ${row['Cantidad']}\n";
-        data += "Notas: ${row['Descripción']}\n";
+        data += "\n*Importe: ${row['Cantidad']}*\n";
+        data += "*Notas:* ${row['Descripción']}\n";
         data +=
-            "Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}\n";
+            "*Fecha:* ${row['FechaGasto'].toIso8601String().substring(0, 10)}\n";
       }
       data += "\n";
     }

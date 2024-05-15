@@ -33,7 +33,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             fontSize: 20),
       ),
       centerTitle: true,
-      //* Modo nocturno
+      // Modo nocturno
       leading: IconButton(
         onPressed: () {
           widget.ref.read(themeNotifierProvider.notifier).toggleDarkMode();
@@ -44,7 +44,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         color: widget.colors.primary,
       ),
 
-      //* Icono para las conversaciones
+      // Icono para las conversaciones
       actions: [
         IconButton(
           onPressed: () {

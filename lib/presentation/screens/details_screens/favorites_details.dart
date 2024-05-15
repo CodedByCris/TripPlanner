@@ -85,7 +85,10 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('DETALLES DEL VIAJE'),
+              title: const Text(
+                'DETALLES DEL VIAJE',
+                style: TextStyle(fontSize: 20),
+              ),
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
@@ -93,7 +96,10 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: const Text('DETALLES DEL VIAJE'),
+              title: const Text(
+                'DETALLES DEL VIAJE',
+                style: TextStyle(fontSize: 20),
+              ),
               actions: <Widget>[
                 IconButton(
                   icon:
