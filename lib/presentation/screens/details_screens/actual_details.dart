@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
@@ -170,6 +171,8 @@ class _ActualDetailsState extends State<ActualDetails> {
   }
 
   Widget viaje(resultViaje) {
+    final formKey = GlobalKey<FormState>();
+
     if (resultViaje == null || resultViaje!.isEmpty) {
       return const Text('No hay datos del viaje');
     } else {
@@ -185,84 +188,85 @@ class _ActualDetailsState extends State<ActualDetails> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('¿Qué quieres hacer?'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancelar'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Modificar'),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Modificar Viaje'),
-                                content: SingleChildScrollView(
-                                  child: Wrap(
-                                    children: <Widget>[
-                                      TextField(
-                                        controller: TextEditingController(
-                                            text: row['Origen']),
-                                        decoration: const InputDecoration(
-                                            labelText: 'Origen'),
-                                      ),
-                                      TextField(
-                                        controller: TextEditingController(
-                                            text: row['Destino']),
-                                        decoration: const InputDecoration(
-                                            labelText: 'Destino'),
-                                      ),
-                                      TextField(
-                                        controller: TextEditingController(
-                                            text: row['FechaSalida']
-                                                .toIso8601String()
-                                                .substring(0, 10)),
-                                        decoration: const InputDecoration(
-                                            labelText: 'Fecha de Salida'),
-                                      ),
-                                      TextField(
-                                        controller: TextEditingController(
-                                            text: row['FechaLlegada']
-                                                .toIso8601String()
-                                                .substring(0, 10)),
-                                        decoration: const InputDecoration(
-                                            labelText: 'Fecha de Llegada'),
-                                      ),
-                                      TextField(
-                                        controller: TextEditingController(
-                                            text: row['NotasViaje']),
-                                        decoration: const InputDecoration(
-                                            labelText: 'Notas del Viaje'),
-                                      ),
-                                    ],
+                      title: const Text('¿Qué quieres hacer?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancelar'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Modificar'),
+                          onPressed: () {
+                            final salidaController = TextEditingController(
+                              text: row['FechaSalida']
+                                  .toIso8601String()
+                                  .substring(0, 10),
+                            );
+                            final llegadaController = TextEditingController(
+                              text: row['FechaLlegada']
+                                  .toIso8601String()
+                                  .substring(0, 10),
+                            );
+                            final notasController = TextEditingController(
+                              text: row['NotasViaje'] ?? 'Sin notas',
+                            );
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Modificar Viaje'),
+                                  content: SingleChildScrollView(
+                                    child: _formViaje(
+                                        formKey,
+                                        row,
+                                        salidaController,
+                                        context,
+                                        llegadaController,
+                                        notasController),
                                   ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('Cancelar'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: const Text('Aceptar'),
-                                    onPressed: () {
-                                      //TODO: UPDATE EN LA BASE DE DATOS
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  );
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Cancelar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('Aceptar'),
+                                      onPressed: () {
+                                        // Solo cerrar el diálogo si el formulario es válido
+                                        if (formKey.currentState!.validate()) {
+                                          // Obtén los valores de los controladores de texto
+                                          String salida = salidaController.text;
+                                          String llegada =
+                                              llegadaController.text;
+                                          String notas = notasController.text;
+
+                                          if (notas == '') {
+                                            notas = 'Sin notas';
+                                          }
+
+                                          // Crea la consulta SQL
+                                          String sql =
+                                              "UPDATE Viaje SET FechaSalida = '$salida', FechaLlegada = '$llegada', NotasViaje = '$notas' WHERE IdViaje = ${widget.idViaje}";
+
+                                          // Ejecuta la consulta SQL
+                                          // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
+                                          conn!.query(sql);
+
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        )
+                      ]);
                 },
               );
             },
@@ -303,6 +307,104 @@ class _ActualDetailsState extends State<ActualDetails> {
         },
       );
     }
+  }
+
+  Widget _formViaje(
+      GlobalKey<FormState> formKey,
+      ResultRow row,
+      TextEditingController salidaController,
+      BuildContext context,
+      TextEditingController llegadaController,
+      TextEditingController notasController) {
+    return Form(
+      key: formKey,
+      child: Wrap(
+        children: <Widget>[
+          TextFormField(
+            controller: TextEditingController(text: row['Origen']),
+            decoration: const InputDecoration(labelText: 'Origen'),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese un origen';
+              }
+              // Comprobar si el valor contiene números
+              if (RegExp(r'[0-9]').hasMatch(value)) {
+                return 'El origen no puede contener números';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: TextEditingController(text: row['Destino']),
+            decoration: const InputDecoration(labelText: 'Destino'),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese un destino';
+              }
+              // Comprobar si el valor contiene números
+              if (RegExp(r'[0-9]').hasMatch(value)) {
+                return 'El destino no puede contener números';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: salidaController,
+            decoration: const InputDecoration(labelText: 'Fecha de Salida'),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese una fecha de salida';
+              }
+              return null;
+            },
+            onTap: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2050),
+              );
+              if (picked != null) {
+                salidaController.text =
+                    picked.toIso8601String().substring(0, 10);
+              }
+            },
+          ),
+          TextFormField(
+            controller: llegadaController,
+            decoration: const InputDecoration(labelText: 'Fecha de Llegada'),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese una fecha de llegada';
+              }
+              if (DateTime.parse(value)
+                  .isBefore(DateTime.parse(salidaController.text))) {
+                return 'La fecha de llegada debe ser posterior a la fecha de salida';
+              }
+              return null;
+            },
+            onTap: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2050),
+              );
+              if (picked != null) {
+                llegadaController.text =
+                    picked.toIso8601String().substring(0, 10);
+              }
+            },
+          ),
+          TextFormField(
+            controller: notasController,
+            decoration: const InputDecoration(labelText: 'Notas del Viaje'),
+          ),
+        ],
+      ),
+    );
   }
 
 // Crea un widget llamado rutas
@@ -423,6 +525,7 @@ class _ActualDetailsState extends State<ActualDetails> {
   }
 
   Widget _dialog(BuildContext context, String tipo, result) {
+    final formKey = GlobalKey<FormState>();
     TextEditingController locationController =
         TextEditingController(text: result['Ubicacion']);
     TextEditingController notesController =
@@ -455,24 +558,45 @@ class _ActualDetailsState extends State<ActualDetails> {
                       return AlertDialog(
                         title: Text('Modificar $tipo'),
                         content: SingleChildScrollView(
-                          child: Wrap(
-                            children: <Widget>[
-                              TextField(
-                                controller: locationController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Ubicación'),
-                              ),
-                              TextField(
-                                controller: notesController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Notas'),
-                              ),
-                              TextField(
-                                controller: orderController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Orden'),
-                              ),
-                            ],
+                          child: Form(
+                            key: formKey,
+                            child: Wrap(
+                              children: <Widget>[
+                                TextFormField(
+                                  controller: locationController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Ubicación'),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor ingrese una ubicación';
+                                    }
+                                    if (value.length <= 3) {
+                                      return 'La ubicación debe tener más de 3 letras';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                TextFormField(
+                                  controller: notesController,
+                                  decoration:
+                                      const InputDecoration(labelText: 'Notas'),
+                                ),
+                                TextFormField(
+                                  controller: orderController,
+                                  decoration:
+                                      const InputDecoration(labelText: 'Orden'),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value != null && value.isNotEmpty) {
+                                      if (int.tryParse(value) == null) {
+                                        return 'Por favor, ingrese un número válido o deje el campo vacío';
+                                      }
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         actions: <Widget>[
@@ -485,38 +609,99 @@ class _ActualDetailsState extends State<ActualDetails> {
                           TextButton(
                             child: const Text('Aceptar'),
                             onPressed: () {
-                              //TODO: UPDATE EN LA BASE DE DATOS DE RUTAS
-                              Navigator.of(context).pop();
+                              if (formKey.currentState!.validate()) {
+                                // Obtén los valores de los controladores de texto
+                                String notasRuta = notesController.text;
+                                String orden = orderController.text;
+                                String ubicacion = locationController.text;
+
+                                if (orden == '') {
+                                  orden = '0';
+                                }
+
+                                if (notasRuta == '') {
+                                  notasRuta = 'Sin notas';
+                                }
+
+                                // Obtén el IdRuta
+                                String idRuta = result['IdRuta'].toString();
+
+                                // Crea la consulta SQL
+                                String sql =
+                                    "UPDATE Ruta SET NotasRuta = '$notasRuta', Orden = '$orden', Ubicacion = '$ubicacion' WHERE IdRuta = $idRuta";
+
+                                // Ejecuta la consulta SQL
+                                // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
+                                conn!.query(sql);
+
+                                Navigator.of(context).pop();
+                              }
                             },
                           ),
                         ],
                       );
                     },
                   )
-                : showDialog(
+                : // Define la clave del formulario
+                showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text('Modificar $tipo'),
                         content: SingleChildScrollView(
-                          child: Wrap(
-                            children: <Widget>[
-                              TextField(
-                                controller: amountController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Cantidad'),
-                              ),
-                              TextField(
-                                controller: descriptionController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Descripción'),
-                              ),
-                              TextField(
-                                controller: dateController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Fecha'),
-                              ),
-                            ],
+                          child: Form(
+                            key: formKey,
+                            child: Wrap(
+                              children: <Widget>[
+                                TextFormField(
+                                  controller: amountController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Cantidad'),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, introduce una cantidad';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                TextFormField(
+                                  controller: descriptionController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Descripción'),
+                                ),
+                                TextFormField(
+                                  controller: dateController,
+                                  decoration:
+                                      const InputDecoration(labelText: 'Fecha'),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, introduce una fecha';
+                                    }
+                                    return null;
+                                  },
+                                  onTap: () async {
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                    final DateTime? picked =
+                                        await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                    );
+                                    if (picked != null) {
+                                      dateController.text = picked
+                                          .toIso8601String()
+                                          .substring(0, 10);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         actions: <Widget>[
@@ -529,13 +714,39 @@ class _ActualDetailsState extends State<ActualDetails> {
                           TextButton(
                             child: const Text('Aceptar'),
                             onPressed: () {
-                              //TODO: UPDATE EN LA BASE DE DATOS DE GASTOS
-                              Navigator.of(context).pop();
+                              if (formKey.currentState!.validate()) {
+                                // Obtén los valores de los controladores de texto
+                                String cantidad = amountController.text;
+                                String descripcion = descriptionController.text;
+                                String fecha = dateController.text;
+
+                                if (fecha == '') {
+                                  fecha = DateTime.now().toIso8601String();
+                                }
+
+                                if (descripcion == '') {
+                                  descripcion = 'Sin descripción';
+                                }
+
+                                // Obtén el IdRuta
+                                String idGasto = result['IdGasto'].toString();
+
+                                // Crea la consulta SQL
+                                String sql =
+                                    "UPDATE Gastos_del_Viaje SET Cantidad = '$cantidad', Descripción = '$descripcion', FechaGasto = '$fecha' WHERE IdGasto = $idGasto";
+
+                                // Ejecuta la consulta SQL
+                                // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
+                                conn!.query(sql);
+
+                                Navigator.of(context).pop();
+                              }
                             },
                           ),
                         ],
                       );
-                    });
+                    },
+                  );
           },
         ),
         TextButton(

@@ -139,7 +139,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               )
             : const Text(
-                'Pulsa para modificar los datos del viaje',
+                'Pulsa para ver todos los datos del viaje',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
