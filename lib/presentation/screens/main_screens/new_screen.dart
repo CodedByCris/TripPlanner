@@ -57,70 +57,68 @@ class NewScreenState extends ConsumerState<NewScreen> {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
-    return NetworkSensitive(
-      child: Scaffold(
-        appBar: AppBar(
-          title: CustomAppBar(
-            isDarkMode: isDarkMode,
-            colors: colors,
-            ref: ref,
-            titulo: 'NUEVO VIAJE',
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: CustomAppBar(
+          isDarkMode: isDarkMode,
+          colors: colors,
+          ref: ref,
+          titulo: 'NUEVO VIAJE',
         ),
-        body: Form(
-          key: formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(8.0),
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  'Los campos * son obligatorios',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic),
-                  textAlign: TextAlign.center,
+      ),
+      body: Form(
+        key: formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(8.0),
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                'Los campos * son obligatorios',
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w900,
+                    fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            _origen(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _destino(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _fechaOrigen(colors, context),
                 ),
-              ),
-              _origen(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _destino(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _fechaOrigen(colors, context),
-                  ),
-                  const SizedBox(
-                    width: 20.0,
-                  ),
-                  Expanded(
-                    child: _fechaLlegada(colors, context),
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _precioBilletes(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _notas(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _btnGuardar(ref, colors, context, db),
-            ],
-          ),
+                const SizedBox(
+                  width: 20.0,
+                ),
+                Expanded(
+                  child: _fechaLlegada(colors, context),
+                ),
+                const SizedBox(
+                  height: 20.0,
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _precioBilletes(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _notas(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _btnGuardar(ref, colors, context, db),
+          ],
         ),
       ),
     );

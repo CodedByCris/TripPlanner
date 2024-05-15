@@ -68,98 +68,95 @@ class _HistorialScreenState extends State<HistorialScreen> {
         final colors = Theme.of(context).colorScheme;
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
-        return NetworkSensitive(
-          child: Scaffold(
-            appBar: AppBar(
-              title: CustomAppBar(
-                isDarkMode: isDarkMode,
-                colors: colors,
-                ref: ref,
-                titulo: 'HISTORIAL',
-              ),
+        return Scaffold(
+          appBar: AppBar(
+            title: CustomAppBar(
+              isDarkMode: isDarkMode,
+              colors: colors,
+              ref: ref,
+              titulo: 'HISTORIAL',
             ),
-            body: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : hayDatos
-                    ? Column(
+          ),
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : hayDatos
+                  ? Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            "Pulsa para ver todos los datos del viaje",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: groupedData.length,
+                            itemBuilder: (context, index) {
+                              final month = groupedData.keys.elementAt(index);
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      month,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  ...groupedData[month]!.map((viaje) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        print(viaje['IdViaje']);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ActualDetails(
+                                              idViaje: viaje['IdViaje'],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: ActualTravelCard(
+                                        origen: viaje['Origen'],
+                                        destino: viaje['Destino'],
+                                        fechaSalida: viaje['FechaSalida'],
+                                        fechaLlegada: viaje['FechaLlegada'],
+                                        gastos: 20,
+                                        numRutas: 3,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              "Pulsa para ver todos los datos del viaje",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                          const Text(
+                            'No tienes viajes en tu historial',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 9, 61, 104),
                             ),
                           ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: groupedData.length,
-                              itemBuilder: (context, index) {
-                                final month = groupedData.keys.elementAt(index);
-                                return Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        month,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ...groupedData[month]!.map((viaje) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          print(viaje['IdViaje']);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ActualDetails(
-                                                idViaje: viaje['IdViaje'],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: ActualTravelCard(
-                                          origen: viaje['Origen'],
-                                          destino: viaje['Destino'],
-                                          fechaSalida: viaje['FechaSalida'],
-                                          fechaLlegada: viaje['FechaLlegada'],
-                                          gastos: 20,
-                                          numRutas: 3,
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                );
-                              },
-                            ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: fetchData,
+                            child: const Text('Refrescar'),
                           ),
                         ],
-                      )
-                    : Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'No tienes viajes en tu historial',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 9, 61, 104),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: fetchData,
-                              child: const Text('Refrescar'),
-                            ),
-                          ],
-                        ),
                       ),
-          ),
+                    ),
         );
       },
     );

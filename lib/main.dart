@@ -2,10 +2,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trip_planner/conf/connectivity.dart';
 import 'package:trip_planner/conf/theme/app_theme.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 import 'conf/router/app_router.dart';
 import 'presentation/Database/connections.dart';
+import 'presentation/screens/user_screens/no_connection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,18 +40,44 @@ class App extends StatelessWidget {
   }
 }
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends ConsumerState<MainApp> {
+  final ConnectionStatusListener _connectionStatus =
+      ConnectionStatusListener.getInstance();
+
+  @override
+  void initState() {
+    super.initState();
+    _connectionStatus.initNoInternetListener();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppTheme appTheme = ref.watch(themeNotifierProvider);
 
-    return MaterialApp.router(
-      title: "Trip Planner",
-      routerConfig: appRouter,
-      debugShowCheckedModeBanner: false,
-      theme: appTheme.getTheme(),
+    return ValueListenableBuilder<bool>(
+      valueListenable: _connectionStatus.connectionChangeNotifier,
+      builder: (context, hasConnection, _) {
+        return MaterialApp.router(
+          title: "Trip Planner",
+          routerConfig: appRouter,
+          debugShowCheckedModeBanner: false,
+          theme: appTheme.getTheme(),
+          builder: (context, child) {
+            if (hasConnection) {
+              return child!;
+            } else {
+              return const NoConnectionScreen();
+            }
+          },
+        );
+      },
     );
   }
 }

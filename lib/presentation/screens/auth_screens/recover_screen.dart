@@ -19,28 +19,26 @@ class _RecoverScreenState extends State<RecoverScreen> {
   @override
   Widget build(BuildContext context) {
     //final textStyles = Theme.of(context).textTheme;
-    return NetworkSensitive(
-      child: Scaffold(
-          body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Icon Banner
+    return Scaffold(
+        body: SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Icon Banner
 
-            const SizedBox(height: 50),
+          const SizedBox(height: 50),
 
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(100)),
-              ),
-              child: const _RecoverForm(),
-            )
-          ],
-        ),
-      )),
-    );
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(100)),
+            ),
+            child: const _RecoverForm(),
+          )
+        ],
+      ),
+    ));
   }
 }
 

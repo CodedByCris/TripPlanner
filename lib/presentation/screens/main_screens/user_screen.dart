@@ -21,21 +21,19 @@ class UserScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
-    return NetworkSensitive(
-      child: Scaffold(
-        appBar: AppBar(
-          title: CustomAppBar(
-            isDarkMode: isDarkMode,
-            colors: colors,
-            ref: ref,
-            titulo: 'PERFIL DE USUARIO',
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: CustomAppBar(
+          isDarkMode: isDarkMode,
+          colors: colors,
+          ref: ref,
+          titulo: 'PERFIL DE USUARIO',
         ),
-        //*Cuerpo de la aplicación
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: _userView(ref, context),
-        ),
+      ),
+      //*Cuerpo de la aplicación
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: _userView(ref, context),
       ),
     );
   }

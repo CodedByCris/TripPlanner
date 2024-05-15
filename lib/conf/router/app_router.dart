@@ -19,13 +19,13 @@ final appRouter = GoRouter(
       },
     ),
 
-    //* Ruta para los mensajes
+    // Ruta para los mensajes
     GoRoute(
       path: '/messages',
       builder: (context, state) => const MessagesScreen(),
     ),
 
-    //* Auth Routes
+    // Auth Routes
     GoRoute(
       path: '/',
       builder: (context, state) => const SplashScreen(),
@@ -43,7 +43,7 @@ final appRouter = GoRouter(
       builder: (context, state) => const RecoverScreen(),
     ),
 
-    //* Ruta para las opciones de configuración del usuario
+    // Ruta para las opciones de configuración del usuario
     GoRoute(
       path: '/theme-changer',
       builder: (context, state) => const ThemeChangerScreen(),

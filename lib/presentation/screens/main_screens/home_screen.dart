@@ -48,39 +48,37 @@ class HomeScreen extends ConsumerWidget {
 
     final sharedValue = ref.watch(tabIndexProvider);
 
-    return NetworkSensitive(
-      child: Scaffold(
-        appBar: AppBar(
-          title: CustomAppBar(
-            isDarkMode: isDarkMode,
-            colors: colors,
-            ref: ref,
-            titulo: 'TRIP PLANNER',
-          ),
-          bottom: hasToken
-              ? PreferredSize(
-                  preferredSize: const Size.fromHeight(50.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: CupertinoSegmentedControl<int>(
-                      children: myTabs,
-                      onValueChanged: (int val) {
-                        ref.read(tabIndexProvider.notifier).setIndex(val);
-                      },
-                      groupValue: sharedValue,
-                    ),
-                  ),
-                )
-              : null,
+    return Scaffold(
+      appBar: AppBar(
+        title: CustomAppBar(
+          isDarkMode: isDarkMode,
+          colors: colors,
+          ref: ref,
+          titulo: 'TRIP PLANNER',
         ),
-        body: hasToken
-            ? (sharedValue == 0)
-                ? const HomeView()
-                : (sharedValue == 1)
-                    ? const GuestView()
-                    : null
-            : const GuestView(),
+        bottom: hasToken
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(50.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: CupertinoSegmentedControl<int>(
+                    children: myTabs,
+                    onValueChanged: (int val) {
+                      ref.read(tabIndexProvider.notifier).setIndex(val);
+                    },
+                    groupValue: sharedValue,
+                  ),
+                ),
+              )
+            : null,
       ),
+      body: hasToken
+          ? (sharedValue == 0)
+              ? const HomeView()
+              : (sharedValue == 1)
+                  ? const GuestView()
+                  : null
+          : const GuestView(),
     );
   }
 }

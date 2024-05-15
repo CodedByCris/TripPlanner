@@ -52,42 +52,40 @@ class NewScreenState extends ConsumerState<AddGasto> {
     print(widget.fechaFin);
     final colors = Theme.of(context).colorScheme;
 
-    return NetworkSensitive(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('NUEVOS GASTOS'),
-        ),
-        body: Form(
-          key: formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(8.0),
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  'Los campos * son obligatorios',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic),
-                  textAlign: TextAlign.center,
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('NUEVOS GASTOS'),
+      ),
+      body: Form(
+        key: formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(8.0),
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                'Los campos * son obligatorios',
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w900,
+                    fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
               ),
-              _cantidad(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _descripcion(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _fechaGasto(colors, widget.fechaInicio, widget.fechaFin),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _btnGuardar(ref, colors, context, db),
-            ],
-          ),
+            ),
+            _cantidad(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _descripcion(colors),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _fechaGasto(colors, widget.fechaInicio, widget.fechaFin),
+            const SizedBox(
+              height: 20.0,
+            ),
+            _btnGuardar(ref, colors, context, db),
+          ],
         ),
       ),
     );
