@@ -10,9 +10,16 @@ import 'package:mysql1/mysql1.dart';
 import '../../Database/connections.dart';
 
 class ChatScreen extends StatefulWidget {
+  final String imagen;
+  final String nombre;
   final String idGrupo;
   final String correo;
-  const ChatScreen({super.key, required this.idGrupo, required this.correo});
+  const ChatScreen(
+      {super.key,
+      required this.idGrupo,
+      required this.correo,
+      required this.imagen,
+      required this.nombre});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -76,43 +83,76 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       messages = messageResult.toList();
     });
+
+    // Add a post frame callback to jump to the bottom of the list after the UI has been updated
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: Row(
+          children: [
+            const SizedBox(width: 8.0),
+            CircleAvatar(
+              backgroundImage: NetworkImage(widget.imagen),
+            ),
+            const SizedBox(width: 8.0),
+            Text(widget.nombre),
+          ],
+        ),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          ListView.separated(
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
-            controller: _scrollController,
-            itemCount: messages.length,
-            itemBuilder: (context, index) {
-              final message = messages[index];
-              final isSender = message['Correo'] == widget.correo;
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedMessage = message['Contenido'];
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 50.0),
-                  child: BubbleSpecialThree(
-                    text: message['Contenido'],
-                    color: Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
-                    tail: true,
-                    textStyle:
-                        const TextStyle(color: Colors.white, fontSize: 16),
-                    isSender: isSender,
-                    delivered: true,
+          Expanded(
+            child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              controller: _scrollController,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final isSender = message['Correo'] == widget.correo;
+                final isImageURL = message['Contenido'].contains("https:");
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedMessage = message['Contenido'];
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 5.0),
+                    child: isImageURL
+                        ? BubbleNormalImage(
+                            id: 'id$index',
+                            image: Image(
+                              image: NetworkImage(message['Contenido']),
+                              fit: BoxFit.cover,
+                            ),
+                            color:
+                                Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
+                            tail: true,
+                            delivered: true,
+                          )
+                        : BubbleSpecialThree(
+                            text: message['Contenido'],
+                            color:
+                                Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
+                            tail: true,
+                            textStyle: const TextStyle(
+                                color: Colors.white, fontSize: 16),
+                            isSender: isSender,
+                            delivered: true,
+                          ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
           MessageBar(
             messageBarHintText: 'Escribe un mensaje',

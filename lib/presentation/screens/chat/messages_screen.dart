@@ -137,6 +137,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
+                                  imagen: imageUrl,
+                                  nombre:
+                                      data.fields['NombreUsuario'].toString(),
                                   correo: correo!,
                                   idGrupo:
                                       key), // Pass the idGrupo to ChatScreen
@@ -173,6 +176,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
+                                  imagen: imageUrl,
+                                  nombre:
+                                      data.fields['NombreUsuario'].toString(),
                                   correo: correo!,
                                   idGrupo:
                                       key), // Pass the idGrupo to ChatScreen
