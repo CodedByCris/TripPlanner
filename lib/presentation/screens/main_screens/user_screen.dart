@@ -26,7 +26,6 @@ class UserScreen extends ConsumerWidget {
         title: CustomAppBar(
           isDarkMode: isDarkMode,
           colors: colors,
-          ref: ref,
           titulo: 'PERFIL DE USUARIO',
         ),
       ),

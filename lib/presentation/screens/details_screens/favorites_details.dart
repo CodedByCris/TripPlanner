@@ -101,17 +101,18 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                 style: TextStyle(fontSize: 20),
               ),
               actions: <Widget>[
-                IconButton(
-                  icon:
-                      Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-                  onPressed: () {
-                    if (isFavorite) {
-                      removeFromFavorites();
-                    } else {
-                      addToFavorites();
-                    }
-                  },
-                ),
+                if (miCorreo != null)
+                  IconButton(
+                    icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border),
+                    onPressed: () {
+                      if (isFavorite) {
+                        removeFromFavorites();
+                      } else {
+                        addToFavorites();
+                      }
+                    },
+                  ),
               ],
             ),
             body: Padding(

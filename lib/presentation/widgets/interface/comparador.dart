@@ -311,6 +311,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     );
   }
 
+  String? correoConsulta;
   //!Consultas
   Future<Results> consultas({
     required String origen,
@@ -320,7 +321,12 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     double? precioMin,
     double? precioMax,
   }) async {
-    List<dynamic> parameters = [origen.toUpperCase(), correo];
+    if (correo == null || correo!.isEmpty) {
+      correoConsulta = "";
+    } else {
+      correoConsulta = correo!;
+    }
+    List<dynamic> parameters = [origen.toUpperCase(), correoConsulta];
     String query =
         '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
     LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ? AND Viaje.Correo != ?''';
@@ -360,7 +366,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
         " __  fechaLlegada $fechaLlegada"
         " __  precioMin $precioMin"
         " __  precioMax $precioMax");
-
+    print(resultViaje);
     return resultViaje = await conn!.query(query, parameters);
   }
 }

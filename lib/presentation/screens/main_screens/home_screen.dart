@@ -53,7 +53,6 @@ class HomeScreen extends ConsumerWidget {
         title: CustomAppBar(
           isDarkMode: isDarkMode,
           colors: colors,
-          ref: ref,
           titulo: 'TRIP PLANNER',
         ),
         bottom: hasToken

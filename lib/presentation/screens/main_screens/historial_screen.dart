@@ -73,7 +73,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
             title: CustomAppBar(
               isDarkMode: isDarkMode,
               colors: colors,
-              ref: ref,
               titulo: 'HISTORIAL',
             ),
           ),

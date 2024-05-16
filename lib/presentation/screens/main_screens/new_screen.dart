@@ -62,7 +62,6 @@ class NewScreenState extends ConsumerState<NewScreen> {
         title: CustomAppBar(
           isDarkMode: isDarkMode,
           colors: colors,
-          ref: ref,
           titulo: 'NUEVO VIAJE',
         ),
       ),
