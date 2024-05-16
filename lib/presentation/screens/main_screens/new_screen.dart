@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../functions/alerts.dart';
 import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
@@ -56,76 +55,114 @@ class NewScreenState extends ConsumerState<NewScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+    final correo = ref.watch(tokenProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: CustomAppBar(
-          isDarkMode: isDarkMode,
-          colors: colors,
-          titulo: 'NUEVO VIAJE',
+    if (correo == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: CustomAppBar(
+            isDarkMode: isDarkMode,
+            colors: colors,
+            titulo: 'NUEVO VIAJE',
+          ),
         ),
-      ),
-      body: Form(
-        key: formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(8.0),
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0),
-              child: Text(
-                'Los campos * son obligatorios',
-                style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w900,
-                    fontStyle: FontStyle.italic),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            _origen(colors),
-            const SizedBox(
-              height: 20.0,
-            ),
-            _destino(colors),
-            const SizedBox(
-              height: 20.0,
-            ),
-            Row(
+        body: Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: _fechaOrigen(colors, context),
+                const Text(
+                  'Debes iniciar sesión para crear un viaje',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 9, 61, 104),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(
-                  width: 20.0,
-                ),
-                Expanded(
-                  child: _fechaLlegada(colors, context),
-                ),
-                const SizedBox(
-                  height: 20.0,
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    GoRouter.of(context).go('/login');
+                  },
+                  child: const Text('Iniciar sesión'),
                 ),
               ],
             ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            _precioBilletes(colors),
-            const SizedBox(
-              height: 20.0,
-            ),
-            _notas(colors),
-            const SizedBox(
-              height: 20.0,
-            ),
-            _btnGuardar(ref, colors, context, db),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: CustomAppBar(
+            isDarkMode: isDarkMode,
+            colors: colors,
+            titulo: 'NUEVO VIAJE',
+          ),
+        ),
+        body: Form(
+          key: formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(8.0),
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  'Los campos * son obligatorios',
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w900,
+                      fontStyle: FontStyle.italic),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              _origen(colors),
+              const SizedBox(
+                height: 20.0,
+              ),
+              _destino(colors),
+              const SizedBox(
+                height: 20.0,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _fechaOrigen(colors, context),
+                  ),
+                  const SizedBox(
+                    width: 20.0,
+                  ),
+                  Expanded(
+                    child: _fechaLlegada(colors, context),
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20.0,
+              ),
+              _precioBilletes(colors),
+              const SizedBox(
+                height: 20.0,
+              ),
+              _notas(colors),
+              const SizedBox(
+                height: 20.0,
+              ),
+              _btnGuardar(ref, colors, context, db, correo),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Widget _btnGuardar(WidgetRef ref, ColorScheme colors, BuildContext context,
-      DatabaseHelper db) {
-    final correo = ref.watch(tokenProvider);
+      DatabaseHelper db, String correo) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: colors.primary,
