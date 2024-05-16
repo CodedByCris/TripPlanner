@@ -6,6 +6,7 @@ import 'package:trip_planner/presentation/screens/screens.dart';
 import '../../Database/connections.dart';
 import '../../providers/theme_provider.dart';
 import 'add_group_screen.dart';
+import 'chat_screen.dart';
 
 bool hayDatosss = false;
 
@@ -111,56 +112,90 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ],
           ),
           body: hayDatosss
-              ? ListView.builder(
+              ? ListView.separated(
                   itemCount: groupedData.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10), // Define your separator here
                   itemBuilder: (context, index) {
                     String key = groupedData.keys.elementAt(index);
                     var data = groupedData[key]![0];
                     String imageUrl = data.fields['Imagen'].toString();
                     Widget leadingWidget;
 
-                    if (imageUrl.isEmpty || imageUrl == 'null') {
-                      leadingWidget = const Icon(Icons.person);
+                    if (imageUrl.isEmpty || imageUrl.compareTo("null") == 0) {
+                      leadingWidget = const Icon(Icons.group);
                     } else {
                       leadingWidget = Image.network(imageUrl);
                     }
 
                     if (data.fields['NombreUsuario'] != null) {
+                      print("key-> $key");
                       // It's a private chat, display the NombreUsuario and leadingWidget
-                      return SizedBox(
-                        height: 120, // Adjust the height of the ListTile
-                        child: ListTile(
-                          onTap: () => print('Go to chat screen'),
-                          leading: CircleAvatar(
-                            radius: 50, // Adjust the size of the image
-                            backgroundImage: NetworkImage(imageUrl),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          title: Text(
-                            data.fields['NombreUsuario'].toString(),
-                            style: const TextStyle(
-                              fontSize: 20, // Adjust the size of the title
-                              fontWeight: FontWeight.bold,
+                      return ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                  correo: correo!,
+                                  idGrupo:
+                                      key), // Pass the idGrupo to ChatScreen
                             ),
+                          );
+                        },
+                        leading:
+                            imageUrl.isEmpty || imageUrl.compareTo("null") == 0
+                                ? CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors
+                                        .transparent, // Adjust the size of the image
+                                    child: leadingWidget,
+                                  )
+                                : CircleAvatar(
+                                    radius: 50, // Adjust the size of the image
+                                    backgroundImage: NetworkImage(imageUrl),
+                                    backgroundColor: Colors.transparent,
+                                  ),
+                        title: Text(
+                          data.fields['NombreUsuario'].toString(),
+                          style: const TextStyle(
+                            fontSize: 20, // Adjust the size of the title
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       );
                     } else {
+                      print("key-> $key");
                       // It's a group chat, display the NombreGrupo and Descripción
-                      return SizedBox(
-                        height: 120,
-                        child: ListTile(
-                          onTap: () => print('Go to chat screen'),
-                          leading: CircleAvatar(
-                            radius: 50, // Adjust the size of the image
-                            backgroundImage: NetworkImage(imageUrl),
-                            backgroundColor: Colors.transparent,
-                          ), // Display the group's image or icon
-                          title: Text(data.fields['NombreGrupo']
-                              .toString()), // Display the group's name
-                          subtitle: Text(data.fields['Descripción']
-                              .toString()), // Display the group's description
-                        ),
+                      return ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                  correo: correo!,
+                                  idGrupo:
+                                      key), // Pass the idGrupo to ChatScreen
+                            ),
+                          );
+                        },
+                        leading:
+                            imageUrl.isEmpty || imageUrl.compareTo("null") == 0
+                                ? CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors
+                                        .transparent, // Adjust the size of the image
+                                    child: leadingWidget,
+                                  )
+                                : CircleAvatar(
+                                    radius: 50, // Adjust the size of the image
+                                    backgroundImage: NetworkImage(imageUrl),
+                                    backgroundColor: Colors.transparent,
+                                  ),
+                        title: Text(data.fields['NombreGrupo']
+                            .toString()), // Display the group's name
+                        subtitle: Text(data.fields['Descripción']
+                            .toString()), // Display the group's description
                       );
                     }
                   },

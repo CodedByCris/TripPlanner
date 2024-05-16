@@ -1,9 +1,18 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:mysql1/mysql1.dart';
+
+import '../../Database/connections.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final String idGrupo;
+  final String correo;
+  const ChatScreen({super.key, required this.idGrupo, required this.correo});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -13,18 +22,60 @@ class _ChatScreenState extends State<ChatScreen> {
   final ImagePicker _picker = ImagePicker();
   final ScrollController _scrollController = ScrollController();
   String? selectedMessage;
+  final db = DatabaseHelper();
+  MySqlConnection? conn;
+  List<ResultRow> messages = [];
 
   @override
   void initState() {
+    print("key-> ${widget.idGrupo}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
+    fetchData();
+  }
+
+  Future<String> uploadImage(XFile image) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('images')
+        .child(DateTime.now().toString());
+    await ref.putFile(File(image.path));
+    return await ref.getDownloadURL();
+  }
+
+  Future<void> insertMessage(String content, bool isImage) async {
+    final date = DateTime.now();
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+    final timeStr = DateFormat('HH:mm').format(date);
+
+    await conn!.query(
+      'INSERT INTO Mensajes_del_Grupo (Contenido, FechaMensaje, HoraMensaje, Correo, IdGrupo) VALUES (?, ?, ?, ?, ?)',
+      [content, dateStr, timeStr, widget.correo, widget.idGrupo],
+    );
+
+    await fetchData();
   }
 
   Future<void> openCamera() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-    // Aquí puedes manejar la imagen tomada por la cámara
+    if (photo != null) {
+      final imageUrl = await uploadImage(photo);
+      await insertMessage(imageUrl, true);
+    }
+  }
+
+  Future<void> fetchData() async {
+    conn = await db.getConnection();
+
+    final messageResult = await conn!.query(
+        'SELECT Contenido, FechaMensaje, HoraMensaje, Correo FROM Mensajes_del_Grupo WHERE IdGrupo = ?',
+        [widget.idGrupo]);
+
+    setState(() {
+      messages = messageResult.toList();
+    });
   }
 
   @override
@@ -35,38 +86,39 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
+          ListView.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
             controller: _scrollController,
+            itemCount: messages.length,
             itemBuilder: (context, index) {
-              final String message =
-                  index % 2 == 0 ? 'Sinverguenza' : 'Hola david';
+              final message = messages[index];
+              final isSender = message['Correo'] == widget.correo;
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    selectedMessage = message;
+                    selectedMessage = message['Contenido'];
                   });
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 50.0),
                   child: BubbleSpecialThree(
-                    text: message,
-                    color:
-                        Color.fromARGB(255, index % 2 == 0 ? 18 : 23, 37, 18),
+                    text: message['Contenido'],
+                    color: Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
                     tail: true,
                     textStyle:
                         const TextStyle(color: Colors.white, fontSize: 16),
-                    isSender: index % 2 == 0,
+                    isSender: isSender,
                     delivered: true,
                   ),
                 ),
               );
             },
-            itemCount: 10,
           ),
           MessageBar(
+            messageBarHintText: 'Escribe un mensaje',
             replying: selectedMessage != null,
             replyingTo: selectedMessage ?? '',
-            onSend: (message) => print(message),
+            onSend: (message) => insertMessage(message, false),
             messageBarColor: Colors.white,
             actions: [
               Padding(
