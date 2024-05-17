@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../../Database/connections.dart';
+
 //This screen is to show when there is no internet connection
-class NoConnectionScreen extends StatelessWidget {
+class NoConnectionScreen extends StatefulWidget {
   const NoConnectionScreen({super.key});
+
+  @override
+  State<NoConnectionScreen> createState() => _NoConnectionScreenState();
+}
+
+class _NoConnectionScreenState extends State<NoConnectionScreen> {
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _databaseHelper.getConnection();
+  }
 
   @override
   Widget build(BuildContext context) {

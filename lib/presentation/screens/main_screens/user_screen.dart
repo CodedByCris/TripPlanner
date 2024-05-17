@@ -11,6 +11,7 @@ import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 import '../../functions/alerts.dart';
 import '../../providers/theme_provider.dart';
+import '../../video/videoplayer.dart';
 import '../../widgets/interface/custom_app_bar.dart';
 import '../../providers/token_provider.dart';
 
@@ -77,7 +78,7 @@ class UserScreen extends ConsumerWidget {
                     ? _correo(colors, selectedColor, correo)
                     : _correo(colors, selectedColor, "INVITADO@gmail.com"),
                 _colores(colors, selectedColor, ref),
-                _tutorial(colors, selectedColor),
+                _tutorial(colors, selectedColor, context),
                 _informacion(colors, selectedColor),
               ],
             ),
@@ -433,9 +434,9 @@ class UserScreen extends ConsumerWidget {
     );
   }
 
-  Widget _tutorial(List<Color> colors, int selectedColor) {
+  Widget _tutorial(
+      List<Color> colors, int selectedColor, BuildContext context) {
     return ListTile(
-      //TODO: Agregar videoPlayer
       leading: Icon(
         Icons.question_mark,
         color: colors[selectedColor],
@@ -449,6 +450,12 @@ class UserScreen extends ConsumerWidget {
           style: TextStyle(
             fontSize: 15,
           )),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const VideoPlayerScreen()),
+        );
+      },
     );
   }
 }
