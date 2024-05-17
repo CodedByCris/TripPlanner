@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_planner/presentation/screens/details_screens/actual_details.dart';
 
 import 'package:trip_planner/presentation/screens/main_screens/home_screen.dart';
 import 'package:trip_planner/presentation/widgets/travel_cards/actual_travel_card.dart';
 
 import '../../Database/connections.dart';
+import '../../providers/theme_provider.dart';
 import '../../widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mysql1/mysql1.dart';
-
-import '../details_screens/favorites_details.dart';
 
 bool hayDatos = false;
 
@@ -103,98 +103,107 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        !hayDatos
-            ? Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'No tienes viajes programados',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 9, 61, 104),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    isLoading
-                        ? const CircularProgressIndicator()
-                        : ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                isLoading = true; // Comienza la carga
-                              });
-                              fetchData().then((_) {
-                                setState(() {
-                                  isLoading = false; // Termina la carga
-                                });
-                              });
-                            },
-                            child: const Text('Buscar viajes...'),
-                          ),
-                  ],
-                ),
-              )
-            : const Text(
-                'Pulsa para ver todos los datos del viaje',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 9, 61, 104),
-                ),
-              ),
+    return Consumer(builder: (context, ref, child) {
+      final colors = Theme.of(context).colorScheme;
+      final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
-        const SizedBox(height: 20),
-        hayDatos
-            ? Expanded(
-                child: ListView.builder(
-                  itemCount: groupedData.length,
-                  itemBuilder: (context, index) {
-                    final month = groupedData.keys.elementAt(index);
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            month,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
+      return Column(
+        children: [
+          const SizedBox(height: 20),
+          !hayDatos
+              ? Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'No tienes viajes programados',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode
+                              ? colors.secondary
+                              : const Color.fromARGB(255, 9, 61, 104),
                         ),
-                        ...groupedData[month]!.map((viaje) {
-                          return GestureDetector(
-                            onTap: () {
-                              print(viaje['idViaje']);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ActualDetails(
-                                    idViaje: viaje['idViaje'],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: ActualTravelCard(
-                              origen: viaje['origen'],
-                              destino: viaje['destino'],
-                              fechaSalida: viaje['fechaSalida'],
-                              fechaLlegada: viaje['fechaLlegada'],
-                              gastos: 20,
-                              numRutas: 3,
+                      ),
+                      const SizedBox(height: 20),
+                      isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  isLoading = true; // Comienza la carga
+                                });
+                                fetchData().then((_) {
+                                  setState(() {
+                                    isLoading = false; // Termina la carga
+                                  });
+                                });
+                              },
+                              child: const Text('Buscar viajes...'),
                             ),
-                          );
-                        }),
-                      ],
-                    );
-                  },
+                    ],
+                  ),
+                )
+              : Text(
+                  'Pulsa para ver todos los datos del viaje',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode
+                        ? colors.secondary
+                        : const Color.fromARGB(255, 9, 61, 104),
+                  ),
                 ),
-              )
-            : Container(), // Si no hay datos, muestra un contenedor vacío
-      ],
-    );
+
+          const SizedBox(height: 20),
+          hayDatos
+              ? Expanded(
+                  child: ListView.builder(
+                    itemCount: groupedData.length,
+                    itemBuilder: (context, index) {
+                      final month = groupedData.keys.elementAt(index);
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              month,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          ...groupedData[month]!.map((viaje) {
+                            return GestureDetector(
+                              onTap: () {
+                                print(viaje['idViaje']);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ActualDetails(
+                                      idViaje: viaje['idViaje'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: ActualTravelCard(
+                                origen: viaje['origen'],
+                                destino: viaje['destino'],
+                                fechaSalida: viaje['fechaSalida'],
+                                fechaLlegada: viaje['fechaLlegada'],
+                                gastos: 20,
+                                numRutas: 3,
+                              ),
+                            );
+                          }),
+                        ],
+                      );
+                    },
+                  ),
+                )
+              : Container(), // Si no hay datos, muestra un contenedor vacío
+        ],
+      );
+    });
   }
 }

@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 
 import '../../Database/connections.dart';
+import '../../providers/theme_provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final String imagen;
@@ -92,90 +94,115 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const SizedBox(width: 8.0),
-            CircleAvatar(
-              backgroundImage: NetworkImage(widget.imagen),
-            ),
-            const SizedBox(width: 8.0),
-            Text(widget.nombre),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              controller: _scrollController,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                final isSender = message['Correo'] == widget.correo;
-                final isImageURL = message['Contenido'].contains("https:");
+    return Consumer(builder: (context, ref, child) {
+      final colors = Theme.of(context).colorScheme;
+      final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedMessage = message['Contenido'];
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 5.0),
-                    child: isImageURL
-                        ? BubbleNormalImage(
-                            id: 'id$index',
-                            image: Image(
-                              image: NetworkImage(message['Contenido']),
-                              fit: BoxFit.cover,
-                            ),
-                            color:
-                                Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
-                            tail: true,
-                            delivered: true,
-                          )
-                        : BubbleSpecialThree(
-                            text: message['Contenido'],
-                            color:
-                                Color.fromARGB(255, isSender ? 18 : 23, 37, 18),
-                            tail: true,
-                            textStyle: const TextStyle(
-                                color: Colors.white, fontSize: 16),
-                            isSender: isSender,
-                            delivered: true,
-                          ),
-                  ),
-                );
-              },
-            ),
-          ),
-          MessageBar(
-            messageBarHintText: 'Escribe un mensaje',
-            replying: selectedMessage != null,
-            replyingTo: selectedMessage ?? '',
-            onSend: (message) => insertMessage(message, false),
-            messageBarColor: Colors.white,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8, right: 16),
-                child: InkWell(
-                  onTap: openCamera,
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.green,
-                    size: 24,
+      return Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              const SizedBox(width: 8.0),
+              CircleAvatar(
+                backgroundImage: widget.imagen.compareTo("null") == 0
+                    ? NetworkImage(widget.imagen)
+                    : null,
+                child: widget.imagen.compareTo("null") == 0
+                    ? const Icon(Icons.person_2)
+                    : null,
+              ),
+              const SizedBox(width: 8.0),
+              Flexible(
+                child: Text(
+                  widget.nombre,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16, // Adjust this value as needed
+                    color: isDarkMode
+                        ? colors.secondary
+                        : const Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
+                controller: _scrollController,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  final isSender = message['Correo'] == widget.correo;
+                  final isImageURL = message['Contenido'].contains("https:");
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedMessage = message['Contenido'];
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0),
+                      child: isImageURL
+                          ? BubbleNormalImage(
+                              id: 'id$index',
+                              image: Image(
+                                image: NetworkImage(message['Contenido']),
+                                fit: BoxFit.cover,
+                              ),
+                              color: Color.fromARGB(
+                                  255, isSender ? 18 : 23, 37, 18),
+                              tail: true,
+                              delivered: true,
+                            )
+                          : BubbleSpecialThree(
+                              text: message['Contenido'],
+                              color: Color.fromARGB(
+                                  255, isSender ? 18 : 23, 37, 18),
+                              tail: true,
+                              textStyle: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                              isSender: isSender,
+                              delivered: true,
+                            ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            MessageBar(
+              messageBarHintText: 'Escribe un mensaje',
+              replying: selectedMessage != null,
+              replyingTo: selectedMessage ?? '',
+              onSend: (message) => insertMessage(message, false),
+              messageBarColor: isDarkMode
+                  ? const Color.fromARGB(255, 0, 0, 0)
+                  : colors.secondary,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 16),
+                  child: InkWell(
+                    onTap: openCamera,
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.green,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

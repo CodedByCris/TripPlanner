@@ -94,7 +94,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
             title: Text(
               'MENSAJES',
               style: TextStyle(
-                color: isDarkMode ? colors.secondary : colors.primary,
+                color: isDarkMode
+                    ? colors.secondary
+                    : const Color.fromARGB(255, 9, 61, 104),
               ),
             ),
             actions: [
@@ -168,7 +170,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         ),
                       );
                     } else {
-                      print("key-> $key");
                       // It's a group chat, display the NombreGrupo and Descripción
                       return ListTile(
                         onTap: () {
@@ -177,8 +178,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
                                   imagen: imageUrl,
-                                  nombre:
-                                      data.fields['NombreUsuario'].toString(),
+                                  nombre: data.fields['NombreGrupo'].toString(),
                                   correo: correo!,
                                   idGrupo:
                                       key), // Pass the idGrupo to ChatScreen
@@ -206,13 +206,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     }
                   },
                 )
-              : const Center(
+              : Center(
                   child: Text(
                     'No tienes conversaciones activas',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 9, 61, 104),
+                      color: isDarkMode
+                          ? colors.secondary
+                          : const Color.fromARGB(255, 9, 61, 104),
                     ),
                   ),
                 ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/search_screen.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../Database/connections.dart';
+import '../../providers/theme_provider.dart';
 
 class ComparadorWidget extends StatefulWidget {
   const ComparadorWidget({
@@ -43,56 +45,70 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //!Titulo
-              const Text(
-                'Encuentra el viaje perfecto al mejor',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-                textAlign: TextAlign.center,
+    return Consumer(
+      builder: (context, ref, child) {
+        final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //!Titulo
+                  Text(
+                    'Encuentra el viaje perfecto al mejor',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode
+                          ? colors.secondary
+                          : const Color.fromARGB(255, 9, 61, 104),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+
+                  //!Subtitulo
+                  Text(
+                    'Introduce los detalles de tu viaje y descubre las mejores actividades y ofertas',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode
+                          ? colors.secondary
+                          : const Color.fromARGB(255, 9, 61, 104),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 30),
+
+                  //!Campo de texto origen
+                  _origen(colors),
+                  const SizedBox(height: 20),
+
+                  //!Campo de texto destino
+                  _destino(colors),
+                  const SizedBox(height: 20),
+
+                  //! Precio mínimo y máximo
+                  _precio(colors),
+                  const SizedBox(height: 20),
+
+                  //!Fecha de salida y llegada
+                  fechas(colors, context),
+                  const SizedBox(height: 50),
+
+                  //!Botón de buscar
+                  _btnBuscar(colors),
+                ],
               ),
-              const SizedBox(height: 20),
-
-              //!Subtitulo
-              const Text(
-                'Introduce los detalles de tu viaje y descubre las mejores actividades y ofertas',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-
-              //!Campo de texto origen
-              _origen(colors),
-              const SizedBox(height: 20),
-
-              //!Campo de texto destino
-              _destino(colors),
-              const SizedBox(height: 20),
-
-              //! Precio mínimo y máximo
-              _precio(colors),
-              const SizedBox(height: 20),
-
-              //!Fecha de salida y llegada
-              fechas(colors, context),
-              const SizedBox(height: 50),
-
-              //!Botón de buscar
-              _btnBuscar(colors),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
