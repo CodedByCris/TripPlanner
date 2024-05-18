@@ -101,7 +101,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
         'Añadir Gasto',
         style: TextStyle(color: Colors.white),
       ),
-      onPressed: () {
+      onPressed: () async {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
           String? cantidad = cantidadController.text.toUpperCase().trim();
@@ -113,74 +113,37 @@ class NewScreenState extends ConsumerState<AddGasto> {
           descripcionController.clear();
           fechaController.clear();
 
-          //! Insertar los datos en la base de datos
-          //Mounted comprueba si el widget sigue en la pantalla
-          if (mounted)
-          // Show a dialog
-          {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Ruta creado'),
-                  content: const Text(
-                      'El gasto ha sido creada correctamente, ¿desea añadir otro gasto?'),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Salir'),
-                      //INSERT
-                      onPressed: () async {
-                        //Comprobaciones
-                        if (descr!.isEmpty) {
-                          descr = 'Sin descripción';
-                        }
-                        if (fecha!.isEmpty) {
-                          fecha = DateTime.now().toString();
-                        }
-                        String sql =
-
-                            //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Gastos_del_Viaje(Cantidad, Descripción, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
-                        await db.getConnection().then((conn) async {
-                          await conn.query(
-                              sql, [cantidad, descr, fecha, widget.idViaje]);
-                        });
-                        Navigator.of(context).pop();
-                        GoRouter.of(context).go(
-                            '/home/0'); //TODO: CAMBIAR POR LA CARD DEL VIAJE ACTUAL
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Aceptar'),
-                      //INSERT
-                      onPressed: () async {
-                        //Comprobaciones
-                        if (descr!.isEmpty) {
-                          descr = 'Sin descripción';
-                        }
-                        if (fecha!.isEmpty) {
-                          fecha = DateTime.now().toString();
-                        }
-                        print("CANTIDAD: $cantidad");
-                        print("DESCRIPCION: $descr");
-                        print("FECHA: $fecha");
-                        print("ID VIAJE: ${widget.idViaje}");
-                        String sql =
-
-                            //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Gastos_del_Viaje(Cantidad, Descripción, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
-                        await db.getConnection().then((conn) async {
-                          await conn.query(
-                              sql, [cantidad, descr, fecha, widget.idViaje]);
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
+          //Comprobaciones
+          if (descr.isEmpty) {
+            descr = 'Sin descripción';
           }
+          if (fecha.isEmpty) {
+            fecha = DateTime.now().toString();
+          }
+
+          String sql =
+              'INSERT INTO Gastos_del_Viaje(Cantidad, Descripción, FechaGasto, IdViaje) VALUES (?, ?, ?, ?)';
+          await db.getConnection().then((conn) async {
+            await conn.query(sql, [cantidad, descr, fecha, widget.idViaje]);
+          });
+
+          // Muestra un dialogo
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Gasto añadido correctamente'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Aceptar'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         }
       },
     );

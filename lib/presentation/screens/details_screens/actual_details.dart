@@ -126,7 +126,11 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 idViaje: widget.idViaje,
                               ),
                             ),
-                          );
+                          ).then((value) {
+                            setState(() {
+                              fetchData();
+                            });
+                          });
                         },
                       ),
                     ],
@@ -156,7 +160,11 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 fechaFin: fechaFin,
                               ),
                             ),
-                          );
+                          ).then((value) {
+                            setState(() {
+                              fetchData();
+                            });
+                          });
                         },
                       ),
                     ],
@@ -201,6 +209,12 @@ class _ActualDetailsState extends State<ActualDetails> {
                         TextButton(
                           child: const Text('Modificar'),
                           onPressed: () {
+                            final origenController = TextEditingController(
+                              text: row['Origen'],
+                            );
+                            final destinoController = TextEditingController(
+                              text: row['Destino'],
+                            );
                             final salidaController = TextEditingController(
                               text: row['FechaSalida']
                                   .toIso8601String()
@@ -222,7 +236,8 @@ class _ActualDetailsState extends State<ActualDetails> {
                                   content: SingleChildScrollView(
                                     child: _formViaje(
                                         formKey,
-                                        row,
+                                        origenController,
+                                        destinoController,
                                         salidaController,
                                         context,
                                         llegadaController,
@@ -241,6 +256,10 @@ class _ActualDetailsState extends State<ActualDetails> {
                                         // Solo cerrar el diálogo si el formulario es válido
                                         if (formKey.currentState!.validate()) {
                                           // Obtén los valores de los controladores de texto
+                                          String origen =
+                                              origenController.text.trim();
+                                          String destino =
+                                              destinoController.text.trim();
                                           String salida =
                                               salidaController.text.trim();
                                           String llegada =
@@ -254,13 +273,16 @@ class _ActualDetailsState extends State<ActualDetails> {
 
                                           // Crea la consulta SQL
                                           String sql =
-                                              "UPDATE Viaje SET FechaSalida = '$salida', FechaLlegada = '$llegada', NotasViaje = '$notas' WHERE IdViaje = ${widget.idViaje}";
+                                              "UPDATE Viaje SET Origen = '$origen', Destino = '$destino', FechaSalida = '$salida', FechaLlegada = '$llegada', NotasViaje = '$notas' WHERE IdViaje = ${widget.idViaje}";
 
                                           // Ejecuta la consulta SQL
                                           // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
                                           conn!.query(sql);
                                           Snackbar().mensaje(context,
                                               'Viaje modificado con éxito');
+                                          setState(() {
+                                            fetchData();
+                                          });
                                           Navigator.of(context).pop();
                                         }
                                       },
@@ -316,7 +338,8 @@ class _ActualDetailsState extends State<ActualDetails> {
 
   Widget _formViaje(
       GlobalKey<FormState> formKey,
-      ResultRow row,
+      TextEditingController origenController,
+      TextEditingController destinoController,
       TextEditingController salidaController,
       BuildContext context,
       TextEditingController llegadaController,
@@ -326,7 +349,7 @@ class _ActualDetailsState extends State<ActualDetails> {
       child: Wrap(
         children: <Widget>[
           TextFormField(
-            controller: TextEditingController(text: row['Origen']),
+            controller: origenController,
             decoration: const InputDecoration(labelText: 'Origen'),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -336,11 +359,15 @@ class _ActualDetailsState extends State<ActualDetails> {
               if (RegExp(r'[0-9]').hasMatch(value)) {
                 return 'El origen no puede contener números';
               }
+              // Comprobar si el valor tiene menos de 3 letras
+              if (value.length < 3) {
+                return 'El origen debe tener al menos 3 letras';
+              }
               return null;
             },
           ),
           TextFormField(
-            controller: TextEditingController(text: row['Destino']),
+            controller: destinoController,
             decoration: const InputDecoration(labelText: 'Destino'),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -349,6 +376,10 @@ class _ActualDetailsState extends State<ActualDetails> {
               // Comprobar si el valor contiene números
               if (RegExp(r'[0-9]').hasMatch(value)) {
                 return 'El destino no puede contener números';
+              }
+              // Comprobar si el valor tiene menos de 3 letras
+              if (value.length < 3) {
+                return 'El destino debe tener al menos 3 letras';
               }
               return null;
             },
@@ -642,6 +673,9 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 Snackbar().mensaje(
                                     context, 'Ruta modificado con éxito');
                                 Navigator.of(context).pop();
+                                setState(() {
+                                  fetchData();
+                                });
                               }
                             },
                           ),
@@ -748,6 +782,9 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 conn!.query(sql);
                                 Snackbar().mensaje(
                                     context, 'Gasto modificado con éxito');
+                                setState(() {
+                                  fetchData();
+                                });
 
                                 Navigator.of(context).pop();
                               }
@@ -775,6 +812,9 @@ class _ActualDetailsState extends State<ActualDetails> {
             tipo.compareTo('ruta') == 0
                 ? Snackbar().mensaje(context, 'Ruta eliminada correctamente')
                 : Snackbar().mensaje(context, 'Gasto eliminado correctamente');
+            setState(() {
+              fetchData();
+            });
             Navigator.of(context).pop();
           },
         ),

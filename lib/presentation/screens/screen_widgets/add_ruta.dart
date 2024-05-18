@@ -91,7 +91,7 @@ class NewScreenState extends ConsumerState<AddRuta> {
         'Añadir Ruta',
         style: TextStyle(color: Colors.white),
       ),
-      onPressed: () {
+      onPressed: () async {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
           String? ubicacion = ubicacionController.text.toUpperCase().trim();
@@ -103,70 +103,36 @@ class NewScreenState extends ConsumerState<AddRuta> {
           notasController.clear();
           ordenController.clear();
 
-          //! Insertar los datos en la base de datos
-          //Mounted comprueba si el widget sigue en la pantalla
-          if (mounted)
-          // Show a dialog
-          {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Ruta creado'),
-                  content: const Text(
-                      'La ruta ha sido creada correctamente, ¿desea añadir otra ruta?'),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Salir'),
-                      //INSERT
-                      onPressed: () async {
-                        //Comprobaciones
-                        if (notas!.isEmpty) {
-                          notas = 'Sin notas';
-                        }
-                        if (orden!.isEmpty) {
-                          orden = '0';
-                        }
-                        String sql =
-
-                            //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
-                        await db.getConnection().then((conn) async {
-                          await conn.query(
-                              sql, [ubicacion, notas, orden, widget.idViaje]);
-                        });
-                        Navigator.of(context).pop();
-                        // GoRouter.of(context).go(
-                        //     '/home/0'); //TODO: CAMBIAR POR LA CARD DEL VIAJE ACTUAL
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Aceptar'),
-                      //INSERT
-                      onPressed: () async {
-                        //Comprobaciones
-                        if (notas!.isEmpty) {
-                          notas = 'Sin notas';
-                        }
-                        if (orden!.isEmpty) {
-                          orden = '0';
-                        }
-                        String sql =
-
-                            //INSERTO LOS DATOS DEL VIAJE
-                            'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
-                        await db.getConnection().then((conn) async {
-                          await conn.query(
-                              sql, [ubicacion, notas, orden, widget.idViaje]);
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
+          //Comprobaciones
+          if (notas.isEmpty) {
+            notas = 'Sin notas';
           }
+          if (orden.isEmpty) {
+            orden = '0';
+          }
+          String sql =
+              'INSERT INTO Ruta(Ubicacion, NotasRuta, Orden, IdViaje) VALUES (?, ?, ?, ?)';
+          await db.getConnection().then((conn) async {
+            await conn.query(sql, [ubicacion, notas, orden, widget.idViaje]);
+          });
+
+          // Muestra un dialogo
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Ruta añadida correctamente'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Aceptar'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         }
       },
     );
