@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:trip_planner/presentation/functions/alerts.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
-import '../../functions/errors.dart';
+import '../../functions/snackbars.dart';
 import '../../widgets/widgets.dart';
 
 class RecoverScreen extends StatefulWidget {
@@ -138,9 +137,9 @@ class _RecoverForm extends ConsumerWidget {
         onPressed: () async {
           if (formKey.currentState!.validate()) {
             // Agrega esta línea
-            String email = correo.text;
-            String pass = password.text;
-            String repPass = repeatPassword.text;
+            String email = correo.text.trim();
+            String pass = password.text.trim();
+            String repPass = repeatPassword.text.trim();
             bool loginSuccessful = false;
 
             //* Consulta SQL
@@ -164,10 +163,9 @@ class _RecoverForm extends ConsumerWidget {
                   "UPDATE Usuario SET Password = ? WHERE Correo = ?",
                   [pass, email],
                 );
-                Alerts().recoverySuccessfully(context);
+                Snackbar()
+                    .mensaje(context, 'Contraseña actualizada correctamente');
                 context.go('/login');
-              } else {
-                Errors().emailDontExist(context);
               }
             });
           }

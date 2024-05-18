@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
-import '../../functions/alerts.dart';
+import '../../functions/snackbars.dart';
 import '../../providers/theme_provider.dart';
 import '../../video/videoplayer.dart';
 import '../../widgets/interface/custom_app_bar.dart';
@@ -151,7 +151,7 @@ class UserScreen extends ConsumerWidget {
         "UPDATE Usuario SET Imagen = ? WHERE Correo = ?",
         [imageUrl, email],
       );
-      Alerts().recoverySuccessfully(context); //TODO: CAMBIAR EL MENSAJE
+      Snackbar().mensaje(context, 'Foto de perfil actualizada correctamente');
     });
   }
 
@@ -343,7 +343,8 @@ class UserScreen extends ConsumerWidget {
                     onPressed: () async {
                       // Delete the token
                       await ref.read(tokenProvider.notifier).deleteToken();
-
+                      Snackbar().mensaje(
+                          context, 'Sesión cerrada... Volviendo al login');
                       // Redirect the user to the login screen
                       Navigator.of(context).pop();
                       GoRouter.of(context).go('/login');

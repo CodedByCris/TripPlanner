@@ -6,6 +6,8 @@ import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart'
 import 'package:trip_planner/presentation/screens/screen_widgets/add_ruta.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../functions/snackbars.dart';
+
 class ActualDetails extends StatefulWidget {
   final int idViaje;
 
@@ -239,10 +241,12 @@ class _ActualDetailsState extends State<ActualDetails> {
                                         // Solo cerrar el diálogo si el formulario es válido
                                         if (formKey.currentState!.validate()) {
                                           // Obtén los valores de los controladores de texto
-                                          String salida = salidaController.text;
+                                          String salida =
+                                              salidaController.text.trim();
                                           String llegada =
-                                              llegadaController.text;
-                                          String notas = notasController.text;
+                                              llegadaController.text.trim();
+                                          String notas =
+                                              notasController.text.trim();
 
                                           if (notas == '') {
                                             notas = 'Sin notas';
@@ -255,7 +259,8 @@ class _ActualDetailsState extends State<ActualDetails> {
                                           // Ejecuta la consulta SQL
                                           // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
                                           conn!.query(sql);
-
+                                          Snackbar().mensaje(context,
+                                              'Viaje modificado con éxito');
                                           Navigator.of(context).pop();
                                         }
                                       },
@@ -611,9 +616,10 @@ class _ActualDetailsState extends State<ActualDetails> {
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
                                 // Obtén los valores de los controladores de texto
-                                String notasRuta = notesController.text;
-                                String orden = orderController.text;
-                                String ubicacion = locationController.text;
+                                String notasRuta = notesController.text.trim();
+                                String orden = orderController.text.trim();
+                                String ubicacion =
+                                    locationController.text.trim();
 
                                 if (orden == '') {
                                   orden = '0';
@@ -633,7 +639,8 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 // Ejecuta la consulta SQL
                                 // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
                                 conn!.query(sql);
-
+                                Snackbar().mensaje(
+                                    context, 'Ruta modificado con éxito');
                                 Navigator.of(context).pop();
                               }
                             },
@@ -716,9 +723,10 @@ class _ActualDetailsState extends State<ActualDetails> {
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
                                 // Obtén los valores de los controladores de texto
-                                String cantidad = amountController.text;
-                                String descripcion = descriptionController.text;
-                                String fecha = dateController.text;
+                                String cantidad = amountController.text.trim();
+                                String descripcion =
+                                    descriptionController.text.trim();
+                                String fecha = dateController.text.trim();
 
                                 if (fecha == '') {
                                   fecha = DateTime.now().toIso8601String();
@@ -738,6 +746,8 @@ class _ActualDetailsState extends State<ActualDetails> {
                                 // Ejecuta la consulta SQL
                                 // Asegúrate de reemplazar 'database' con la referencia a tu base de datos
                                 conn!.query(sql);
+                                Snackbar().mensaje(
+                                    context, 'Gasto modificado con éxito');
 
                                 Navigator.of(context).pop();
                               }
@@ -750,7 +760,6 @@ class _ActualDetailsState extends State<ActualDetails> {
           },
         ),
         TextButton(
-          //TODO:FALTA QUE SE RECARGUE LA PÁGINA
           child: const Text('Eliminar'),
           onPressed: () {
             String tableName =
@@ -763,6 +772,9 @@ class _ActualDetailsState extends State<ActualDetails> {
             String sql = 'DELETE FROM $tableName WHERE $idField = $id';
 
             conn!.query(sql);
+            tipo.compareTo('ruta') == 0
+                ? Snackbar().mensaje(context, 'Ruta eliminada correctamente')
+                : Snackbar().mensaje(context, 'Gasto eliminado correctamente');
             Navigator.of(context).pop();
           },
         ),

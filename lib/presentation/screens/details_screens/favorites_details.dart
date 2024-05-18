@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 
+import '../../functions/snackbars.dart';
+
 class FavoriteDetails extends StatefulWidget {
   final int idViaje;
   final String correo;
@@ -65,6 +67,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
     setState(() {
       isFavorite = true;
     });
+    Snackbar().mensaje(context, 'Viaje agregado a favoritos');
   }
 
   Future<void> removeFromFavorites() async {
@@ -73,6 +76,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
     setState(() {
       isFavorite = false;
     });
+    Snackbar().mensaje(context, 'Viaje eliminado de favoritos');
   }
 
   @override

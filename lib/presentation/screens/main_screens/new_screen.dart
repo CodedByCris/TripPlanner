@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 
-import '../../functions/alerts.dart';
 import '../../Database/connections.dart';
+import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 
@@ -174,12 +174,12 @@ class NewScreenState extends ConsumerState<NewScreen> {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
-          String? origen = origenController.text.toUpperCase();
-          String? destino = destinoController.text.toUpperCase();
-          String? fechaSalida = fechaOrigenController.text;
-          String? fechaLlegada = fechaLlegadaController.text;
-          String? precioBilletes = precioBilletesController.text;
-          String? notas = notasController.text;
+          String? origen = origenController.text.toUpperCase().trim();
+          String? destino = destinoController.text.toUpperCase().trim();
+          String? fechaSalida = fechaOrigenController.text.trim();
+          String? fechaLlegada = fechaLlegadaController.text.trim();
+          String? precioBilletes = precioBilletesController.text.trim();
+          String? notas = notasController.text.trim();
           // Aquí puedes guardar los datos en la base de datos o en cualquier otro lugar
 
           // Clear the text fields
@@ -249,7 +249,8 @@ class NewScreenState extends ConsumerState<NewScreen> {
                             ]);
                           }
 
-                          Alerts().registerSuccessfully(context);
+                          Snackbar()
+                              .mensaje(context, 'Viaje creado correctamente');
                         });
                         Navigator.of(context).pop();
                         GoRouter.of(context).go('/home/0');

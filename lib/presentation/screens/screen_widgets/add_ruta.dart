@@ -94,9 +94,9 @@ class NewScreenState extends ConsumerState<AddRuta> {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
-          String? ubicacion = ubicacionController.text.toUpperCase();
-          String? notas = notasController.text;
-          String? orden = ordenController.text;
+          String? ubicacion = ubicacionController.text.toUpperCase().trim();
+          String? notas = notasController.text.trim();
+          String? orden = ordenController.text.trim();
 
           // Clear the text fields
           ubicacionController.clear();

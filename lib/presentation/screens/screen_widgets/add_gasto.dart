@@ -104,9 +104,9 @@ class NewScreenState extends ConsumerState<AddGasto> {
       onPressed: () {
         if (formKey.currentState!.validate()) {
           // Guarda los datos
-          String? cantidad = cantidadController.text.toUpperCase();
-          String? descr = descripcionController.text;
-          String? fecha = fechaController.text;
+          String? cantidad = cantidadController.text.toUpperCase().trim();
+          String? descr = descripcionController.text.trim();
+          String? fecha = fechaController.text.trim();
 
           // Clear the text fields
           cantidadController.clear();

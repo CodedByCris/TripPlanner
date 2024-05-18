@@ -119,14 +119,6 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           //*Minimo
           child: TextFormField(
             controller: precioMinText,
-            // validator: (value) {
-            //   if (value!.isNotEmpty) {
-            //     if (double.parse(value) < 0) {
-            //       return 'Por favor ingrese un precio válido';
-            //     }
-            //   }
-            //   return null;
-            // },
             decoration: InputDecoration(
               labelText: 'PRECIO MIN',
               prefixIcon: Icon(
@@ -340,16 +332,16 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     if (correo == null || correo!.isEmpty) {
       correoConsulta = "";
     } else {
-      correoConsulta = correo!;
+      correoConsulta = correo!.trim();
     }
-    List<dynamic> parameters = [origen.toUpperCase(), correoConsulta];
+    List<dynamic> parameters = [origen.toUpperCase().trim(), correoConsulta];
     String query =
         '''SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo, Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal FROM Viaje 
     LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje WHERE Viaje.Origen = ? AND Viaje.Correo != ?''';
 
     if (destino != null) {
       query += ' AND Viaje.Destino = ?';
-      parameters.add(destino.toUpperCase());
+      parameters.add(destino.toUpperCase().trim());
     }
 
     if (fechaSalida != null) {

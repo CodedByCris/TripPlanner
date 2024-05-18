@@ -4,6 +4,7 @@ import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
 import '../../Database/connections.dart';
+import '../../functions/snackbars.dart';
 import '../../providers/theme_provider.dart';
 
 class AddGroupScreen extends StatefulWidget {
@@ -153,11 +154,11 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                         [
                           descriptionController.text.isEmpty
                               ? ""
-                              : descriptionController.text,
+                              : descriptionController.text.trim(),
                           DateTime.now().toIso8601String().substring(0, 10),
                           groupNameController.text.isEmpty
                               ? ""
-                              : groupNameController.text,
+                              : groupNameController.text.trim(),
                           groupTypes.indexOf(selectedGroupType!) + 1
                         ],
                       );
@@ -174,6 +175,9 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                       );
                       // }
                     }
+                    Snackbar()
+                        .mensaje(context, 'Conversación creada correctamente');
+
                     Navigator.pop(context);
                   },
                   child: const Text('Crear grupo'),

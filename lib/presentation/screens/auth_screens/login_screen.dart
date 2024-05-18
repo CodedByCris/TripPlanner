@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
+import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 
@@ -185,8 +186,8 @@ class _LoginForm extends ConsumerWidget {
           // Validate the inputs
           if (formKey.currentState!.validate()) {
             // If the inputs are valid, do the login
-            String email = correo.text;
-            String pass = password.text;
+            String email = correo.text.trim();
+            String pass = password.text.trim();
             bool loginSuccessful = false;
 
             await db.getConnection().then((conn) async {
@@ -202,6 +203,7 @@ class _LoginForm extends ConsumerWidget {
             });
 
             if (loginSuccessful) {
+              Snackbar().mensaje(context, 'Sesión iniciada correctamente');
               await storage.write(key: 'token', value: email);
               print('Guardo el token');
 

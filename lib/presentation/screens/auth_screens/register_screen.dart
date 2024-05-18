@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:trip_planner/presentation/functions/alerts.dart';
-import 'package:trip_planner/presentation/functions/errors.dart';
+import 'package:trip_planner/presentation/functions/snackbars.dart';
 
 import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
@@ -45,18 +44,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         print('Cuenta creada correctamente');
         await conn.query(
             'INSERT INTO Usuario(NombreUsuario, Correo, Password) VALUES (?, ?, ?)',
-            [widget.nombre.text, widget.correo.text, widget.password.text]);
+            [
+              widget.nombre.text.trim(),
+              widget.correo.text.trim(),
+              widget.password.text.trim()
+            ]);
         if (mounted) {
           // Check if the widget is still in the tree
-          Alerts().registerSuccessfully(context);
+          Snackbar().mensaje(context, 'Cuenta creada correctamente');
         }
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
-      } else {
-        if (mounted) {
-          // Check if the widget is still in the tree
-          Errors().emailExist(context);
-        }
       }
     });
   }
