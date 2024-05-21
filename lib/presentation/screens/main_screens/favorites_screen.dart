@@ -5,7 +5,6 @@ import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/details_screens/favorites_details.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 import '../../functions/mes_mapa.dart';
 import '../../providers/theme_provider.dart';
@@ -43,8 +42,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
       // Use JOIN to combine Favoritos and Viaje tables
       final result = await conn.query(
-          'SELECT Viaje.Origen, Viaje.Destino, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.IdViaje, Viaje.Correo FROM Favoritos JOIN Viaje ON Favoritos.IdViaje = Viaje.IdViaje WHERE Favoritos.Correo = ?',
-          [correo]);
+          '''SELECT Viaje.Origen, Viaje.Destino, Viaje.FechaSalida, Viaje.FechaLlegada, 
+          Viaje.IdViaje, Viaje.Correo, Gastos.TotalGastos, (SELECT COUNT(*) FROM Ruta 
+          WHERE Ruta.IdViaje = Viaje.IdViaje) as NumRutas FROM Favoritos 
+          JOIN Viaje ON Favoritos.IdViaje = Viaje.IdViaje 
+          LEFT JOIN (SELECT IdViaje, SUM(Cantidad) as TotalGastos 
+          FROM Gastos_del_Viaje GROUP BY IdViaje) as Gastos ON Gastos.IdViaje = Viaje.IdViaje 
+          WHERE Favoritos.Correo = ?
+          ''', [correo]);
 
       if (result.isEmpty) {
         setState(() {
@@ -139,8 +144,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                             destino: viaje['Destino'],
                                             fechaSalida: viaje['FechaSalida'],
                                             fechaLlegada: viaje['FechaLlegada'],
-                                            gastos: 20,
-                                            numRutas: 3,
+                                            gastos: viaje['TotalGastos'] ?? 0.0,
+                                            numRutas: viaje['NumRutas'] ?? 0,
                                           ),
                                         );
                                       }),

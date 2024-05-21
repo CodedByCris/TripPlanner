@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 
 class AddRuta extends ConsumerStatefulWidget {

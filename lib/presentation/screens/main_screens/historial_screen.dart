@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 import '../../functions/mes_mapa.dart';
 import '../../providers/theme_provider.dart';
@@ -40,9 +39,14 @@ class _HistorialScreenState extends State<HistorialScreen> {
       correo = correoTemp;
       MySqlConnection conn = await db.getConnection();
 
-      final result = await conn.query(
-          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" AND FechaLlegada < CURDATE() ORDER BY FechaSalida ASC');
-
+      final result = await conn.query('''
+          SELECT Viaje.Origen, Viaje.Destino, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.IdViaje, 
+          SUM(Gastos_del_Viaje.cantidad) as TotalGastos, (SELECT COUNT(*) FROM Ruta 
+          WHERE Ruta.IdViaje = Viaje.IdViaje) as NumRutas FROM Viaje 
+          LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje 
+          WHERE Viaje.Correo = "$correo" AND Viaje.FechaLlegada < CURDATE() 
+          GROUP BY Viaje.IdViaje ORDER BY Viaje.FechaSalida ASC
+          ''');
       if (result.isEmpty) {
         setState(() {
           hayDatos = false;
@@ -163,8 +167,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                           destino: viaje['Destino'],
                                           fechaSalida: viaje['FechaSalida'],
                                           fechaLlegada: viaje['FechaLlegada'],
-                                          gastos: 20,
-                                          numRutas: 3,
+                                          gastos: viaje['TotalGastos'] ?? 0.0,
+                                          numRutas: viaje['NumRutas'],
                                         ),
                                       );
                                     }),

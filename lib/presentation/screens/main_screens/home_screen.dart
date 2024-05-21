@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/guest_view.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 import '../screen_widgets/home_view.dart';

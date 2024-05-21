@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/functions/snackbars.dart';
 
-import '../../../conf/connectivity.dart';
 import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';

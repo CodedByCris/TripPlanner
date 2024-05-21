@@ -43,8 +43,14 @@ class _HomeViewState extends State<HomeView> {
       correo = correoTemp;
       final db = DatabaseHelper();
       var conn = await db.getConnection();
-      final result = await conn.query(
-          'SELECT Origen, Destino, FechaSalida, FechaLlegada, IdViaje FROM Viaje WHERE Correo = "$correo" ORDER BY FechaSalida ASC');
+      final result = await conn.query('''
+    SELECT V.Origen, V.Destino, V.FechaSalida, V.FechaLlegada, V.IdViaje, 
+    (SELECT SUM(G.cantidad) FROM Gastos_del_Viaje G WHERE G.IdViaje = V.IdViaje) as Gastos,
+    (SELECT COUNT(*) FROM Ruta R WHERE R.IdViaje = V.IdViaje) as NumRutas
+    FROM Viaje V 
+    WHERE V.Correo = "$correo" 
+    ORDER BY V.FechaSalida ASC
+    ''');
       DateTime now = DateTime.now();
       if (result.isEmpty) {
         setState(() {
@@ -73,6 +79,8 @@ class _HomeViewState extends State<HomeView> {
                 'fechaSalida': fechaSalidaRow,
                 'fechaLlegada': fechaLlegadaRow,
                 'idViaje': row['IdViaje'],
+                'gastos': row['Gastos'], // Add this line
+                'numRutas': row['numRutas'], // Add this line
               });
             });
           }
@@ -154,7 +162,6 @@ class _HomeViewState extends State<HomeView> {
                         : const Color.fromARGB(255, 9, 61, 104),
                   ),
                 ),
-
           const SizedBox(height: 20),
           hayDatos
               ? Expanded(
@@ -174,6 +181,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                           ...groupedData[month]!.map((viaje) {
+                            print("Numero de rutas -> ${viaje['numRutas']}");
                             return GestureDetector(
                               onTap: () {
                                 print(viaje['idViaje']);
@@ -191,8 +199,9 @@ class _HomeViewState extends State<HomeView> {
                                 destino: viaje['destino'],
                                 fechaSalida: viaje['fechaSalida'],
                                 fechaLlegada: viaje['fechaLlegada'],
-                                gastos: 20,
-                                numRutas: 3,
+                                gastos:
+                                    viaje['gastos'] ?? 0.0, // Change this line
+                                numRutas: viaje['numRutas'] ?? 0,
                               ),
                             );
                           }),
@@ -201,7 +210,7 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                 )
-              : Container(), // Si no hay datos, muestra un contenedor vacío
+              : Container(),
         ],
       );
     });
