@@ -54,6 +54,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
+      } else {
+        Snackbar().mensaje(context, 'Ya existe ese usuario');
       }
     });
   }

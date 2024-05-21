@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 
@@ -14,26 +15,38 @@ import '../../video/videoplayer.dart';
 import '../../widgets/interface/custom_app_bar.dart';
 import '../../providers/token_provider.dart';
 
-class UserScreen extends ConsumerWidget {
+class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = Theme.of(context).colorScheme;
-    final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
-    return Scaffold(
-      appBar: AppBar(
-        title: CustomAppBar(
-          isDarkMode: isDarkMode,
-          colors: colors,
-          titulo: 'PERFIL DE USUARIO',
-        ),
-      ),
-      //*Cuerpo de la aplicación
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: _userView(ref, context),
-      ),
+  _UserScreenState createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, WidgetRef ref, child) {
+        final colors = Theme.of(context).colorScheme;
+        final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+        return Scaffold(
+          appBar: AppBar(
+            title: CustomAppBar(
+              isDarkMode: isDarkMode,
+              colors: colors,
+              titulo: 'PERFIL DE USUARIO',
+            ),
+          ),
+          //*Cuerpo de la aplicación
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: _userView(ref,
+                context), // Asegúrate de actualizar _userView para usar imageUrl en lugar de ref.watch(imageProvider)
+          ),
+        );
+      },
     );
   }
 
@@ -111,11 +124,13 @@ class UserScreen extends ConsumerWidget {
               ),
               child: ClipOval(
                 child: snapshot.data!.contains('http')
-                    ? Image.network(
-                        snapshot.data!,
+                    ? CachedNetworkImage(
+                        imageUrl: snapshot.data!,
                         width: 200,
                         height: 200,
                         fit: BoxFit.cover,
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       )
                     : Image(
                         image: FileImage(File(snapshot.data!)),
@@ -149,6 +164,9 @@ class UserScreen extends ConsumerWidget {
         [imageUrl, email],
       );
       Snackbar().mensaje(context, 'Foto de perfil actualizada correctamente');
+      setState(() {
+        this.imageUrl = imageUrl;
+      });
     });
   }
 

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
@@ -104,8 +105,8 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               const SizedBox(width: 8.0),
               CircleAvatar(
-                backgroundImage: widget.imagen.compareTo("null") == 0
-                    ? NetworkImage(widget.imagen)
+                backgroundImage: widget.imagen.compareTo("null") != 0
+                    ? CachedNetworkImageProvider(widget.imagen)
                     : null,
                 child: widget.imagen.compareTo("null") == 0
                     ? const Icon(Icons.person_2)
@@ -140,7 +141,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  final isSender = message['Correo'] == widget.correo;
+                  final isSender =
+                      message['Correo'].toString().compareTo(widget.correo) ==
+                          0;
                   final isImageURL = message['Contenido'].contains("https:");
 
                   return GestureDetector(
