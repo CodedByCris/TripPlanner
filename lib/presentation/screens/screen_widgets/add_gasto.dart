@@ -78,7 +78,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
             const SizedBox(
               height: 20.0,
             ),
-            _fechaGasto(colors, widget.fechaInicio, widget.fechaFin),
+            _fechaGasto(colors),
             const SizedBox(
               height: 20.0,
             ),
@@ -193,8 +193,7 @@ class NewScreenState extends ConsumerState<AddGasto> {
     );
   }
 
-  Widget _fechaGasto(
-      ColorScheme colors, DateTime inicioViaje, DateTime finalViaje) {
+  Widget _fechaGasto(ColorScheme colors) {
     return TextFormField(
       controller: fechaController,
       readOnly: true,
@@ -209,9 +208,9 @@ class NewScreenState extends ConsumerState<AddGasto> {
           onPressed: () async {
             final DateTime? picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(),
-              firstDate: inicioViaje,
-              lastDate: finalViaje,
+              initialDate: widget.fechaInicio,
+              firstDate: widget.fechaInicio,
+              lastDate: widget.fechaFin,
             );
             if (picked != null) {
               fechaController.text = DateFormat('yyyy-MM-dd').format(picked);

@@ -87,8 +87,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     fechaSalida: viaje['FechaSalida'],
                     fechaLlegada: viaje['FechaLlegada'],
                     correoUsuario: viaje['Correo'],
-                    gastos: 20,
-                    numRutas: 3,
+                    gastos: viaje['TotalGastos'] ?? 0.0,
+                    numRutas: viaje['NumRutas'] ?? 0,
                     userData: userData[viaje['Correo']] ?? {},
                   ),
                 );

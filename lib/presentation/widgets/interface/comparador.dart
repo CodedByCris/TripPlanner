@@ -335,11 +335,12 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     }
     List<dynamic> parameters = [origen.toUpperCase().trim(), correoConsulta];
     String query = '''
-    SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo,
-     Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as GastoTotal 
-    FROM Viaje LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje 
-    WHERE Viaje.Origen = ? AND Viaje.Correo != ?
-    ''';
+SELECT Viaje.Destino, Viaje.Origen, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.Correo,
+ Viaje.IdViaje, SUM(Gastos_del_Viaje.Cantidad) as TotalGastos, 
+ (SELECT COUNT(*) FROM Ruta WHERE Ruta.IdViaje = Viaje.IdViaje) as NumRutas
+FROM Viaje LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje 
+WHERE Viaje.Origen = ? AND Viaje.Correo != ?
+''';
 
     if (destino != null) {
       query += ' AND Viaje.Destino = ?';

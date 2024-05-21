@@ -85,7 +85,7 @@ class _SearchCardState extends State<SearchCard> {
                           Text(
                             '${widget.origen} - ${widget.destino}',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -98,7 +98,7 @@ class _SearchCardState extends State<SearchCard> {
                           Text(
                             "${widget.numRutas.toString()} Rutas",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -116,7 +116,7 @@ class _SearchCardState extends State<SearchCard> {
                           Text(
                             '${widget.fechaSalida.toString().split(' ')[0]} - ${widget.fechaLlegada.toString().split(' ')[0]}',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -129,7 +129,7 @@ class _SearchCardState extends State<SearchCard> {
                           Text(
                             "${widget.gastos.toString()} €",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
