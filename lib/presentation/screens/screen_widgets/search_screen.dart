@@ -76,10 +76,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       MaterialPageRoute(
                         builder: (context) => FavoriteDetails(
                           idViaje: viaje['IdViaje'],
-                          correo: viaje['Correo'],
+                          correo2: viaje['Correo'],
                         ),
                       ),
-                    );
+                    ).then((value) => setState(() {
+                          fetchData();
+                        }));
                   },
                   child: SearchCard(
                     origen: viaje['Origen'],

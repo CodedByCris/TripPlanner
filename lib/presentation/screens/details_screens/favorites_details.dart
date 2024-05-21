@@ -6,10 +6,10 @@ import '../../functions/snackbars.dart';
 
 class FavoriteDetails extends StatefulWidget {
   final int idViaje;
-  final String correo;
+  final String correo2;
 
   const FavoriteDetails(
-      {super.key, required this.idViaje, required this.correo});
+      {super.key, required this.idViaje, required this.correo2});
 
   @override
   State<FavoriteDetails> createState() => _FavoriteDetailsState();
@@ -28,8 +28,8 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
   void initState() {
     super.initState();
     setupConnection().then((_) {
-      fetchData();
       checkFavorite();
+      fetchData();
     }); // Llama a la función fetchData
   }
 
@@ -40,7 +40,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   Future<void> checkFavorite() async {
     var result = await conn!.query(
-        'SELECT * FROM Favoritos WHERE idViaje = ${widget.idViaje} AND Correo = "${widget.correo}"');
+        'SELECT * FROM Favoritos WHERE idViaje = ${widget.idViaje} AND Correo = "$miCorreo"');
     setState(() {
       isFavorite = result.isNotEmpty;
     });

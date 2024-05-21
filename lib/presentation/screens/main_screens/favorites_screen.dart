@@ -134,10 +134,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                                 builder: (context) =>
                                                     FavoriteDetails(
                                                   idViaje: viaje['IdViaje'],
-                                                  correo: viaje['Correo'],
+                                                  correo2: viaje['Correo'],
                                                 ),
                                               ),
-                                            );
+                                            ).then((value) => setState(() {
+                                                  fetchData();
+                                                }));
                                           },
                                           child: ActualTravelCard(
                                             origen: viaje['Origen'],
