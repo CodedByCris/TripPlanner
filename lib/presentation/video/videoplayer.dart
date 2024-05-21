@@ -31,18 +31,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Video Tutorial'),
-      ),
-      body: _controller.value.isInitialized
-          ? Expanded(
-              child: Chewie(
-                controller: _chewieController,
-              ),
-            )
-          : Container(),
-    );
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text('Video Tutorial'),
+        ),
+        body: _controller.value.isInitialized
+            ? Column(
+                children: [
+                  Expanded(
+                    child: Chewie(
+                      controller: _chewieController,
+                    ),
+                  ),
+                ],
+              )
+            : const Center(
+                child: CircularProgressIndicator(),
+              ));
   }
 
   @override

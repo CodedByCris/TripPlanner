@@ -88,8 +88,6 @@ class UserScreen extends ConsumerWidget {
   }
 
   Widget _imagen(String? imagen, List<Color> colors, int selectedColor) {
-    DatabaseHelper db = DatabaseHelper();
-
     return FutureBuilder<String>(
       future: Future.value(imagen ?? ''), // convert String? to Future<String>
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -192,8 +190,6 @@ class UserScreen extends ConsumerWidget {
 
           // Sube la imagen y obtén la URL
           String urlImagen = await subirImagen(rutaImagen);
-
-          ref.read(imageProvider.notifier).state = urlImagen;
 
           // Obtiene el correo electrónico del usuario
           final correo = ref.watch(tokenProvider);
