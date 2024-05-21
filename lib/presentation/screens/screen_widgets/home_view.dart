@@ -43,14 +43,15 @@ class _HomeViewState extends State<HomeView> {
       correo = correoTemp;
       final db = DatabaseHelper();
       var conn = await db.getConnection();
+
       final result = await conn.query('''
-    SELECT V.Origen, V.Destino, V.FechaSalida, V.FechaLlegada, V.IdViaje, 
-    (SELECT SUM(G.cantidad) FROM Gastos_del_Viaje G WHERE G.IdViaje = V.IdViaje) as Gastos,
-    (SELECT COUNT(*) FROM Ruta R WHERE R.IdViaje = V.IdViaje) as NumRutas
-    FROM Viaje V 
-    WHERE V.Correo = "$correo" 
-    ORDER BY V.FechaSalida ASC
-    ''');
+          SELECT Viaje.Origen, Viaje.Destino, Viaje.FechaSalida, Viaje.FechaLlegada, Viaje.IdViaje, 
+          SUM(Gastos_del_Viaje.cantidad) as TotalGastos, (SELECT COUNT(*) FROM Ruta 
+          WHERE Ruta.IdViaje = Viaje.IdViaje) as NumRutas FROM Viaje 
+          LEFT JOIN Gastos_del_Viaje ON Viaje.IdViaje = Gastos_del_Viaje.IdViaje 
+          WHERE Viaje.Correo = "$correo" AND Viaje.FechaLlegada >= CURDATE() 
+          GROUP BY Viaje.IdViaje ORDER BY Viaje.FechaSalida ASC
+          ''');
       DateTime now = DateTime.now();
       if (result.isEmpty) {
         setState(() {
@@ -79,8 +80,8 @@ class _HomeViewState extends State<HomeView> {
                 'fechaSalida': fechaSalidaRow,
                 'fechaLlegada': fechaLlegadaRow,
                 'idViaje': row['IdViaje'],
-                'gastos': row['Gastos'], // Add this line
-                'numRutas': row['numRutas'], // Add this line
+                'gastos': row['TotalGastos'], // Add this line
+                'numRutas': row['NumRutas'], // Add this line
               });
             });
           }
