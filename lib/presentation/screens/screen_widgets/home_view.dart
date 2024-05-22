@@ -89,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
         }
       }
     } else {
-      print("Correo es nulo");
+      //print("Correo es nulo");
     }
     setState(() {
       isLoading =
@@ -183,10 +183,10 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                           ...groupedData[month]!.map((viaje) {
-                            print("Numero de rutas -> ${viaje['numRutas']}");
+                            //print("Numero de rutas -> ${viaje['numRutas']}");
                             return GestureDetector(
                               onTap: () {
-                                print(viaje['idViaje']);
+                                //print(viaje['idViaje']);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -195,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
                                     ),
                                   ),
                                 ).then((_) {
-                                  print("Después del then");
+                                  //print("Después del then");
                                   Future.delayed(Duration.zero, () {
                                     setState(() {
                                       fetchData();

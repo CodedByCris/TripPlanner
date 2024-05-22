@@ -81,7 +81,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   @override
   Widget build(BuildContext context) {
-    print('FAVORITOS_DETAILS');
+    //print('FAVORITOS_DETAILS');
     return FutureBuilder(
       future: setupConnection().then((_) => fetchData()),
       builder: (BuildContext context, AsyncSnapshot snapshot) {

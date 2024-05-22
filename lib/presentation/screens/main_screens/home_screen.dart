@@ -34,8 +34,8 @@ class HomeScreen extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final isDarkMode = ref.read(themeNotifierProvider).isDarkMode;
     final hasToken = ref.watch(tokenChangeProvider);
-    print(correo);
-    print(hasToken);
+    //print(correo);
+    //print(hasToken);
     const Map<int, Widget> myTabs = <int, Widget>{
       0: Text('VIAJE ACTUAL', style: TextStyle(fontSize: 14)),
       1: Text(

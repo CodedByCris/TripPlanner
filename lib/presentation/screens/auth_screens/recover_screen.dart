@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Add this line
 
-import '../../Database/connections.dart';
 import '../../functions/snackbars.dart';
 import '../../widgets/widgets.dart';
 

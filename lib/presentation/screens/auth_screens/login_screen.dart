@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../Database/connections.dart';
-import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +58,6 @@ class _LoginForm extends ConsumerWidget {
     final correo = TextEditingController();
     final password = TextEditingController();
     final textStyles = Theme.of(context).textTheme;
-    final db = DatabaseHelper();
     final formKey = GlobalKey<FormState>(); // Agrega esta línea
 
     getToken().then((token) {

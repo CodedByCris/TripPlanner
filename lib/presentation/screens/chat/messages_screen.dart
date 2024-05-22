@@ -99,7 +99,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Resultados $groupedData");
+    //print("Resultados $groupedData");
     return Consumer(
       builder: (context, ref, child) {
         final colors = Theme.of(context).colorScheme;
@@ -152,7 +152,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     }
 
                     if (data.fields['NombreUsuario'] != null) {
-                      print("key-> $key");
+                      //print("key-> $key");
                       // It's a private chat, display the NombreUsuario and leadingWidget
                       return ListTile(
                         onTap: () {

@@ -48,7 +48,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         context.go('/home/0');
       });
     } catch (e) {
-      print(e);
+      //print(e);
       Snackbar().mensaje(context, 'Este correo ya está registrado');
     }
   }

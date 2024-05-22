@@ -78,9 +78,9 @@ class ConnectionStatusListener {
   ) {
     if (!hasConnection) {
       connectionStatus.hasShownNoInternet = true;
-      print('No conexion a internet');
+      //print('No conexion a internet');
     } else {
-      print('Si conexion a internet');
+      //print('Si conexion a internet');
       if (connectionStatus.hasShownNoInternet) {
         connectionStatus.hasShownNoInternet = false;
       }

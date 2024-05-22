@@ -113,7 +113,7 @@ class _UserScreenState extends State<UserScreen> {
               .error); // show error icon if there was an error loading the image
         } else {
           if (snapshot.data != "") {
-            print('Image URL: ${snapshot.data}'); // print the image URL
+            //print('Image URL: ${snapshot.data}'); // print the image URL
             widget = Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -188,7 +188,7 @@ class _UserScreenState extends State<UserScreen> {
       return urlDescarga;
     } on firebase_storage.FirebaseException catch (e) {
       // Maneja cualquier error
-      print(e);
+      //print(e);
       return '';
     }
   }
@@ -313,7 +313,6 @@ class _UserScreenState extends State<UserScreen> {
 
   Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
     return ListTile(
-      //TODO: Hacer una consulta a la base de datos para obtener el nombre del usuario con el correo
       leading: Icon(
         Icons.person,
         color: colors[selectedColor],

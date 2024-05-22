@@ -60,7 +60,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         groupedData = await groupDataByMonth(result);
       }
     } else {
-      print("Correo es nulo");
+      //print("Correo es nulo");
     }
     setState(() {
       isLoading =
@@ -153,7 +153,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                     ...groupedData[month]!.map((viaje) {
                                       return GestureDetector(
                                         onTap: () {
-                                          print(viaje['IdViaje']);
+                                          //print(viaje['IdViaje']);
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(

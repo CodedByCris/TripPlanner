@@ -46,8 +46,8 @@ class NewScreenState extends ConsumerState<AddGasto> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.fechaInicio);
-    print(widget.fechaFin);
+    //print(widget.fechaInicio);
+    //print(widget.fechaFin);
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(

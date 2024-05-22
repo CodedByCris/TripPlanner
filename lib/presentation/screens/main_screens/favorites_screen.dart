@@ -65,7 +65,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         groupedData = await groupDataByMonth(result);
       }
     } else {
-      print("Correo es nulo");
+      //print("Correo es nulo");
     }
     setState(() {
       isLoading =

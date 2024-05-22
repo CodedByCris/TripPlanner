@@ -21,7 +21,7 @@ class UserNameNotifier extends StateNotifier<String?> {
   Future<void> _loadUserName() async {
     String userName = "";
     final correo = await getToken();
-    print("Correo del provider -> $correo");
+    //print("Correo del provider -> $correo");
     DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
@@ -32,7 +32,7 @@ class UserNameNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      print("Nombre del provider -> $userName");
+      //print("Nombre del provider -> $userName");
       state = userName;
     });
   }
@@ -47,7 +47,7 @@ class ImageNotifier extends StateNotifier<String?> {
   Future<void> _loadImage() async {
     String? imagen;
     final correo = await getToken();
-    print("Correo del provider -> $correo");
+    //print("Correo del provider -> $correo");
     DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
@@ -59,7 +59,7 @@ class ImageNotifier extends StateNotifier<String?> {
         }
       });
 
-      print("Imagen del provider -> $imagen");
+      //print("Imagen del provider -> $imagen");
       state = imagen;
     });
   }

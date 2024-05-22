@@ -151,7 +151,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
   }
 
   Widget _btnBuscar(ColorScheme colors) {
-    print("Correo$correo");
+    //print("Correo$correo");
     return ElevatedButton.icon(
       onPressed: () async {
         if (formKey != null && formKey!.currentState!.validate()) {
@@ -176,7 +176,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
             precioMin: precioMin.isNotEmpty ? double.parse(precioMin) : null,
             precioMax: precioMax.isNotEmpty ? double.parse(precioMax) : null,
           );
-          print(resultViaje);
+          //print(resultViaje);
 
           // Comprueba si la consulta devuelve datos
           if (resultViaje != null && resultViaje!.isNotEmpty) {
@@ -371,13 +371,13 @@ WHERE Viaje.Origen = ? AND Viaje.Correo != ?
 
     query += ' ORDER BY Viaje.FechaSalida ASC';
 
-    print("origen $origen"
-        " __  destino $destino"
+    //print("origen $origen"
+    " __  destino $destino"
         " __  fechaSalida $fechaSalida"
         " __  fechaLlegada $fechaLlegada"
         " __  precioMin $precioMin"
-        " __  precioMax $precioMax");
-    print(resultViaje);
+        " __  precioMax $precioMax";
+    //print(resultViaje);
     return resultViaje = await conn!.query(query, parameters);
   }
 }

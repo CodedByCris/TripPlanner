@@ -38,7 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    print("key-> ${widget.idGrupo}");
+    //print("key-> ${widget.idGrupo}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);

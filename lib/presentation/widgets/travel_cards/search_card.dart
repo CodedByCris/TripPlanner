@@ -51,7 +51,7 @@ class _SearchCardState extends State<SearchCard> {
       setState(() {
         nombreUsuario = result.first['NombreUsuario'] ?? "";
         imagenUsuario = result.first['Imagen'] ?? const Icon(Icons.person);
-        print(nombreUsuario);
+        //print(nombreUsuario);
       });
     }
   }

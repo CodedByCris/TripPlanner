@@ -43,7 +43,7 @@ class _ActualDetailsState extends State<ActualDetails> {
 
   // Crea una nueva función fetchData
   Future<void> fetchData() async {
-    print('Consultas');
+    //print('Consultas');
 
     resultViaje = await conn!.query(
         'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
@@ -52,9 +52,9 @@ class _ActualDetailsState extends State<ActualDetails> {
     resultGastos = await conn!.query(
         'SELECT IdGasto, Descripción, Cantidad, FechaGasto FROM Gastos_del_Viaje WHERE idViaje = ${widget.idViaje}');
 
-    print(resultViaje);
-    print(resultRuta);
-    print(resultGastos);
+    //print(resultViaje);
+    //print(resultRuta);
+    //print(resultGastos);
   }
 
   @override
@@ -823,7 +823,6 @@ class _ActualDetailsState extends State<ActualDetails> {
   }
 
   void shareData(row) {
-    // TODO: INTENTAR QUE FUNCIONE PARA ABRIR LA APP
     String deepLink = "tripPlanner://viaje/${widget.idViaje}";
 
     // Comparte el enlace
