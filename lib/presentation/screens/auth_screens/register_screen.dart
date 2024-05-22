@@ -6,6 +6,7 @@ import 'package:trip_planner/presentation/functions/snackbars.dart';
 import '../../Database/connections.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   RegisterScreen({super.key});
@@ -21,43 +22,35 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final db = DatabaseHelper();
+  final _auth = FirebaseAuth.instance;
 
   Future<void> registerUser() async {
     if (!widget.formKey.currentState!.validate()) {
       return;
     }
 
-    bool loginSuccessful = true;
-    await db.getConnection().then((conn) async {
-      String sql = 'select Correo from Usuario';
-      await conn.query(sql).then((result) {
-        for (final row in result) {
-          if (widget.correo.text == row[0]) {
-            loginSuccessful = false;
-            break;
-          }
-        }
-      });
-
-      if (loginSuccessful) {
-        print('Cuenta creada correctamente');
-        await conn.query(
-            'INSERT INTO Usuario(NombreUsuario, Correo, Password) VALUES (?, ?, ?)',
-            [
-              widget.nombre.text.trim(),
-              widget.correo.text.trim(),
-              widget.password.text.trim()
-            ]);
+    try {
+      final newUser = await _auth.createUserWithEmailAndPassword(
+        email: widget.correo.text.trim(),
+        password: widget.password.text.trim(),
+      );
+      await db.getConnection().then((conn) async {
+        await conn
+            .query('INSERT INTO Usuario(NombreUsuario, Correo) VALUES (?, ?)', [
+          widget.nombre.text.trim(),
+          widget.correo.text.trim(),
+        ]);
         if (mounted) {
           // Check if the widget is still in the tree
           Snackbar().mensaje(context, 'Cuenta creada correctamente');
         }
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
         context.go('/home/0');
-      } else {
-        Snackbar().mensaje(context, 'Ya existe ese usuario');
-      }
-    });
+      });
+    } catch (e) {
+      print(e);
+      Snackbar().mensaje(context, 'Este correo ya está registrado');
+    }
   }
 
   @override

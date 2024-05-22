@@ -7,6 +7,9 @@ import '../../Database/connections.dart';
 import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -98,6 +101,8 @@ class _LoginForm extends ConsumerWidget {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Por favor, ingrese su contraseña';
+                } else if (value.length < 3) {
+                  return "La contraseña debe tener al menos 3 letras";
                 }
                 // Add password validation here
                 return null;
@@ -108,7 +113,7 @@ class _LoginForm extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               height: 60,
-              child: _btnIniciar(correo, password, db, ref, context, formKey),
+              child: _btnIniciar(correo, password, ref, context, formKey),
             ),
             const SizedBox(
               height: 20,
@@ -174,8 +179,7 @@ class _LoginForm extends ConsumerWidget {
   Widget _btnIniciar(
       TextEditingController correo,
       TextEditingController password,
-      DatabaseHelper db,
-      WidgetRef ref, // Agrega este parámetro
+      WidgetRef ref,
       BuildContext context,
       GlobalKey<FormState> formKey) {
     return CustomFilledButton(
@@ -187,24 +191,19 @@ class _LoginForm extends ConsumerWidget {
             // If the inputs are valid, do the login
             String email = correo.text.trim();
             String pass = password.text.trim();
-            bool loginSuccessful = false;
 
-            await db.getConnection().then((conn) async {
-              String sql = 'select Correo, Password from Usuario';
-              await conn.query(sql).then((result) {
-                for (final row in result) {
-                  if (email == row[0] && pass == row[1]) {
-                    loginSuccessful = true;
-                    break;
-                  }
-                }
-              });
-            });
+            try {
+              // Sign in the user with Firebase Authentication
+              final UserCredential userCredential =
+                  await _auth.signInWithEmailAndPassword(
+                email: email,
+                password: pass,
+              );
 
-            if (loginSuccessful) {
-              Snackbar().mensaje(context, 'Sesión iniciada correctamente');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Sesión iniciada correctamente')),
+              );
               await storage.write(key: 'token', value: email);
-              print('Guardo el token');
 
               // Verificar el token después de escribirlo
               getToken().then((token) {
@@ -223,9 +222,23 @@ class _LoginForm extends ConsumerWidget {
                   }
                 }
               });
-            } else {
-              const snackbar = SnackBar(content: Text('El usuario no existe'));
-              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+            } on FirebaseAuthException catch (e) {
+              String message;
+              if (e.code == 'user-not-found') {
+                message = 'Los datos introducidos son incorrectos.';
+              } else if (e.code == 'wrong-password') {
+                message = 'Los datos introducidos son incorrectos.';
+              } else {
+                message = 'Los datos introducidos son incorrectos.';
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(message)),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Los datos introducidos son incorrectos")),
+              );
             }
           }
         });
