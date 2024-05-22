@@ -48,7 +48,7 @@ class _ActualDetailsState extends State<ActualDetails> {
     resultViaje = await conn!.query(
         'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
     resultRuta = await conn!.query(
-        'SELECT IdRuta, Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden DESC');
+        'SELECT IdRuta, Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden ASC');
     resultGastos = await conn!.query(
         'SELECT IdGasto, Descripción, Cantidad, FechaGasto FROM Gastos_del_Viaje WHERE idViaje = ${widget.idViaje}');
 

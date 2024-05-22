@@ -1,30 +1,11 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class BottomMenu extends StatelessWidget {
   final int currentIndex;
-  const BottomMenu({super.key, required this.currentIndex});
-
-  void onItemTapped(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go("/home/0");
-        break;
-      case 1:
-        context.go("/home/1");
-        break;
-      case 2:
-        context.go("/home/2");
-        break;
-      case 3:
-        context.go("/home/3");
-        break;
-      case 4:
-        context.go("/home/4");
-        break;
-    }
-  }
+  final ValueChanged<int> onPageSelected;
+  const BottomMenu(
+      {super.key, required this.currentIndex, required this.onPageSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +13,7 @@ class BottomMenu extends StatelessWidget {
     return ConvexAppBar(
       style: TabStyle.custom,
       initialActiveIndex: currentIndex,
-      onTap: (index) => onItemTapped(context, index),
+      onTap: (index) => onPageSelected(index),
       backgroundColor: colors.primary,
       items: const [
         TabItem(icon: Icons.home_outlined, title: 'Home'),
