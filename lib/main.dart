@@ -44,10 +44,10 @@ class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  _MainAppState createState() => _MainAppState();
+  MainAppState createState() => MainAppState();
 }
 
-class _MainAppState extends ConsumerState<MainApp> {
+class MainAppState extends ConsumerState<MainApp> {
   final ConnectionStatusListener _connectionStatus =
       ConnectionStatusListener.getInstance();
 

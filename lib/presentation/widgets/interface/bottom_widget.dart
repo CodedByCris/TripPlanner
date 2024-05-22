@@ -12,10 +12,10 @@ class MenuBarrita extends StatefulWidget {
   const MenuBarrita({super.key, required this.pageIndex});
 
   @override
-  _MenuBarritaState createState() => _MenuBarritaState();
+  MenuBarritaState createState() => MenuBarritaState();
 }
 
-class _MenuBarritaState extends State<MenuBarrita> {
+class MenuBarritaState extends State<MenuBarrita> {
   late PageController _pageController;
 
   @override

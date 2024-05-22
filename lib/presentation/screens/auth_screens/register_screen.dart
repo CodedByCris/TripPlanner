@@ -17,10 +17,10 @@ class RegisterScreen extends ConsumerStatefulWidget {
   final password = TextEditingController();
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  RegisterScreenState createState() => RegisterScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+class RegisterScreenState extends ConsumerState<RegisterScreen> {
   final db = DatabaseHelper();
   final _auth = FirebaseAuth.instance;
 

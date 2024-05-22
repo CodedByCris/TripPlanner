@@ -11,10 +11,10 @@ class AddGroupScreen extends StatefulWidget {
   const AddGroupScreen({super.key});
 
   @override
-  _AddGroupScreenState createState() => _AddGroupScreenState();
+  AddGroupScreenState createState() => AddGroupScreenState();
 }
 
-class _AddGroupScreenState extends State<AddGroupScreen> {
+class AddGroupScreenState extends State<AddGroupScreen> {
   final db = DatabaseHelper();
   MySqlConnection? conn;
 
