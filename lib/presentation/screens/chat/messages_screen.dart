@@ -30,6 +30,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Future<void> fetchData() async {
+    groupedData.clear();
+
     setState(() {
       isLoading = true; // Set isLoading to true before loading the data
     });

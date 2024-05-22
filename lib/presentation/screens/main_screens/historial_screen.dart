@@ -30,6 +30,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   Future<void> fetchData() async {
+    groupedData.clear();
+
     setState(() {
       isLoading =
           true; // Establecer isLoading en true antes de cargar los datos
@@ -160,7 +162,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                                 idViaje: viaje['IdViaje'],
                                               ),
                                             ),
-                                          );
+                                          ).then((value) => setState(() {
+                                                fetchData();
+                                              }));
                                         },
                                         child: ActualTravelCard(
                                           origen: viaje['Origen'],

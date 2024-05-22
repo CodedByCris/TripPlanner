@@ -31,6 +31,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> fetchData() async {
+    groupedData.clear();
+
     setState(() {
       isLoading =
           true; // Establecer isLoading en true antes de cargar los datos
@@ -173,7 +175,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               const SizedBox(height: 20),
                               ElevatedButton(
                                 onPressed: fetchData,
-                                child: const Text('Buscar viajes'),
+                                child: const Text('Actualizar favoritos'),
                               ),
                             ],
                           ),

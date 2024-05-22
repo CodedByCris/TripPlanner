@@ -34,6 +34,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> fetchData() async {
+    groupedData.clear();
     setState(() {
       isLoading =
           true; // Establecer isLoading en true antes de cargar los datos
@@ -193,7 +194,14 @@ class _HomeViewState extends State<HomeView> {
                                       idViaje: viaje['idViaje'],
                                     ),
                                   ),
-                                );
+                                ).then((_) {
+                                  print("Después del then");
+                                  Future.delayed(Duration.zero, () {
+                                    setState(() {
+                                      fetchData();
+                                    });
+                                  });
+                                });
                               },
                               child: ActualTravelCard(
                                 origen: viaje['origen'],

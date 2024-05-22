@@ -253,7 +253,6 @@ class NewScreenState extends ConsumerState<NewScreen> {
                               .mensaje(context, 'Viaje creado correctamente');
                         });
                         Navigator.of(context).pop();
-                        GoRouter.of(context).go('/home/0');
                       },
                     ),
                   ],
