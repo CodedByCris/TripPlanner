@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart'
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
-/// Example:
+/// com.cris:
 /// ```dart
 /// import 'firebase_options.dart';
 /// // ...
@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1047598233178',
     projectId: 'tripplanner-7f54c',
     storageBucket: 'tripplanner-7f54c.appspot.com',
-    iosBundleId: 'com.example.tripPlanner',
+    iosBundleId: 'com.cris.tripPlanner',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1047598233178',
     projectId: 'tripplanner-7f54c',
     storageBucket: 'tripplanner-7f54c.appspot.com',
-    iosBundleId: 'com.example.tripPlanner',
+    iosBundleId: 'com.cris.tripPlanner',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
