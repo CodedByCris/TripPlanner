@@ -13,12 +13,14 @@ import '../../Database/connections.dart';
 import '../../providers/theme_provider.dart';
 
 class ChatScreen extends StatefulWidget {
+  final bool esgrupo;
   final String imagen;
   final String nombre;
   final String idGrupo;
   final String correo;
   const ChatScreen(
       {super.key,
+      required this.esgrupo,
       required this.idGrupo,
       required this.correo,
       required this.imagen,
@@ -38,7 +40,6 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    //print("key-> ${widget.idGrupo}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -101,6 +102,22 @@ class ChatScreenState extends State<ChatScreen> {
 
       return Scaffold(
         appBar: AppBar(
+          actions: widget.esgrupo
+              ? <Widget>[
+                  PopupMenuButton<String>(
+                    onSelected: (String result) {
+                      // handle your logic here to add a new person to the group
+                    },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'Nuevo',
+                        child: Text('Añadir miembro'),
+                      ),
+                    ],
+                  ),
+                ]
+              : null,
           title: Row(
             children: [
               const SizedBox(width: 8.0),

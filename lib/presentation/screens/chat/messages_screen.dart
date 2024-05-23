@@ -22,6 +22,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Map<String, List<ResultRow>> groupedData = {};
   bool isLoading = false;
   MySqlConnection? conn;
+  bool? esgrupo;
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             [row['IdGrupo']]);
 
         // If there is no NombreGrupo or Descripción, it's a private chat
-        if (grupoResult.first['NombreGrupo'] == "" ||
+        if (grupoResult.first['NombreGrupo'] == "" &&
             grupoResult.first['Descripción'] == "") {
           // Query the Usuario_GrupoViaje table to get the Correo of the other user in the group
           final otherUserResult = await conn!.query(
@@ -156,10 +157,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       // It's a private chat, display the NombreUsuario and leadingWidget
                       return ListTile(
                         onTap: () {
+                          esgrupo = false;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
+                                  esgrupo: esgrupo!,
                                   imagen: imageUrl,
                                   nombre:
                                       data.fields['NombreUsuario'].toString(),
@@ -232,10 +235,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       // It's a group chat, display the NombreGrupo and Descripción
                       return ListTile(
                         onTap: () {
+                          esgrupo = true;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
+                                  esgrupo: esgrupo!,
                                   imagen: imageUrl,
                                   nombre: data.fields['NombreGrupo'].toString(),
                                   correo: correo!,
@@ -262,14 +267,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   TextButton(
                                     child: const Text('Eliminar'),
                                     onPressed: () async {
-                                      await deleteData(key);
                                       Navigator.of(context).pop();
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                        setState(() {
-                                          fetchData();
-                                        });
-                                      });
+                                      await deleteData(key);
                                     },
                                   ),
                                 ],

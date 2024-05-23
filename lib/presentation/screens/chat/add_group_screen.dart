@@ -22,7 +22,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
   final descriptionController = TextEditingController();
   final groupNameController = TextEditingController();
   String? selectedUser;
-  String? selectedGroupType;
+  String selectedGroupType = "Chat privado";
   List<String> groupTypes = ['Chat privado', 'Grupo público', 'Grupo privado'];
 
   // Change users to a Map
@@ -72,6 +72,32 @@ class AddGroupScreenState extends State<AddGroupScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(children: [
                 DropdownButtonFormField<String>(
+                  value: selectedGroupType,
+                  items: groupTypes.map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(
+                        type,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedGroupType = newValue!;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, selecciona un tipo de grupo';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Tipo de grupo',
+                  ),
+                ),
+                DropdownButtonFormField<String>(
                   value: selectedUser,
                   items: users.keys.map((String user) {
                     return DropdownMenuItem<String>(
@@ -97,38 +123,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                     labelText: 'Usuario',
                   ),
                 ),
-                DropdownButtonFormField<String>(
-                  value: selectedGroupType,
-                  items: groupTypes.map((String type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(
-                        type,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedGroupType = newValue;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, selecciona un tipo de grupo';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo de grupo',
-                  ),
-                ),
-                if (selectedGroupType != 'Chat privado') ...[
-                  TextFormField(
-                    controller: descriptionController,
-                    decoration: const InputDecoration(
-                        labelText: 'Descripción del grupo'),
-                  ),
+                if (selectedGroupType.compareTo('Chat privado') != 0) ...[
                   TextFormField(
                     controller: groupNameController,
                     decoration:
@@ -139,6 +134,11 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                       }
                       return null;
                     },
+                  ),
+                  TextFormField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                        labelText: 'Descripción del grupo'),
                   ),
                 ],
                 const SizedBox(height: 20),
@@ -159,7 +159,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                           groupNameController.text.isEmpty
                               ? ""
                               : groupNameController.text.trim(),
-                          groupTypes.indexOf(selectedGroupType!) + 1
+                          groupTypes.indexOf(selectedGroupType) + 1
                         ],
                       );
 
@@ -173,12 +173,11 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                         'INSERT INTO Usuario_GrupoViaje (Correo, IdGrupo) VALUES (?, ?)',
                         [selectedUserEmail, idGrupo],
                       );
-                      // }
-                    }
-                    Snackbar()
-                        .mensaje(context, 'Conversación creada correctamente');
+                      Snackbar().mensaje(
+                          context, 'Conversación creada correctamente');
 
-                    Navigator.pop(context);
+                      Navigator.pop(context);
+                    }
                   },
                   child: const Text('Crear grupo'),
                 ),
