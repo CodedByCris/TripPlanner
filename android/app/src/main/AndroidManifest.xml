@@ -6,7 +6,7 @@
 
     <application
     
-        android:label="trip_planner"
+        android:label="Trip Planner"
         android:icon="@mipmap/ic_launcher"
         android:name="androidx.multidex.MultiDexApplication" >
         <activity
