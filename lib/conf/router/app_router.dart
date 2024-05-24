@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:trip_planner/presentation/screens/auth_screens/splash_screen.dart';
 import 'package:trip_planner/presentation/widgets/interface/bottom_widget.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
+import '../../presentation/screens/chat/chat_screenAPI.dart';
 import '../../presentation/widgets/widgets.dart';
 
 // GoRouter configuration
@@ -19,10 +21,10 @@ final appRouter = GoRouter(
       },
     ),
 
-    // Ruta para los mensajes
+    //Ruta para los mensajes
     GoRoute(
       path: '/messages',
-      builder: (context, state) => const MessagesScreen(),
+      builder: (context, state) => MessagesScreen(),
     ),
 
     // Auth Routes
