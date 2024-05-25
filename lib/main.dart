@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:trip_planner/app.dart';
 import 'package:trip_planner/conf/connectivity.dart';
 import 'package:trip_planner/conf/theme/app_theme.dart';
 import 'package:trip_planner/presentation/providers/theme_provider.dart';
@@ -11,19 +12,16 @@ import 'presentation/Database/connections.dart';
 import 'presentation/screens/user_screens/no_connection_screen.dart';
 
 void main() async {
+  final StreamChatClient streamChatClient = StreamChatClient(streamKey);
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(App(
+    client: streamChatClient,
+  ));
 }
 
 class App extends StatelessWidget {
-  final StreamChatClient _streamChatClient = StreamChatClient('bc699ncdnj29');
-  App({super.key});
-
-  void connectFakeUser() async {
-    await _streamChatClient.disconnectUser();
-    _streamChatClient.connectUser(User(id: 'Cris'),
-        'x562qh5qescgfdsz2pr4wq4eu6b797bj55e7r3xewxt3wdt33f6gfzgq9vrxe7s8');
-  }
+  final StreamChatClient client;
+  const App({super.key, required this.client});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +31,10 @@ class App extends StatelessWidget {
       builder: (context, snapshot) {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return const ProviderScope(child: MainApp());
+          return ProviderScope(
+              child: MainApp(
+            client: client,
+          ));
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
@@ -49,7 +50,8 @@ class App extends StatelessWidget {
 }
 
 class MainApp extends ConsumerStatefulWidget {
-  const MainApp({super.key});
+  final StreamChatClient client;
+  const MainApp({super.key, required this.client});
 
   @override
   MainAppState createState() => MainAppState();
@@ -79,7 +81,10 @@ class MainAppState extends ConsumerState<MainApp> {
           theme: appTheme.getTheme(),
           builder: (context, child) {
             if (hasConnection) {
-              return child!;
+              return StreamChatCore(
+                client: widget.client,
+                child: child!,
+              );
             } else {
               return const NoConnectionScreen();
             }

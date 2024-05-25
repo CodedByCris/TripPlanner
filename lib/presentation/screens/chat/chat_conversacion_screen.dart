@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:trip_planner/presentation/screens/chat/models/message_data.dart';
 
+import 'models/models.dart';
+import 'widget/glowing_action_button.dart';
 import 'widget/widgets.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -12,17 +12,21 @@ class ChatScreen extends StatelessWidget {
         ),
       );
 
-  final MessageData messageData;
+  const ChatScreen({
+    super.key,
+    required this.messageData,
+  });
 
-  const ChatScreen({super.key, required this.messageData});
+  final MessageData messageData;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _AppBarTitle(
-          messageData: messageData,
-        ),
+        iconTheme: Theme.of(context).iconTheme,
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leadingWidth: 54,
         leading: Align(
           alignment: Alignment.centerRight,
@@ -33,53 +37,91 @@ class ChatScreen extends StatelessWidget {
             },
           ),
         ),
+        title: _AppBarTitle(
+          messageData: messageData,
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Center(
-              child: IconBorder(icon: Icons.video_camera_back, onTap: () {}),
+              child: IconBorder(
+                icon: CupertinoIcons.video_camera_solid,
+                onTap: () {},
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Center(
-              child: IconBorder(icon: Icons.phone, onTap: () {}),
+              child: IconBorder(
+                icon: CupertinoIcons.phone_solid,
+                onTap: () {},
+              ),
             ),
           ),
         ],
       ),
-      body: const MessageTest(),
+      body: const Column(
+        children: [
+          Expanded(
+            child: _DemoMessageList(),
+          ),
+          _ActionBar(),
+        ],
+      ),
     );
   }
 }
 
-class MessageTest extends StatelessWidget {
-  const MessageTest({super.key});
+class _DemoMessageList extends StatelessWidget {
+  const _DemoMessageList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const [
-        _DateLabel(label: "Yesterday"),
-        _MessageTile(
-            message: "Hi,Lucy! How your day going", messageDate: '12:01PM'),
-        _MessageOwnTile(
-            message: "Hi,Lucy! How your day going", messageDate: '12:02PM'),
-        _MessageTile(
-            message: "Hi,Lucy! How your day going", messageDate: '12:02PM'),
-        _MessageOwnTile(
-            message: "Hi,Lucy! How your day going", messageDate: '12:03PM'),
-        _MessageTile(
-            message: "Hi,Lucy! How your day going", messageDate: '12:03PM'),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListView(
+        children: const [
+          _DateLable(lable: 'Yesterday'),
+          _MessageTile(
+            message: 'Hi, Lucy! How\'s your day going?',
+            messageDate: '12:01 PM',
+          ),
+          _MessageOwnTile(
+            message: 'You know how it goes...',
+            messageDate: '12:02 PM',
+          ),
+          _MessageTile(
+            message: 'Do you want Starbucks?',
+            messageDate: '12:02 PM',
+          ),
+          _MessageOwnTile(
+            message: 'Would be awesome!',
+            messageDate: '12:03 PM',
+          ),
+          _MessageTile(
+            message: 'Coming up!',
+            messageDate: '12:03 PM',
+          ),
+          _MessageOwnTile(
+            message: 'YAY!!!',
+            messageDate: '12:03 PM',
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _MessageTile extends StatelessWidget {
-  final String message, messageDate;
-  const _MessageTile(
-      {super.key, required this.message, required this.messageDate});
+  const _MessageTile({
+    super.key,
+    required this.message,
+    required this.messageDate,
+  });
+
+  final String message;
+  final String messageDate;
 
   static const _borderRadius = 26.0;
 
@@ -95,25 +137,29 @@ class _MessageTile extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Colors.blueAccent.shade100,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(_borderRadius),
                   topRight: Radius.circular(_borderRadius),
                   bottomRight: Radius.circular(_borderRadius),
                 ),
               ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
+                child: Text(message),
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-              child: Text(message),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(messageDate,
-                  style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold)),
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                messageDate,
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             )
           ],
         ),
@@ -123,16 +169,21 @@ class _MessageTile extends StatelessWidget {
 }
 
 class _MessageOwnTile extends StatelessWidget {
-  final String message, messageDate;
-  const _MessageOwnTile(
-      {super.key, required this.message, required this.messageDate});
+  const _MessageOwnTile({
+    super.key,
+    required this.message,
+    required this.messageDate,
+  });
+
+  final String message;
+  final String messageDate;
 
   static const _borderRadius = 26.0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Align(
         alignment: Alignment.centerRight,
         child: Column(
@@ -140,26 +191,33 @@ class _MessageOwnTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(_borderRadius),
-                  topRight: Radius.circular(_borderRadius),
                   bottomRight: Radius.circular(_borderRadius),
+                  bottomLeft: Radius.circular(_borderRadius),
                 ),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
+                child: Text(message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                    )),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-              child: Text(message),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(messageDate,
-                  style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold)),
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                messageDate,
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             )
           ],
         ),
@@ -168,28 +226,33 @@ class _MessageOwnTile extends StatelessWidget {
   }
 }
 
-class _DateLabel extends StatelessWidget {
-  final String label;
-  const _DateLabel({super.key, required this.label});
+class _DateLable extends StatelessWidget {
+  const _DateLable({
+    super.key,
+    required this.lable,
+  });
+
+  final String lable;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
+        padding: const EdgeInsets.symmetric(vertical: 32.0),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
             child: Text(
-              label,
+              lable,
               style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+              ),
             ),
           ),
         ),
@@ -228,16 +291,74 @@ class _AppBarTitle extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               const Text(
-                "En línea",
+                'Online now',
                 style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green),
-              )
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
             ],
           ),
         )
       ],
+    );
+  }
+}
+
+class _ActionBar extends StatelessWidget {
+  const _ActionBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: true,
+      top: false,
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  width: 2,
+                  color: Theme.of(context).dividerColor,
+                ),
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                CupertinoIcons.camera_fill,
+              ),
+            ),
+          ),
+          const Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 16.0),
+              child: TextField(
+                style: TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Type something...',
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 24.0,
+            ),
+            child: GlowingActionButton(
+              color: Colors.accents.first,
+              icon: Icons.send_rounded,
+              onPressed: () {
+                print('TODO: send a message');
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

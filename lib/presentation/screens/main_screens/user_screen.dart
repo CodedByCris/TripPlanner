@@ -90,7 +90,6 @@ class UserScreenState extends State<UserScreen> {
                     ? _correo(colors, selectedColor, correo)
                     : _correo(colors, selectedColor, "INVITADO@gmail.com"),
                 _colores(colors, selectedColor, ref),
-                _tutorial(colors, selectedColor, context),
                 _informacion(colors, selectedColor),
               ],
             ),
@@ -444,31 +443,6 @@ class UserScreenState extends State<UserScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _tutorial(
-      List<Color> colors, int selectedColor, BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        Icons.question_mark,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "¿Cómo funciona la app?",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: const Text("Ver tutorial",
-          style: TextStyle(
-            fontSize: 15,
-          )),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const VideoPlayerScreen()),
-        );
-      },
     );
   }
 }

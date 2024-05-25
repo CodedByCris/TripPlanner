@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:trip_planner/presentation/screens/chat/helpers.dart';
 import 'package:trip_planner/presentation/screens/chat/widget/glowing_action_button.dart';
 import 'package:trip_planner/presentation/screens/chat/widget/widgets.dart';
