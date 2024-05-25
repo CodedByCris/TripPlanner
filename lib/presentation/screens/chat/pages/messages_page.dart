@@ -1,11 +1,7 @@
 import 'package:faker/faker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:trip_planner/presentation/screens/chat/chat_conversacion_screen.dart';
 import 'package:trip_planner/presentation/screens/chat/helpers.dart';
-import 'package:trip_planner/presentation/screens/chat/models/story_data.dart';
 
 import '../models/models.dart';
 import '../widget/widgets.dart';

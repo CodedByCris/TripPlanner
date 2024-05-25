@@ -5,6 +5,7 @@ import 'package:trip_planner/presentation/screens/chat/helpers.dart';
 import 'package:trip_planner/presentation/screens/chat/widget/glowing_action_button.dart';
 import 'package:trip_planner/presentation/screens/chat/widget/widgets.dart';
 import 'chats_barril.dart';
+import 'select_user_screen.dart';
 
 class MessagesScreen extends StatelessWidget {
   static Route get route => MaterialPageRoute(
@@ -129,7 +130,11 @@ class __BottomNavigationBarState extends State<_BottomNavigationBar> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: GlowingActionButton(
-                    color: Colors.green, icon: Icons.add, onPressed: () {}),
+                    color: Colors.green,
+                    icon: Icons.add,
+                    onPressed: () {
+                      Navigator.of(context).push(SelectUserScreen.route);
+                    }),
               ),
               _NavigationBarItem(
                 index: 2,
