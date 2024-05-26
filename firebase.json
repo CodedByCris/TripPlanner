@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"tripplanner-7f54c","appId":"1:1047598233178:android:b91bfa72aaa6ee13248a63","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tripplanner-7f54c","configurations":{"android":"1:1047598233178:android:b91bfa72aaa6ee13248a63","ios":"1:1047598233178:ios:c907ee5be18d8cf8248a63","macos":"1:1047598233178:ios:c907ee5be18d8cf8248a63","web":"1:1047598233178:web:6439109966b8f452248a63","windows":"1:1047598233178:web:d208202bcdbc9d62248a63"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tripplanner-7f54c",
+          "appId": "1:1047598233178:android:b91bfa72aaa6ee13248a63",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tripplanner-7f54c",
+          "configurations": {
+            "android": "1:1047598233178:android:b91bfa72aaa6ee13248a63",
+            "ios": "1:1047598233178:ios:c907ee5be18d8cf8248a63",
+            "macos": "1:1047598233178:ios:c907ee5be18d8cf8248a63",
+            "web": "1:1047598233178:web:6439109966b8f452248a63",
+            "windows": "1:1047598233178:web:d208202bcdbc9d62248a63"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}

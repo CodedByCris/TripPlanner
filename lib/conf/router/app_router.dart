@@ -3,7 +3,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:trip_planner/presentation/screens/auth_screens/splash_screen.dart';
 import 'package:trip_planner/presentation/widgets/interface/bottom_widget.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
-import '../../presentation/screens/chat/chat_screenAPI.dart';
+import '../../presentation/chat/screens/chat_screenAPI.dart';
 import '../../presentation/widgets/widgets.dart';
 
 // GoRouter configuration

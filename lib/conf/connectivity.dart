@@ -26,7 +26,7 @@ class ConnectionStatusListener {
   Stream<bool> get connectionChange => connectionChangeController.stream;
 
   // Add ValueNotifier
-  ValueNotifier<bool> connectionChangeNotifier = ValueNotifier<bool>(false);
+  ValueNotifier<bool> connectionChangeNotifier = ValueNotifier<bool>(true);
 
   //Flutter connectivity listener
   void _connectionChange(List<ConnectivityResult> results) {
