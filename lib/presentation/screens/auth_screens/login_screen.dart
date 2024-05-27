@@ -210,6 +210,9 @@ class _LoginForm extends ConsumerWidget {
                     // Notify the tokenProvider of the change
                     ref.read(tokenProvider.notifier).setToken(
                         token); // Usa ref.read en lugar de context.read
+
+                    ref.read(userNameProvider.notifier).refresh();
+                    ref.read(imageProvider.notifier).refresh();
                   } catch (e) {
                     if (e is NoSuchMethodError) {
                       // El widget ha sido desmontado, no hacer nada
