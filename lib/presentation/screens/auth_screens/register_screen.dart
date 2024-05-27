@@ -45,6 +45,8 @@ class RegisterScreenState extends ConsumerState<RegisterScreen> {
           Snackbar().mensaje(context, 'Cuenta creada correctamente');
         }
         ref.read(tokenProvider.notifier).setToken(widget.correo.text);
+        ref.read(userNameProvider.notifier).refresh();
+        ref.read(imageProvider.notifier).refresh();
         context.go('/home/0');
       });
     } catch (e) {

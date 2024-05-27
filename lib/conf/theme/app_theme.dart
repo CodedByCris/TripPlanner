@@ -3,15 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 //* Lista de colores para elegir el tema
 const colorList = <Color>[
-  Color.fromARGB(255, 58, 33, 243),
-  Colors.blue,
-  Colors.teal,
-  Colors.green,
-  Colors.purple,
-  Colors.deepPurple,
-  Colors.yellow,
-  Colors.red,
-  Colors.pinkAccent
+  Color.fromARGB(255, 138, 124, 245),
+  Color.fromARGB(255, 76, 170, 248),
+  Color.fromARGB(255, 91, 249, 233),
+  Color.fromARGB(255, 114, 192, 117),
+  Color.fromARGB(255, 163, 89, 176),
+  Color.fromARGB(255, 126, 95, 179),
+  Color.fromARGB(255, 163, 157, 101),
+  Color.fromARGB(255, 169, 107, 102),
+  Color.fromARGB(255, 255, 142, 179)
 ];
 
 class AppTheme {
