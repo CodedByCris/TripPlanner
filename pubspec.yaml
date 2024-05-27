@@ -76,7 +76,6 @@ flutter:
     - assets/images/loading.gif
     - assets/images/nubes.gif
     - assets/images/Logo.png
-    - assets/video/video.mp4
 
 flutter_launcher_icons:
   android: true
