@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,10 +15,18 @@ class SplashScreen extends ConsumerStatefulWidget {
 class SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
+  final List<String> travelQuotes = [
+    'Preparando las maletas para viajar',
+    'Mirando el tiempo en Florida',
+    'Consultando el mapa de Nueva York',
+  ];
+
+  late final String selectedQuote;
 
   @override
   void initState() {
     super.initState();
+    selectedQuote = travelQuotes[Random().nextInt(travelQuotes.length)];
 
     controller = AnimationController(
       duration: const Duration(seconds: 1),
@@ -54,9 +64,9 @@ class SplashScreenState extends ConsumerState<SplashScreen>
                 builder: (_, __) {
                   final int dots = (controller.value * 4).floor() % 4;
                   return Text(
-                    'Comprobando el tiempo en la playa${'.' * dots}',
+                    '$selectedQuote ${'.' * dots}',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 30,
                       color: const Color.fromARGB(255, 25, 25, 25)
                           .withOpacity(0.8),
                       shadows: const [

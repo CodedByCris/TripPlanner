@@ -297,17 +297,40 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     }
                   },
                 )
-              : Center(
-                  child: Text(
-                    'No tienes conversaciones activas',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? colors.secondary
-                          : const Color.fromARGB(255, 9, 61, 104),
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.mail_outline_rounded,
+                        size: 100, color: colors.primary),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'No tienes conversaciones activas',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode
+                              ? colors.secondary
+                              : const Color.fromARGB(255, 9, 61, 104),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Puedes esperar a que te agreguen a una conversación nueva o ¿por qué no pruebas a crear una pulsando sobre el símbolo +?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode
+                              ? colors.secondary
+                              : const Color.fromARGB(255, 87, 87, 87),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
         );
       },

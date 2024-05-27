@@ -125,14 +125,33 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'No tienes viajes programados',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode
-                              ? colors.secondary
-                              : const Color.fromARGB(255, 9, 61, 104),
+                      Icon(Icons.card_travel, size: 100, color: colors.primary),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'No tienes viajes programados a futuro.',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode
+                                ? colors.secondary
+                                : const Color.fromARGB(255, 9, 61, 104),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Puedes programar uno en la sección "Nuevo".',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode
+                                ? colors.secondary
+                                : const Color.fromARGB(255, 87, 87, 87),
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -149,7 +168,7 @@ class _HomeViewState extends State<HomeView> {
                                   });
                                 });
                               },
-                              child: const Text('Buscar viajes...'),
+                              child: const Text('Actualizar viajes...'),
                             ),
                     ],
                   ),

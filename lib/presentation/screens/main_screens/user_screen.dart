@@ -193,7 +193,7 @@ class UserScreenState extends State<UserScreen> {
     );
   }
 
-  Future<void> updateImage(String email, String imageUrl, context) async {
+  Future<void> updateImage(String email, String imageUrl, context, ref) async {
     DatabaseHelper db = DatabaseHelper();
 
     await db.getConnection().then((conn) async {
@@ -201,10 +201,10 @@ class UserScreenState extends State<UserScreen> {
         "UPDATE Usuario SET Imagen = ? WHERE Correo = ?",
         [imageUrl, email],
       );
+
       Snackbar().mensaje(context, 'Foto de perfil actualizada correctamente');
-      setState(() {
-        this.imageUrl = imageUrl;
-      });
+      this.imageUrl = imageUrl;
+      ref.read(imageProvider.notifier).refresh();
     });
   }
 
@@ -251,7 +251,7 @@ class UserScreenState extends State<UserScreen> {
           final correo = ref.watch(tokenProvider);
 
           // Actualiza la imagen en la base de datos
-          updateImage(correo!, urlImagen, context);
+          updateImage(correo!, urlImagen, context, ref);
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<ImageSource>>[
@@ -275,6 +275,33 @@ class UserScreenState extends State<UserScreen> {
 
   Widget _informacion(List<Color> colors, int selectedColor) {
     return ListTile(
+      onTap: () => showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'INFORMACIÓN',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Esta aplicación fue desarrollada por Cristian Arellano para el proyecto final del grado superior de Desarrollo de Aplicaciones Multiplataforma en el I.E.S. Florencio Pintado.',
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Versión 2.0',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
       leading: Icon(
         Icons.info,
         color: colors[selectedColor],
@@ -282,9 +309,12 @@ class UserScreenState extends State<UserScreen> {
       ),
       title: const Text(
         "Información de la app",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-      subtitle: const Text("Version 1.0",
+      subtitle: const Text("Version 2.0",
           style: TextStyle(
             fontSize: 15,
           )),

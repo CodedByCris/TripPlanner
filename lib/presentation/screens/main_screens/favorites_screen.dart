@@ -164,12 +164,34 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                'No tienes viajes favoritos',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 9, 61, 104),
+                              Icon(Icons.heart_broken,
+                                  size: 100, color: colors.primary),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'No tienes viajes favoritos',
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode
+                                        ? colors.secondary
+                                        : const Color.fromARGB(255, 9, 61, 104),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Puedes agregar uno en nuestro comparador de viajes en la pantalla principal.',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode
+                                        ? colors.secondary
+                                        : const Color.fromARGB(255, 87, 87, 87),
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               const SizedBox(height: 20),

@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:mysql1/mysql1.dart';
 
-import '../../Database/connections.dart';
+import '../../providers/messages_provider.dart';
 import '../../providers/theme_provider.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   final bool esgrupo;
   final String imagen;
   final String nombre;
@@ -27,24 +25,24 @@ class ChatScreen extends StatefulWidget {
       required this.nombre});
 
   @override
-  ChatScreenState createState() => ChatScreenState();
+  _ChatScreenState createState() => _ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ImagePicker _picker = ImagePicker();
   final ScrollController _scrollController = ScrollController();
   String? selectedMessage;
-  final db = DatabaseHelper();
-  MySqlConnection? conn;
-  List<ResultRow> messages = [];
 
   @override
   void initState() {
     super.initState();
+    ref
+        .read(messageProvider(widget.idGrupo).notifier)
+        .fetchData(widget.idGrupo);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
-    fetchData();
   }
 
   Future<String> uploadImage(XFile image) async {
@@ -56,173 +54,160 @@ class ChatScreenState extends State<ChatScreen> {
     return await ref.getDownloadURL();
   }
 
-  Future<void> insertMessage(String content, bool isImage) async {
-    final date = DateTime.now();
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
-    final timeStr = DateFormat('HH:mm').format(date);
-
-    await conn!.query(
-      'INSERT INTO Mensajes_del_Grupo (Contenido, FechaMensaje, HoraMensaje, Correo, IdGrupo) VALUES (?, ?, ?, ?, ?)',
-      [content, dateStr, timeStr, widget.correo, widget.idGrupo],
-    );
-
-    await fetchData();
-  }
-
   Future<void> openCamera() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       final imageUrl = await uploadImage(photo);
-      await insertMessage(imageUrl, true);
+      ref
+          .read(messageProvider(widget.idGrupo).notifier)
+          .insertMessage(imageUrl, widget.correo, widget.idGrupo);
     }
-  }
-
-  Future<void> fetchData() async {
-    conn = await db.getConnection();
-
-    final messageResult = await conn!.query(
-        'SELECT Contenido, FechaMensaje, HoraMensaje, Correo FROM Mensajes_del_Grupo WHERE IdGrupo = ?',
-        [widget.idGrupo]);
-
-    setState(() {
-      messages = messageResult.toList();
-    });
-
-    // Add a post frame callback to jump to the bottom of the list after the UI has been updated
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, ref, child) {
-      final colors = Theme.of(context).colorScheme;
-      final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+    final colors = Theme.of(context).colorScheme;
+    final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+    final messages = ref.watch(messageProvider(widget.idGrupo));
 
-      return Scaffold(
-        appBar: AppBar(
-          actions: widget.esgrupo
-              ? <Widget>[
-                  PopupMenuButton<String>(
-                    onSelected: (String result) {
-                      // handle your logic here to add a new person to the group
-                    },
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'Nuevo',
-                        child: Text('Añadir miembro'),
+    return Scaffold(
+      appBar: AppBar(
+        actions: widget.esgrupo
+            ? <Widget>[
+                PopupMenuButton<String>(
+                  onSelected: (String result) {
+                    // handle your logic here to add a new person to the group
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'Nuevo',
+                      child: Text('Añadir miembro'),
+                    ),
+                  ],
+                ),
+              ]
+            : null,
+        title: Row(
+          children: [
+            const SizedBox(width: 8.0),
+            CircleAvatar(
+              backgroundImage: widget.imagen.compareTo("null") != 0
+                  ? CachedNetworkImageProvider(widget.imagen)
+                  : null,
+              child: widget.imagen.compareTo("null") == 0
+                  ? const Icon(Icons.person_2)
+                  : null,
+            ),
+            const SizedBox(width: 8.0),
+            Flexible(
+              child: Text(
+                widget.nombre,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 16, // Adjust this value as needed
+                  color: isDarkMode
+                      ? colors.secondary
+                      : const Color.fromARGB(255, 0, 0, 0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              controller: _scrollController,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final isSender =
+                    message['Correo'].toString().compareTo(widget.correo) == 0;
+                final isImageURL = message['Contenido'].contains("https:");
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedMessage = message['Contenido'];
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5.0),
+                        child: isImageURL
+                            ? BubbleNormalImage(
+                                id: 'id$index',
+                                image: Image(
+                                  image: NetworkImage(message['Contenido']),
+                                  fit: BoxFit.cover,
+                                ),
+                                color: Color.fromARGB(
+                                    255, isSender ? 18 : 23, 37, 18),
+                                tail: true,
+                                delivered: true,
+                                isSender: isSender,
+                              )
+                            : BubbleSpecialThree(
+                                text: message['Contenido'],
+                                color: Color.fromARGB(
+                                    255, isSender ? 18 : 23, 37, 18),
+                                tail: true,
+                                textStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                                isSender: isSender,
+                                delivered: true,
+                              ),
                       ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          '${message['HoraMensaje'].toString().split(':')[0]}:${message['HoraMensaje'].toString().split(':')[1]}',
+                          textAlign:
+                              isSender ? TextAlign.right : TextAlign.left,
+                          style: TextStyle(
+                            color: colors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      )
                     ],
                   ),
-                ]
-              : null,
-          title: Row(
-            children: [
-              const SizedBox(width: 8.0),
-              CircleAvatar(
-                backgroundImage: widget.imagen.compareTo("null") != 0
-                    ? CachedNetworkImageProvider(widget.imagen)
-                    : null,
-                child: widget.imagen.compareTo("null") == 0
-                    ? const Icon(Icons.person_2)
-                    : null,
-              ),
-              const SizedBox(width: 8.0),
-              Flexible(
-                child: Text(
-                  widget.nombre,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16, // Adjust this value as needed
-                    color: isDarkMode
-                        ? colors.secondary
-                        : const Color.fromARGB(255, 0, 0, 0),
+                );
+              },
+            ),
+          ),
+          MessageBar(
+            messageBarHintText: 'Escribe un mensaje',
+            replying: selectedMessage != null,
+            replyingTo: selectedMessage ?? '',
+            onSend: (message) => ref
+                .read(messageProvider(widget.idGrupo).notifier)
+                .insertMessage(message, widget.correo, widget.idGrupo),
+            messageBarColor: isDarkMode
+                ? const Color.fromARGB(255, 0, 0, 0)
+                : colors.secondary,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 16),
+                child: InkWell(
+                  onTap: openCamera,
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.green,
+                    size: 24,
                   ),
                 ),
               ),
             ],
           ),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.separated(
-                physics: const BouncingScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                controller: _scrollController,
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  final message = messages[index];
-                  final isSender =
-                      message['Correo'].toString().compareTo(widget.correo) ==
-                          0;
-                  final isImageURL = message['Contenido'].contains("https:");
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedMessage = message['Contenido'];
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 5.0),
-                      child: isImageURL
-                          ? BubbleNormalImage(
-                              id: 'id$index',
-                              image: Image(
-                                image: NetworkImage(message['Contenido']),
-                                fit: BoxFit.cover,
-                              ),
-                              color: Color.fromARGB(
-                                  255, isSender ? 18 : 23, 37, 18),
-                              tail: true,
-                              delivered: true,
-                            )
-                          : BubbleSpecialThree(
-                              text: message['Contenido'],
-                              color: Color.fromARGB(
-                                  255, isSender ? 18 : 23, 37, 18),
-                              tail: true,
-                              textStyle: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                              isSender: isSender,
-                              delivered: true,
-                            ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            MessageBar(
-              messageBarHintText: 'Escribe un mensaje',
-              replying: selectedMessage != null,
-              replyingTo: selectedMessage ?? '',
-              onSend: (message) => insertMessage(message, false),
-              messageBarColor: isDarkMode
-                  ? const Color.fromARGB(255, 0, 0, 0)
-                  : colors.secondary,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 16),
-                  child: InkWell(
-                    onTap: openCamera,
-                    child: const Icon(
-                      Icons.camera_alt,
-                      color: Colors.green,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    });
+        ],
+      ),
+    );
   }
 }

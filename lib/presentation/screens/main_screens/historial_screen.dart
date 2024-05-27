@@ -187,18 +187,43 @@ class _HistorialScreenState extends State<HistorialScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              'No tienes viajes en tu historial',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 9, 61, 104),
+                            Icon(
+                              Icons.history,
+                              size: 100,
+                              color: colors.primary,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'No tienes viajes en tu historial',
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode
+                                      ? colors.secondary
+                                      : const Color.fromARGB(255, 9, 61, 104),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Se te agregará un viaje al historial cuando lo completes... ¡A qué esperas!.',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode
+                                      ? colors.secondary
+                                      : const Color.fromARGB(255, 87, 87, 87),
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: fetchData,
-                              child: const Text('Refrescar'),
+                              child: const Text('Actualizar historial'),
                             ),
                           ],
                         ),
