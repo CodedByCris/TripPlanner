@@ -11,7 +11,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../Database/connections.dart';
 import '../../functions/snackbars.dart';
 import '../../providers/theme_provider.dart';
-import '../../video/videoplayer.dart';
 import '../../widgets/interface/custom_app_bar.dart';
 import '../../providers/token_provider.dart';
 
