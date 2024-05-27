@@ -62,7 +62,6 @@ dependencies:
   share_plus: ^9.0.0
   shared_preferences: ^2.2.2
   table_calendar: ^3.1.1
-  video_player: ^2.8.6
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
@@ -76,7 +75,6 @@ flutter:
     - assets/images/loading.gif
     - assets/images/nubes.gif
     - assets/images/Logo.png
-    - assets/video/video.mp4
 
 flutter_launcher_icons:
   android: true

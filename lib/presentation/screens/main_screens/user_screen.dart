@@ -31,6 +31,10 @@ class UserScreenState extends State<UserScreen> {
       builder: (context, WidgetRef ref, child) {
         final colors = Theme.of(context).colorScheme;
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+        final nombre = ref.watch(userNameProvider); // Mover aquí
+        final correo = ref.watch(tokenProvider); // Mover aquí
+        final imagen = ref.watch(imageProvider); // Mover aquí
+
         return Scaffold(
           appBar: AppBar(
             title: CustomAppBar(
@@ -42,20 +46,18 @@ class UserScreenState extends State<UserScreen> {
           //*Cuerpo de la aplicación
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            child: _userView(ref,
-                context), // Asegúrate de actualizar _userView para usar imageUrl en lugar de ref.watch(imageProvider)
+            child: _userView(ref, context, nombre, correo,
+                imagen), // Asegúrate de actualizar _userView para usar imageUrl en lugar de ref.watch(imageProvider)
           ),
         );
       },
     );
   }
 
-  Widget _userView(WidgetRef ref, BuildContext context) {
+  Widget _userView(
+      WidgetRef ref, BuildContext context, nombre, correo, imagen) {
     final List<Color> colors = ref.watch(colorListProvider);
     final int selectedColor = ref.watch(themeNotifierProvider).selectedColor;
-    final correo = ref.watch(tokenProvider);
-    final nombre = ref.watch(userNameProvider);
-    final imagen = ref.watch(imageProvider);
 
     return Column(
       children: [
@@ -90,13 +92,32 @@ class UserScreenState extends State<UserScreen> {
                     ? _correo(colors, selectedColor, correo)
                     : _correo(colors, selectedColor, "INVITADO@gmail.com"),
                 _colores(colors, selectedColor, ref),
-                _tutorial(colors, selectedColor, context),
                 _informacion(colors, selectedColor),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
+    return ListTile(
+      leading: Icon(
+        Icons.person,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Nombre de usuario",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        nombre,
+        style: const TextStyle(
+          fontSize: 15,
+        ),
+      ),
     );
   }
 
@@ -152,6 +173,24 @@ class UserScreenState extends State<UserScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget _correo(List<Color> colors, int selectedColor, String correo) {
+    return ListTile(
+      leading: Icon(
+        Icons.email,
+        color: colors[selectedColor],
+        size: 30,
+      ),
+      title: const Text(
+        "Correo electrónico",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(correo,
+          style: const TextStyle(
+            fontSize: 15,
+          )),
     );
   }
 
@@ -293,44 +332,6 @@ class UserScreenState extends State<UserScreen> {
     );
   }
 
-  Widget _correo(List<Color> colors, int selectedColor, String correo) {
-    return ListTile(
-      leading: Icon(
-        Icons.email,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "Correo electrónico",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(correo,
-          style: const TextStyle(
-            fontSize: 15,
-          )),
-    );
-  }
-
-  Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
-    return ListTile(
-      leading: Icon(
-        Icons.person,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "Nombre de usuario",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(
-        nombre,
-        style: const TextStyle(
-          fontSize: 15,
-        ),
-      ),
-    );
-  }
-
   Widget _logOutButton(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: 200, // Set the width to your desired value
@@ -444,31 +445,6 @@ class UserScreenState extends State<UserScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _tutorial(
-      List<Color> colors, int selectedColor, BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        Icons.question_mark,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "¿Cómo funciona la app?",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: const Text("Ver tutorial",
-          style: TextStyle(
-            fontSize: 15,
-          )),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const VideoPlayerScreen()),
-        );
-      },
     );
   }
 }

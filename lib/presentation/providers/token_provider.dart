@@ -32,9 +32,13 @@ class UserNameNotifier extends StateNotifier<String?> {
           break;
         }
       });
-      //print("Nombre del provider -> $userName");
       state = userName;
+      print("Nombre del provider -> $state");
     });
+  }
+
+  Future<void> refresh() async {
+    _loadUserName();
   }
 }
 
@@ -59,9 +63,13 @@ class ImageNotifier extends StateNotifier<String?> {
         }
       });
 
-      //print("Imagen del provider -> $imagen");
       state = imagen;
+      print("Imagen del provider -> $state");
     });
+  }
+
+  Future<void> refresh() async {
+    _loadImage();
   }
 }
 
@@ -73,6 +81,7 @@ class TokenNotifier extends StateNotifier<String?> {
 
   Future<void> loadToken() async {
     state = await getToken();
+    print("Token del provider -> $state");
   }
 
   Future<void> deleteToken() async {
