@@ -32,7 +32,7 @@ class _ActualTravelCardState extends State<ActualTravelCard> {
           height: 180,
           width: double.infinity,
           child: Card(
-            elevation: 3,
+            elevation: 9,
             margin:
                 const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
             child: Padding(

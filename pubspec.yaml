@@ -76,6 +76,9 @@ flutter:
     - assets/images/loading.gif
     - assets/images/nubes.gif
     - assets/images/Logo.png
+    - assets/images/avion.jpg
+    - assets/images/avion_noche.jpg
+    - assets/images/cielo.jpg
 
 flutter_launcher_icons:
   android: true

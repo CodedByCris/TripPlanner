@@ -81,154 +81,171 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
         return Scaffold(
-          appBar: AppBar(
-            title: CustomAppBar(
-              isDarkMode: isDarkMode,
-              colors: colors,
-              titulo: 'FAVORITOS',
+            appBar: AppBar(
+              title: CustomAppBar(
+                isDarkMode: isDarkMode,
+                colors: colors,
+                titulo: 'FAVORITOS',
+              ),
             ),
-          ),
-          body: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : correo != null
-                  ? hayDatoss
-                      ? Column(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "Pulsa para ver todos los datos del viaje",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: groupedData.length,
-                                itemBuilder: (context, index) {
-                                  final month =
-                                      groupedData.keys.elementAt(index);
-                                  return Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          month,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      ...groupedData[month]!.map((viaje) {
-                                        return GestureDetector(
-                                          onLongPress: () async {
-                                            final conn =
-                                                await db.getConnection();
-                                            await conn.query(
-                                                'DELETE FROM Favoritos WHERE Correo = ? AND IdViaje = ?',
-                                                [correo, viaje['IdViaje']]);
-                                          },
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    FavoriteDetails(
-                                                  idViaje: viaje['IdViaje'],
-                                                  correo2: viaje['Correo'],
-                                                ),
-                                              ),
-                                            ).then((value) => setState(() {
-                                                  fetchData();
-                                                }));
-                                          },
-                                          child: ActualTravelCard(
-                                            origen: viaje['Origen'],
-                                            destino: viaje['Destino'],
-                                            fechaSalida: viaje['FechaSalida'],
-                                            fechaLlegada: viaje['FechaLlegada'],
-                                            gastos: viaje['TotalGastos'] ?? 0.0,
-                                            numRutas: viaje['NumRutas'] ?? 0,
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.heart_broken,
-                                  size: 100, color: colors.primary),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'No tienes viajes favoritos',
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? colors.secondary
-                                        : const Color.fromARGB(255, 9, 61, 104),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Puedes agregar uno en nuestro comparador de viajes en la pantalla principal.',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? colors.secondary
-                                        : const Color.fromARGB(255, 87, 87, 87),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                onPressed: fetchData,
-                                child: const Text('Actualizar favoritos'),
-                              ),
-                            ],
-                          ),
-                        )
-                  : Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Debes iniciar sesión para marcar un viaje como favoritos',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 9, 61, 104),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () {
-                                GoRouter.of(context).go('/login');
-                              },
-                              child: const Text('Iniciar sesión'),
-                            ),
-                          ],
-                        ),
-                      ),
+            body: Stack(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.center,
+                      colors: [Colors.black, Colors.white],
                     ),
-        );
+                    image: DecorationImage(
+                      image: !isDarkMode
+                          ? const AssetImage('assets/images/avion.jpg')
+                          : const AssetImage('assets/images/avion_noche.jpg'),
+                      opacity: !isDarkMode ? 0.4 : 1,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Column(
+                  children: [
+                    !hayDatoss
+                        ? Expanded(
+                            child: Column(
+                              mainAxisAlignment: !isDarkMode
+                                  ? MainAxisAlignment.spaceAround
+                                  : MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Icon(
+                                      Icons.heart_broken,
+                                      size: 80,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'No tienes viajes favoritos',
+                                        style: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : const Color.fromARGB(
+                                                  255, 6, 6, 6),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 15),
+                                      child: Text(
+                                        'Puedes agregar uno en nuestro comparador de viajes en la pantalla principal.',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : const Color.fromARGB(
+                                                  255, 6, 6, 6),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    isLoading
+                                        ? const CircularProgressIndicator()
+                                        : ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .all<Color>(isDarkMode
+                                                          ? Colors.white
+                                                          : Colors.black),
+                                            ),
+                                            onPressed: fetchData,
+                                            child: Text(
+                                              'Actualizar favoritos',
+                                              style: TextStyle(
+                                                  color: isDarkMode
+                                                      ? Colors.black
+                                                      : Colors.white),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox(height: 0),
+                    hayDatoss
+                        ? Expanded(
+                            child: ListView.builder(
+                              itemCount: groupedData.length,
+                              itemBuilder: (context, index) {
+                                final month = groupedData.keys.elementAt(index);
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Text(
+                                        month,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    ...groupedData[month]!.map((viaje) {
+                                      return GestureDetector(
+                                        onLongPress: () async {
+                                          final conn = await db.getConnection();
+                                          await conn.query(
+                                              'DELETE FROM Favoritos WHERE Correo = ? AND IdViaje = ?',
+                                              [correo, viaje['IdViaje']]);
+                                        },
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FavoriteDetails(
+                                                idViaje: viaje['IdViaje'],
+                                                correo2: viaje['Correo'],
+                                              ),
+                                            ),
+                                          ).then((value) => setState(() {
+                                                fetchData();
+                                              }));
+                                        },
+                                        child: ActualTravelCard(
+                                          origen: viaje['Origen'],
+                                          destino: viaje['Destino'],
+                                          fechaSalida: viaje['FechaSalida'],
+                                          fechaLlegada: viaje['FechaLlegada'],
+                                          gastos: viaje['TotalGastos'] ?? 0.0,
+                                          numRutas: viaje['NumRutas'] ?? 0,
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
+              ],
+            ));
       },
     );
   }

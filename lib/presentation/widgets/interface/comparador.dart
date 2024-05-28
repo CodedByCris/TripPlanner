@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mysql1/mysql1.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:trip_planner/presentation/functions/snackbars.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/search_screen.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 
@@ -53,65 +49,78 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
       builder: (context, ref, child) {
         final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  //!Titulo
-                  Text(
-                    'Encuentra el viaje perfecto al mejor',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? colors.secondary
-                          : const Color.fromARGB(255, 9, 61, 104),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-
-                  //!Subtitulo
-                  Text(
-                    'Introduce los detalles de tu viaje y descubre las mejores actividades y ofertas',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isDarkMode
-                          ? colors.secondary
-                          : const Color.fromARGB(255, 9, 61, 104),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 30),
-
-                  //!Campo de texto origen
-                  _origen(colors),
-                  const SizedBox(height: 20),
-
-                  //!Campo de texto destino
-                  _destino(colors),
-                  const SizedBox(height: 20),
-
-                  //! Precio mínimo y máximo
-                  _precio(colors),
-                  const SizedBox(height: 20),
-
-                  //!Fecha de salida y llegada
-                  fechas(colors, context),
-                  const SizedBox(height: 50),
-
-                  //!Botón de buscar
-                  _btnBuscar(colors),
-                ],
+        return Stack(children: [
+          Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.center,
+                colors: [Colors.black, Colors.white],
+              ),
+              image: DecorationImage(
+                image: !isDarkMode
+                    ? const AssetImage('assets/images/avion.jpg')
+                    : const AssetImage('assets/images/avion_noche.jpg'),
+                opacity: !isDarkMode ? 0.4 : 1, // Replace with your image
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-        );
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      //!Titulo
+                      const Text(
+                        'ENCUENTRA TU VIAJE PERFECTO',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 255, 255, 255)),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+
+                      //!Subtitulo
+                      const Text(
+                        'Introduce los detalles de tu viaje y descubre las mejores actividades y ofertas',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 255, 255, 255)),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 30),
+
+                      //!Campo de texto origen
+                      _origen(colors),
+                      const SizedBox(height: 20),
+
+                      //!Campo de texto destino
+                      _destino(colors),
+                      const SizedBox(height: 20),
+
+                      //! Precio mínimo y máximo
+                      _precio(colors),
+                      const SizedBox(height: 20),
+
+                      //!Fecha de salida y llegada
+                      fechas(colors, context),
+                      const SizedBox(height: 50),
+
+                      //!Botón de buscar
+                      _btnBuscar(colors),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ]);
       },
     );
   }
@@ -124,12 +133,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: precioMinText,
             decoration: InputDecoration(
-              labelText: 'PRECIO MIN',
+              labelText: 'MINIMO',
               prefixIcon: Icon(
                 Icons.attach_money,
                 color: colors.primary,
               ),
               border: const OutlineInputBorder(),
+              fillColor: Colors.white,
+              filled: true,
             ),
             keyboardType: TextInputType.number,
           ),
@@ -141,12 +152,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: precioMaxText,
             decoration: InputDecoration(
-              labelText: 'PRECIO MAX',
+              labelText: 'MAXIMO',
               prefixIcon: Icon(
                 Icons.attach_money,
                 color: colors.primary,
               ),
               border: const OutlineInputBorder(),
+              fillColor: Colors.white,
+              filled: true,
             ),
             keyboardType: TextInputType.number,
           ),
@@ -234,13 +247,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: fechaSalidaText,
             decoration: InputDecoration(
-              labelText: 'Fecha salida',
-              prefixIcon: Icon(
-                Icons.calendar_month,
-                color: colors.primary,
-              ),
-              border: const OutlineInputBorder(),
-            ),
+                labelText: 'SALIDA',
+                prefixIcon: Icon(
+                  Icons.calendar_month,
+                  color: colors.primary,
+                ),
+                border: const OutlineInputBorder(),
+                fillColor: Colors.white,
+                filled: true),
             onTap: () async {
               FocusScope.of(context).requestFocus(
                   FocusNode()); // to prevent opening default keyboard
@@ -262,12 +276,14 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
           child: TextFormField(
             controller: fechaLlegadaText,
             decoration: InputDecoration(
-              labelText: 'Fecha llegada',
+              labelText: 'LLEGADA',
               prefixIcon: Icon(
                 Icons.calendar_month,
                 color: colors.primary,
               ),
               border: const OutlineInputBorder(),
+              fillColor: Colors.white,
+              filled: true,
             ),
             onTap: () async {
               FocusScope.of(context).requestFocus(
@@ -296,6 +312,8 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
         labelText: 'DESTINO',
         prefixIcon: ubiActual(colors, destinoText, context),
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
       ),
     );
   }
@@ -307,6 +325,8 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
         labelText: '* ORIGEN',
         prefixIcon: ubiActual(colors, origenText, context),
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {

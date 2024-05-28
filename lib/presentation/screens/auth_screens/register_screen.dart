@@ -58,36 +58,69 @@ class RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 100),
-            _RegisterForm(
-                widget.formKey, widget.nombre, widget.correo, widget.password),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: CustomFilledButton(
-                  text: 'Crear cuenta',
-                  buttonColor: Colors.black,
-                  onPressed: registerUser,
-                ),
+      body: Stack(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.center,
+                colors: [Colors.black, Color.fromARGB(255, 103, 103, 103)],
+              ),
+              image: DecorationImage(
+                image: AssetImage('assets/images/cielo.jpg'),
+                opacity: 0.6, // Replace with your image
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          SingleChildScrollView(
+            child: Column(
               children: [
-                const Text('¿Ya tienes cuenta?'),
-                TextButton(
-                    onPressed: () => context.push('/login'),
-                    child: const Text('Iniciar sesión'))
+                const SizedBox(height: 100),
+                _RegisterForm(widget.formKey, widget.nombre, widget.correo,
+                    widget.password),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: CustomFilledButton(
+                      text: 'Crear cuenta',
+                      buttonColor: Colors.black,
+                      onPressed: registerUser,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '¿Ya tienes cuenta?',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    TextButton(
+                        onPressed: () => context.push('/login'),
+                        child: const Text(
+                          'Iniciar sesión',
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 140, 234, 255),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic),
+                        ))
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -103,15 +136,18 @@ class _RegisterForm extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textStyles = Theme.of(context).textTheme;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Form(
         key: formKey,
         child: Column(
           children: [
-            Text('Registro', style: textStyles.titleLarge),
+            const Text('Registro',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                )),
             const SizedBox(height: 60),
             CustomTextFormField(
               controller: nombre,

@@ -20,21 +20,41 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 50),
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(100)),
+        body: Stack(
+      children: [
+        Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Colors.black, Color.fromARGB(255, 103, 103, 103)],
             ),
-            child: const _LoginForm(),
-          )
-        ],
-      ),
+            image: DecorationImage(
+              image: AssetImage('assets/images/cielo.jpg'),
+              opacity: 0.6, // Replace with your image
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  borderRadius:
+                      BorderRadius.only(topLeft: Radius.circular(100)),
+                ),
+                child: const _LoginForm(),
+              )
+            ],
+          ),
+        ),
+      ],
     ));
   }
 }
@@ -57,7 +77,6 @@ class _LoginForm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final correo = TextEditingController();
     final password = TextEditingController();
-    final textStyles = Theme.of(context).textTheme;
     final formKey = GlobalKey<FormState>(); // Agrega esta línea
 
     getToken().then((token) {
@@ -74,7 +93,12 @@ class _LoginForm extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 50),
-            Text('Login', style: textStyles.titleLarge),
+            const Text('Login',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                )),
             const SizedBox(height: 50),
             CustomTextFormField(
                 label: 'Correo',
@@ -131,10 +155,24 @@ class _LoginForm extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text('¿No tienes cuenta?'),
+        const Text(
+          '¿No tienes cuenta?',
+          style: TextStyle(
+              color: Color.fromARGB(255, 255, 255, 255),
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic),
+        ),
         TextButton(
             onPressed: () => context.push('/register'),
-            child: const Text('Crea una aquí'))
+            child: const Text(
+              'Crea una aquí',
+              style: TextStyle(
+                  color: Color.fromARGB(255, 140, 234, 255),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic),
+            ))
       ],
     );
   }
@@ -145,7 +183,14 @@ class _LoginForm extends ConsumerWidget {
       children: [
         TextButton(
             onPressed: () => context.push('/recover'),
-            child: const Text('Recuperar contraseña'))
+            child: const Text(
+              'Recuperar contraseña',
+              style: TextStyle(
+                  color: Color.fromARGB(255, 140, 234, 255),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic),
+            ))
       ],
     );
   }
@@ -156,7 +201,7 @@ class _LoginForm extends ConsumerWidget {
       height: 60,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(176, 255, 0, 0), // Fondo blanco
+          backgroundColor: const Color.fromARGB(212, 255, 0, 0), // Fondo blanco
           side: const BorderSide(color: Colors.black, width: 2), // Borde negro
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Bordes redondeados
@@ -164,7 +209,7 @@ class _LoginForm extends ConsumerWidget {
         ),
         child: const Text(
           'Entrar como invitado',
-          style: TextStyle(color: Colors.black), // Texto negro
+          style: TextStyle(color: Colors.white), // Texto negro
         ),
         onPressed: () async {
           context.go('/home/0');

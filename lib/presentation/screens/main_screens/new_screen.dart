@@ -67,31 +67,52 @@ class NewScreenState extends ConsumerState<NewScreen> {
             titulo: 'NUEVO VIAJE',
           ),
         ),
-        body: Center(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Debes iniciar sesión para crear un viaje',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 9, 61, 104),
-                  ),
-                  textAlign: TextAlign.center,
+        body: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.center,
+                  colors: [Colors.black, Colors.white],
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/login');
-                  },
-                  child: const Text('Iniciar sesión'),
+                image: DecorationImage(
+                  image: !isDarkMode
+                      ? const AssetImage('assets/images/avion.jpg')
+                      : const AssetImage('assets/images/avion_noche.jpg'),
+                  opacity: !isDarkMode ? 0.4 : 1, // Replace with your image
+                  fit: BoxFit.cover,
                 ),
-              ],
+              ),
             ),
-          ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Debes iniciar sesión para crear un viaje',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 9, 61, 104),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        GoRouter.of(context).go('/login');
+                      },
+                      child: const Text('Iniciar sesión'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       );
     } else {
@@ -103,60 +124,86 @@ class NewScreenState extends ConsumerState<NewScreen> {
             titulo: 'NUEVO VIAJE',
           ),
         ),
-        body: Form(
-          key: formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(8.0),
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  'Los campos * son obligatorios',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic),
-                  textAlign: TextAlign.center,
+        body: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.center,
+                  colors: [Colors.black, Colors.white],
+                ),
+                image: DecorationImage(
+                  image: !isDarkMode
+                      ? const AssetImage('assets/images/avion.jpg')
+                      : const AssetImage('assets/images/avion_noche.jpg'),
+                  opacity: !isDarkMode ? 0.4 : 1, // Replace with your image
+                  fit: BoxFit.cover,
                 ),
               ),
-              _origen(colors),
-              const SizedBox(
-                height: 20.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 40, left: 10, right: 10, bottom: 10),
+              child: Form(
+                key: formKey,
+                child: ListView(
+                  padding: const EdgeInsets.all(8.0),
+                  children: <Widget>[
+                    const Text(
+                      'Los campos * son obligatorios',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w900,
+                          fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    _origen(colors),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    _destino(colors),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _fechaOrigen(colors, context),
+                        ),
+                        const SizedBox(
+                          width: 20.0,
+                        ),
+                        Expanded(
+                          child: _fechaLlegada(colors, context),
+                        ),
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    _precioBilletes(colors),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    _notas(colors),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    _btnGuardar(ref, colors, context, db, correo),
+                  ],
+                ),
               ),
-              _destino(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _fechaOrigen(colors, context),
-                  ),
-                  const SizedBox(
-                    width: 20.0,
-                  ),
-                  Expanded(
-                    child: _fechaLlegada(colors, context),
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _precioBilletes(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _notas(colors),
-              const SizedBox(
-                height: 20.0,
-              ),
-              _btnGuardar(ref, colors, context, db, correo),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
@@ -272,12 +319,14 @@ class NewScreenState extends ConsumerState<NewScreen> {
       maxLines: null,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
-        labelText: 'Notas del viaje (opcional)',
+        labelText: 'NOTAS DEL VIAJE (opcional)',
         prefixIcon: Icon(
           Icons.comment,
           color: colors.primary,
         ),
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
       ),
       validator: (value) {
         if (value!.length < 3 && value.isNotEmpty) {
@@ -292,8 +341,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
     return TextFormField(
       controller: precioBilletesController,
       decoration: InputDecoration(
-        labelText: 'Precio de los billetes (opcional)',
+        labelText: 'PRECIO BILLETES (opcional)',
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
         prefixIcon: Icon(
           Icons.attach_money,
           color: colors.primary,
@@ -317,8 +368,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
     return TextFormField(
       controller: fechaLlegadaController,
       decoration: InputDecoration(
-        labelText: 'Fecha llegada',
+        labelText: 'LLEGADA',
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
         prefixIcon: Icon(
           Icons.calendar_today,
           color: colors.primary,
@@ -356,8 +409,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
     return TextFormField(
       controller: fechaOrigenController,
       decoration: InputDecoration(
-        labelText: '* Fecha salida',
+        labelText: '* SALIDA',
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
         prefixIcon: Icon(
           Icons.calendar_today,
           color: colors.primary,
@@ -389,8 +444,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
     return TextFormField(
       controller: destinoController,
       decoration: InputDecoration(
-        labelText: '* Destino',
+        labelText: '* DESTINO',
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
         prefixIcon: ubiActual(colors, destinoController, context),
       ),
       validator: (value) {
@@ -406,8 +463,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
     return TextFormField(
       controller: origenController,
       decoration: InputDecoration(
-        labelText: '* Origen',
+        labelText: '* ORIGEN',
         border: const OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
         prefixIcon: ubiActual(colors, origenController, context),
       ),
       validator: (value) {

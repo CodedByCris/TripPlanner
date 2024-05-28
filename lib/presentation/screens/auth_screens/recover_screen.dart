@@ -17,21 +17,41 @@ class _RecoverScreenState extends State<RecoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 50),
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(100)),
+        body: Stack(
+      children: [
+        Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Colors.black, Color.fromARGB(255, 103, 103, 103)],
             ),
-            child: const _RecoverForm(),
-          )
-        ],
-      ),
+            image: DecorationImage(
+              image: AssetImage('assets/images/cielo.jpg'),
+              opacity: 0.6, // Replace with your image
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  borderRadius:
+                      BorderRadius.only(topLeft: Radius.circular(100)),
+                ),
+                child: const _RecoverForm(),
+              )
+            ],
+          ),
+        ),
+      ],
     ));
   }
 }
@@ -53,7 +73,12 @@ class _RecoverForm extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 50),
-            Text('Recuperar contraseña', style: textStyles.titleLarge),
+            const Text('Recuperar contraseña',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                )),
             const SizedBox(height: 50),
             CustomTextFormField(
               controller: correo,
@@ -79,7 +104,14 @@ class _RecoverForm extends ConsumerWidget {
               children: [
                 TextButton(
                     onPressed: () => context.push('/login'),
-                    child: const Text('Iniciar sesión'))
+                    child: const Text(
+                      'Iniciar sesión',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 140, 234, 255),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ))
               ],
             ),
           ],
