@@ -14,24 +14,11 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController controller;
-  final List<String> travelQuotes = [
-    'Preparando las maletas para viajar',
-    'Mirando el tiempo en Florida',
-    'Consultando el mapa de Nueva York',
-  ];
-
   late final String selectedQuote;
 
   @override
   void initState() {
     super.initState();
-    selectedQuote = travelQuotes[Random().nextInt(travelQuotes.length)];
-
-    controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..repeat();
 
     getToken().then((token) {
       Future.delayed(const Duration(seconds: 3), () {
@@ -64,42 +51,9 @@ class SplashScreenState extends ConsumerState<SplashScreen>
                 ),
               ),
             ),
-            Center(
-              child: SizedBox(
-                width: 300,
-                child: AnimatedBuilder(
-                  animation: controller,
-                  builder: (_, __) {
-                    final int dots = (controller.value * 4).floor() % 4;
-                    return Text(
-                      '$selectedQuote ${'.' * dots}',
-                      style: TextStyle(
-                        fontSize: 30,
-                        color: const Color.fromARGB(255, 25, 25, 25)
-                            .withOpacity(0.8),
-                        shadows: const [
-                          Shadow(
-                            offset: Offset(2.0, 2.0),
-                            blurRadius: 3.0,
-                            color: Color.fromARGB(255, 120, 255, 255),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }

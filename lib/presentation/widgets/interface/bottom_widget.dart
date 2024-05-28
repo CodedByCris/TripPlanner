@@ -29,6 +29,8 @@ class MenuBarritaState extends State<MenuBarrita> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
+        physics:
+            const NeverScrollableScrollPhysics(), // disable swipe navigation
         children: const <Widget>[
           HomeScreen(),
           FavoritesScreen(),
@@ -36,9 +38,6 @@ class MenuBarritaState extends State<MenuBarrita> {
           HistorialScreen(),
           UserScreen()
         ],
-        onPageChanged: (index) {
-          context.go("/home/$index");
-        },
       ),
       bottomNavigationBar: BottomMenu(
         currentIndex: widget.pageIndex,
