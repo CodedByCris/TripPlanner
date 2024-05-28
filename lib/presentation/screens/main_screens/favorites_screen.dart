@@ -75,11 +75,67 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final colors = Theme.of(context).colorScheme;
-        final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
-
+    return Consumer(builder: (context, ref, child) {
+      final colors = Theme.of(context).colorScheme;
+      final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
+      if (correo == null) {
+        return Scaffold(
+          appBar: AppBar(
+            title: CustomAppBar(
+              isDarkMode: isDarkMode,
+              colors: colors,
+              titulo: 'HISTORIAL',
+            ),
+          ),
+          body: Stack(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.center,
+                    colors: [Colors.black, Colors.white],
+                  ),
+                  image: DecorationImage(
+                    image: !isDarkMode
+                        ? const AssetImage('assets/images/avion.jpg')
+                        : const AssetImage('assets/images/avion_noche.jpg'),
+                    opacity: !isDarkMode ? 0.4 : 1,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Debes iniciar sesión para ver tu historial de viajes',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 9, 61, 104),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          GoRouter.of(context).go('/login');
+                        },
+                        child: const Text('Iniciar sesión'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
         return Scaffold(
             appBar: AppBar(
               title: CustomAppBar(
@@ -246,7 +302,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 ),
               ],
             ));
-      },
-    );
+      }
+    });
   }
 }

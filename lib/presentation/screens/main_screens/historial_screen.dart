@@ -84,8 +84,25 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 titulo: 'HISTORIAL',
               ),
             ),
-            body: Column(
+            body: Stack(
               children: [
+                Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.center,
+                      colors: [Colors.black, Colors.white],
+                    ),
+                    image: DecorationImage(
+                      image: !isDarkMode
+                          ? const AssetImage('assets/images/avion.jpg')
+                          : const AssetImage('assets/images/avion_noche.jpg'),
+                      opacity: !isDarkMode ? 0.4 : 1,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,

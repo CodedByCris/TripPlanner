@@ -79,6 +79,7 @@ flutter:
     - assets/images/avion.jpg
     - assets/images/avion_noche.jpg
     - assets/images/cielo.jpg
+    - assets/images/user.jpg
 
 flutter_launcher_icons:
   android: true
