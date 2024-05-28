@@ -1,6 +1,7 @@
 //import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_planner/conf/connectivity.dart';
 import 'package:trip_planner/conf/theme/app_theme.dart';
@@ -11,8 +12,10 @@ import 'presentation/screens/user_screens/no_connection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(const ProviderScope(child: App()));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const ProviderScope(child: App()));
+  });
 }
 
 class App extends StatelessWidget {

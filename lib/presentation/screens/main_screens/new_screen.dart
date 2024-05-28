@@ -92,21 +92,30 @@ class NewScreenState extends ConsumerState<NewScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Debes iniciar sesión para crear un viaje',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 9, 61, 104),
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            isDarkMode ? Colors.white : Colors.black),
+                      ),
                       onPressed: () {
                         GoRouter.of(context).go('/login');
                       },
-                      child: const Text('Iniciar sesión'),
+                      child: Text(
+                        'Iniciar sesión',
+                        style: TextStyle(
+                          color: !isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
                     ),
                   ],
                 ),
