@@ -51,35 +51,44 @@ class SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 43, 198, 255),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: <Widget>[
-            Image.asset('assets/images/nubes.gif'),
-            SizedBox(
-              width: 300,
-              child: AnimatedBuilder(
-                animation: controller,
-                builder: (_, __) {
-                  final int dots = (controller.value * 4).floor() % 4;
-                  return Text(
-                    '$selectedQuote ${'.' * dots}',
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: const Color.fromARGB(255, 25, 25, 25)
-                          .withOpacity(0.8),
-                      shadows: const [
-                        Shadow(
-                          offset: Offset(2.0, 2.0),
-                          blurRadius: 3.0,
-                          color: Color.fromARGB(255, 120, 255, 255),
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  );
-                },
+            Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/nubes.gif'),
+                  opacity: 1, // Replace with your image
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Center(
+              child: SizedBox(
+                width: 300,
+                child: AnimatedBuilder(
+                  animation: controller,
+                  builder: (_, __) {
+                    final int dots = (controller.value * 4).floor() % 4;
+                    return Text(
+                      '$selectedQuote ${'.' * dots}',
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: const Color.fromARGB(255, 25, 25, 25)
+                            .withOpacity(0.8),
+                        shadows: const [
+                          Shadow(
+                            offset: Offset(2.0, 2.0),
+                            blurRadius: 3.0,
+                            color: Color.fromARGB(255, 120, 255, 255),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
+                ),
               ),
             ),
           ],

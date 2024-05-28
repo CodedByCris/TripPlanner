@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 import '../../widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -93,12 +94,16 @@ class _LoginForm extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 50),
-            const Text('Login',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                )),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.15,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/Logo.png'),
+                  opacity: 1, // Replace with your image
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
             const SizedBox(height: 50),
             CustomTextFormField(
                 label: 'Correo',
@@ -241,10 +246,8 @@ class _LoginForm extends ConsumerWidget {
                 email: email,
                 password: pass,
               );
+              Snackbar().mensaje(context, "Sesión iniciada correctamente");
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Sesión iniciada correctamente')),
-              );
               await storage.write(key: 'token', value: email);
 
               // Verificar el token después de escribirlo
@@ -276,14 +279,10 @@ class _LoginForm extends ConsumerWidget {
               } else {
                 message = 'Los datos introducidos son incorrectos.';
               }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(message)),
-              );
+              Snackbar().mensaje(context, message);
             } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Los datos introducidos son incorrectos")),
-              );
+              Snackbar()
+                  .mensaje(context, "Los datos introducidos son incorrectos");
             }
           }
         });

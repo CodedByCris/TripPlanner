@@ -73,7 +73,6 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/images/loading.gif
     - assets/images/nubes.gif
     - assets/images/Logo.png
     - assets/images/avion.jpg

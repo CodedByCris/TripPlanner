@@ -11,6 +11,7 @@ import 'presentation/screens/user_screens/no_connection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const ProviderScope(child: App()));
 }
 
