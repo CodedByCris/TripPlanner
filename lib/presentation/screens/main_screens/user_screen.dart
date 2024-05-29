@@ -314,7 +314,7 @@ class UserScreenState extends State<UserScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      subtitle: const Text("Version 2.0",
+      subtitle: const Text("Version 1.3",
           style: TextStyle(
             fontSize: 15,
           )),
