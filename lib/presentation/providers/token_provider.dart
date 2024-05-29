@@ -33,7 +33,6 @@ class UserNameNotifier extends StateNotifier<String?> {
         }
       });
       state = userName;
-      print("Nombre del provider -> $state");
     });
   }
 
@@ -64,7 +63,6 @@ class ImageNotifier extends StateNotifier<String?> {
       });
 
       state = imagen;
-      print("Imagen del provider -> $state");
     });
   }
 
@@ -81,7 +79,6 @@ class TokenNotifier extends StateNotifier<String?> {
 
   Future<void> loadToken() async {
     state = await getToken();
-    print("Token del provider -> $state");
   }
 
   Future<void> deleteToken() async {

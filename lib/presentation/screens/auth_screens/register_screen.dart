@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +52,6 @@ class RegisterScreenState extends ConsumerState<RegisterScreen> {
         context.go('/home/0');
       });
     } catch (e) {
-      print(e);
       Snackbar().mensaje(context, 'Este correo ya está registrado');
     }
   }

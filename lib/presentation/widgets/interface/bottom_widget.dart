@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:trip_planner/presentation/widgets/interface/bottom_menu.dart';
 import 'package:trip_planner/presentation/screens/screens.dart';
 

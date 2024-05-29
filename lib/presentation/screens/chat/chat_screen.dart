@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -48,6 +50,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
+  // ignore: unused_element
   void _messageListener() {
     if (isWriting) {
       ref.read(messageProvider(widget.idGrupo).notifier).stopTimer();
