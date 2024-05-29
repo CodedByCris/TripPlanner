@@ -20,6 +20,8 @@ class MessageNotifier extends StateNotifier<List<ResultRow>> {
   }
 
   void startTimer() {
+    print("START TIMER");
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       fetchData(idGrupo);
@@ -27,6 +29,7 @@ class MessageNotifier extends StateNotifier<List<ResultRow>> {
   }
 
   void stopTimer() {
+    print("STOP TIMER");
     _timer?.cancel();
   }
 

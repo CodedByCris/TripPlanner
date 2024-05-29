@@ -34,7 +34,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   final ScrollController _scrollController = ScrollController();
   String? selectedMessage;
-
+  bool isWriting = false;
+  bool timerOn = true;
   @override
   void initState() {
     super.initState();
@@ -45,6 +46,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
+  }
+
+  void _messageListener() {
+    if (isWriting) {
+      ref.read(messageProvider(widget.idGrupo).notifier).stopTimer();
+    } else {
+      ref.read(messageProvider(widget.idGrupo).notifier).startTimer();
+    }
   }
 
   Future<String> uploadImage(XFile image) async {
@@ -207,12 +216,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           MessageBar(
+            onTextChanged: (text) {
+              isWriting = text.isNotEmpty;
+              if (isWriting && timerOn) {
+                ref.read(messageProvider(widget.idGrupo).notifier).stopTimer();
+                timerOn = false;
+              } else if (!timerOn && !isWriting) {
+                ref.read(messageProvider(widget.idGrupo).notifier).startTimer();
+                timerOn = true;
+              }
+            },
             messageBarHintText: 'Escribe un mensaje',
             replying: selectedMessage != null,
             replyingTo: selectedMessage ?? '',
-            onSend: (message) => ref
-                .read(messageProvider(widget.idGrupo).notifier)
-                .insertMessage(message, widget.correo, widget.idGrupo),
+            onSend: (message) {
+              ref
+                  .read(messageProvider(widget.idGrupo).notifier)
+                  .insertMessage(message, widget.correo, widget.idGrupo);
+              ref.read(messageProvider(widget.idGrupo).notifier).startTimer();
+              timerOn = true;
+            },
             messageBarColor: isDarkMode
                 ? const Color.fromARGB(255, 0, 0, 0)
                 : colors.secondary,
