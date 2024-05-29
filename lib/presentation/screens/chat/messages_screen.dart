@@ -146,10 +146,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     String imageUrl = data.fields['Imagen'].toString();
                     Widget leadingWidget;
 
-                    if (imageUrl.isEmpty || imageUrl.compareTo("null") == 0) {
-                      leadingWidget = const Icon(Icons.group);
+                    if (data.fields['NombreUsuario'] != null) {
+                      // It's a private chat
+                      esgrupo = false;
+                      leadingWidget =
+                          const Icon(Icons.person); // Icon for private chat
                     } else {
-                      leadingWidget = Image.network(imageUrl);
+                      // It's a group chat
+                      esgrupo = true;
+                      leadingWidget =
+                          const Icon(Icons.group); // Icon for group chat
                     }
 
                     if (data.fields['NombreUsuario'] != null) {

@@ -19,6 +19,17 @@ class MessageNotifier extends StateNotifier<List<ResultRow>> {
     fetchData(idGrupo);
   }
 
+  void startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      fetchData(idGrupo);
+    });
+  }
+
+  void stopTimer() {
+    _timer?.cancel();
+  }
+
   void fetchData(String idGrupo) {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {

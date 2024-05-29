@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:trip_planner/presentation/screens/chat/add_member_screen.dart';
 
 import '../../providers/messages_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -30,6 +31,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ImagePicker _picker = ImagePicker();
+
   final ScrollController _scrollController = ScrollController();
   String? selectedMessage;
 
@@ -80,9 +82,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   },
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddMemberScreen(
+                              idGrupo: widget.idGrupo,
+                            ), // Pass the idGrupo to ChatScreen
+                          ),
+                        );
+                      },
                       value: 'Nuevo',
-                      child: Text('Añadir miembro'),
+                      child: const Text('Añadir miembro'),
                     ),
                   ],
                 ),
@@ -138,6 +150,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   },
                   child: Column(
                     children: [
+                      if (widget.esgrupo && !isSender)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            message['Correo'].toString().split('@')[0],
+                            style: TextStyle(
+                              color: colors.secondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 5),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5.0),
                         child: isImageURL

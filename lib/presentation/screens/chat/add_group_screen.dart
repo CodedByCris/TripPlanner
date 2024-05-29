@@ -22,8 +22,8 @@ class AddGroupScreenState extends State<AddGroupScreen> {
   final descriptionController = TextEditingController();
   final groupNameController = TextEditingController();
   String? selectedUser;
-  String selectedGroupType = "Chat privado";
-  List<String> groupTypes = ['Chat privado', 'Grupo público', 'Grupo privado'];
+  String selectedGroupType = 'Nuevo Chat';
+  List<String> groupTypes = ['Nuevo Chat', 'Nuevo Grupo'];
 
   // Change users to a Map
   Map<String, String> users = {};
@@ -123,7 +123,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                     labelText: 'Usuario',
                   ),
                 ),
-                if (selectedGroupType.compareTo('Chat privado') != 0) ...[
+                if (selectedGroupType.compareTo('Nuevo Chat') != 0) ...[
                   TextFormField(
                     controller: groupNameController,
                     decoration:
