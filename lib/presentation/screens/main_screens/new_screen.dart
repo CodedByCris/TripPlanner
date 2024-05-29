@@ -271,8 +271,10 @@ class NewScreenState extends ConsumerState<NewScreen> {
                           notas = 'Sin notas';
                         }
                         if (fechaLlegada!.isEmpty) {
-                          fechaLlegada =
-                              DateTime.now().toIso8601String().substring(0, 10);
+                          fechaLlegada = DateTime.now()
+                              .add(const Duration(days: 365))
+                              .toIso8601String()
+                              .substring(0, 10);
                         }
                         String sql =
 

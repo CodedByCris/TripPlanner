@@ -169,140 +169,133 @@ class _HistorialScreenState extends State<HistorialScreen> {
                     ),
                   ),
                 ),
-                isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : hayDatos
-                        ? Column(
-                            children: [
-                              Expanded(
-                                child: ListView.builder(
-                                  itemCount: groupedData.length,
-                                  itemBuilder: (context, index) {
-                                    final month =
-                                        groupedData.keys.elementAt(index);
-                                    return Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20),
-                                          child: Text(
-                                            month,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                        ...groupedData[month]!.map((viaje) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              //print(viaje['IdViaje']);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ActualDetails(
-                                                    idViaje: viaje['IdViaje'],
-                                                  ),
-                                                ),
-                                              ).then((value) => setState(() {
-                                                    fetchData();
-                                                  }));
-                                            },
-                                            child: ActualTravelCard(
-                                              origen: viaje['Origen'],
-                                              destino: viaje['Destino'],
-                                              fechaSalida: viaje['FechaSalida'],
-                                              fechaLlegada:
-                                                  viaje['FechaLlegada'],
-                                              gastos:
-                                                  viaje['TotalGastos'] ?? 0.0,
-                                              numRutas: viaje['NumRutas'],
+                Positioned.fill(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : hayDatos
+                          ? ListView.builder(
+                              itemCount: groupedData.length,
+                              itemBuilder: (context, index) {
+                                final month = groupedData.keys.elementAt(index);
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Text(
+                                        month,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    ...groupedData[month]!.map((viaje) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          //print(viaje['IdViaje']);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ActualDetails(
+                                                idViaje: viaje['IdViaje'],
+                                              ),
                                             ),
-                                          );
-                                        }),
-                                      ],
-                                    );
-                                  },
-                                ),
+                                          ).then((value) => setState(() {
+                                                fetchData();
+                                              }));
+                                        },
+                                        child: ActualTravelCard(
+                                          origen: viaje['Origen'],
+                                          destino: viaje['Destino'],
+                                          fechaSalida: viaje['FechaSalida'],
+                                          fechaLlegada: viaje['FechaLlegada'],
+                                          gastos: viaje['TotalGastos'] ?? 0.0,
+                                          numRutas: viaje['NumRutas'],
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                );
+                              },
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: !isDarkMode
+                                    ? MainAxisAlignment.spaceAround
+                                    : MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Icon(
+                                        Icons.history,
+                                        size: 80,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : const Color.fromARGB(
+                                                255, 0, 0, 0),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'No tienes viajes en tu historial',
+                                          style: TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : const Color.fromARGB(
+                                                    255, 6, 6, 6),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 15),
+                                        child: Text(
+                                          'Se te agregará un viaje al historial cuando lo completes...¡A qué esperas!.',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : const Color.fromARGB(
+                                                    255, 6, 6, 6),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      isLoading
+                                          ? const CircularProgressIndicator()
+                                          : ElevatedButton(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty
+                                                        .all<Color>(isDarkMode
+                                                            ? Colors.white
+                                                            : Colors.black),
+                                              ),
+                                              onPressed: fetchData,
+                                              child: Text(
+                                                'Actualizar historial',
+                                                style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.black
+                                                        : Colors.white),
+                                              ),
+                                            ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
-                          )
-                        : Expanded(
-                            child: Column(
-                              mainAxisAlignment: !isDarkMode
-                                  ? MainAxisAlignment.spaceAround
-                                  : MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                  children: [
-                                    Icon(
-                                      Icons.history,
-                                      size: 80,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : const Color.fromARGB(255, 0, 0, 0),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'No tienes viajes en tu historial',
-                                        style: TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : const Color.fromARGB(
-                                                  255, 6, 6, 6),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 15),
-                                      child: Text(
-                                        'Se te agregará un viaje al historial cuando lo completes...¡A qué esperas!.',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : const Color.fromARGB(
-                                                  255, 6, 6, 6),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    isLoading
-                                        ? const CircularProgressIndicator()
-                                        : ElevatedButton(
-                                            style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .all<Color>(isDarkMode
-                                                          ? Colors.white
-                                                          : Colors.black),
-                                            ),
-                                            onPressed: fetchData,
-                                            child: Text(
-                                              'Actualizar historial',
-                                              style: TextStyle(
-                                                  color: isDarkMode
-                                                      ? Colors.black
-                                                      : Colors.white),
-                                            ),
-                                          ),
-                                  ],
-                                ),
-                              ],
                             ),
-                          )
+                ),
               ],
             ),
           );
