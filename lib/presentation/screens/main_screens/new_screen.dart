@@ -411,7 +411,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
         DateTime fechaLlegada = DateTime.parse(value);
 
         if (fechaLlegada.isBefore(fechaSalida) && value.isNotEmpty) {
-          return 'La fecha de llegada debe ser posterior a la fecha de salida';
+          return 'Llegada debe ser posterior a Salida';
         }
         return null;
       },
