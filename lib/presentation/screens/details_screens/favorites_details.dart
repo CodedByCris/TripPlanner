@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 
 import '../../functions/snackbars.dart';
+import '../../providers/token_provider.dart';
 
 class FavoriteDetails extends StatefulWidget {
   final int idViaje;
@@ -84,72 +86,75 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
   @override
   Widget build(BuildContext context) {
     //print('FAVORITOS_DETAILS');
-    return FutureBuilder(
-      future: setupConnection().then((_) => fetchData()),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: const Text(
-                'DETALLES DEL VIAJE',
-                style: TextStyle(fontSize: 20),
+    return Consumer(builder: (context, ref, child) {
+      return FutureBuilder(
+        future: setupConnection().then((_) => fetchData()),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: const Text(
+                  'DETALLES DEL VIAJE',
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
-            ),
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: const Text(
-                'DETALLES DEL VIAJE',
-                style: TextStyle(fontSize: 20),
-              ),
-              actions: <Widget>[
-                if (miCorreo != null)
-                  IconButton(
-                    icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border),
-                    onPressed: () {
-                      if (isFavorite) {
-                        removeFromFavorites();
-                      } else {
-                        addToFavorites();
-                      }
-                    },
-                  ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  const SizedBox(height: 20),
-                  const Text('Datos del viaje:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  viaje(resultViaje),
-                  const Divider(height: 40),
-                  const Text('Rutas:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  rutas(resultRuta),
-                  const Divider(height: 40),
-                  const Text('Gastos:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  gastos(resultGastos),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: const Text(
+                  'DETALLES DEL VIAJE',
+                  style: TextStyle(fontSize: 20),
+                ),
+                actions: <Widget>[
+                  if (miCorreo != null)
+                    IconButton(
+                      icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border),
+                      onPressed: () {
+                        if (isFavorite) {
+                          removeFromFavorites();
+                        } else {
+                          addToFavorites();
+                        }
+                        ref.read(favoriteTripsProvider.notifier).refresh();
+                      },
+                    ),
                 ],
               ),
-            ),
-          );
-        }
-      },
-    );
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView(
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text('Datos del viaje:',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    viaje(resultViaje),
+                    const Divider(height: 40),
+                    const Text('Rutas:',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    rutas(resultRuta),
+                    const Divider(height: 40),
+                    const Text('Gastos:',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    gastos(resultGastos),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      );
+    });
   }
 
   Widget viaje(resultViaje) {

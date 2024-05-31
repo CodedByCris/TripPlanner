@@ -263,6 +263,8 @@ class _LoginForm extends ConsumerWidget {
 
                     ref.read(userNameProvider.notifier).refresh();
                     ref.read(imageProvider.notifier).refresh();
+                    ref.read(favoriteTripsProvider.notifier).refresh();
+                    ref.read(completedTripsProvider.notifier).refresh();
                   } catch (e) {
                     if (e is NoSuchMethodError) {
                       // El widget ha sido desmontado, no hacer nada

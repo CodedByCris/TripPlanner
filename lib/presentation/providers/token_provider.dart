@@ -12,6 +12,13 @@ final userNameProvider = StateNotifierProvider<UserNameNotifier, String?>(
 final imageProvider =
     StateNotifierProvider<ImageNotifier, String?>((ref) => ImageNotifier());
 
+final favoriteTripsProvider = StateNotifierProvider<FavoriteTripsNotifier, int>(
+    (ref) => FavoriteTripsNotifier());
+
+final completedTripsProvider =
+    StateNotifierProvider<CompletedTripsNotifier, int>(
+        (ref) => CompletedTripsNotifier());
+
 //!PARA SACAR EL NOMBRE DEL USUARIO
 class UserNameNotifier extends StateNotifier<String?> {
   UserNameNotifier() : super(null) {
@@ -68,6 +75,59 @@ class ImageNotifier extends StateNotifier<String?> {
 
   Future<void> refresh() async {
     _loadImage();
+  }
+}
+
+//!PARA SACAR LOS VIAJES FAVORITOS DEL USUARIO
+class FavoriteTripsNotifier extends StateNotifier<int> {
+  FavoriteTripsNotifier() : super(0) {
+    _loadFavoriteTrips();
+  }
+
+  Future<void> _loadFavoriteTrips() async {
+    final correo = await getToken();
+    DatabaseHelper db = DatabaseHelper();
+
+    await db.getConnection().then((conn) async {
+      String sql = 'select count(*) from Favoritos Where Correo="$correo"';
+      await conn.query(sql).then((result) {
+        for (final row in result) {
+          state = row[0];
+          break;
+        }
+      });
+    });
+  }
+
+  Future<void> refresh() async {
+    _loadFavoriteTrips();
+  }
+}
+
+//! PARA SACAR LOS VIAJES COMPLETADOS DEL USUARIO
+class CompletedTripsNotifier extends StateNotifier<int> {
+  CompletedTripsNotifier() : super(0) {
+    _loadCompletedTrips();
+  }
+
+  Future<void> _loadCompletedTrips() async {
+    final correo = await getToken();
+    DatabaseHelper db = DatabaseHelper();
+
+    await db.getConnection().then((conn) async {
+      print("Correo->${correo!}");
+      String sql = 'select count(*) from Viaje Where Correo="$correo"';
+      await conn.query(sql).then((result) {
+        for (final row in result) {
+          state = row[0];
+          break;
+        }
+      });
+    });
+  }
+
+  Future<void> refresh() async {
+    _loadCompletedTrips();
   }
 }
 

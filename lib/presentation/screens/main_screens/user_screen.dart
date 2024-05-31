@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +14,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../Database/connections.dart';
 import '../../functions/snackbars.dart';
 import '../../providers/theme_provider.dart';
-import '../../widgets/interface/custom_app_bar.dart';
 import '../../providers/token_provider.dart';
 
 class UserScreen extends StatefulWidget {
@@ -35,28 +35,131 @@ class UserScreenState extends State<UserScreen> {
         final nombre = ref.watch(userNameProvider); // Mover aquí
         final correo = ref.watch(tokenProvider); // Mover aquí
         final imagen = ref.watch(imageProvider); // Mover aquí
+        final viajesFavoritos =
+            correo != null ? ref.watch(favoriteTripsProvider) : 0;
+        final viajesCompletados =
+            correo != null ? ref.watch(completedTripsProvider) : 0;
 
         return Scaffold(
-          appBar: AppBar(
-            title: CustomAppBar(
-              isDarkMode: isDarkMode,
-              colors: colors,
-              titulo: 'PERFIL DE USUARIO',
-            ),
-          ),
+          appBar: _customAppBar(isDarkMode, ref, colors, correo, context),
           //*Cuerpo de la aplicación
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            child: _userView(ref, context, nombre, correo,
-                imagen), // Asegúrate de actualizar _userView para usar imageUrl en lugar de ref.watch(imageProvider)
+            child: _userView(
+                ref,
+                context,
+                nombre,
+                correo,
+                imagen,
+                isDarkMode,
+                viajesFavoritos,
+                viajesCompletados), // Asegúrate de actualizar _userView para usar imageUrl en lugar de ref.watch(imageProvider)
           ),
         );
       },
     );
   }
 
-  Widget _userView(
-      WidgetRef ref, BuildContext context, nombre, correo, imagen) {
+  AppBar _customAppBar(bool isDarkMode, WidgetRef ref, ColorScheme colors,
+      String? correo, BuildContext context) {
+    return AppBar(
+      title: Text(
+        "PERFIL DE USUARIO",
+        style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black, fontSize: 20),
+      ),
+      centerTitle: true,
+      // Modo nocturno
+      leading: IconButton(
+        onPressed: () {
+          ref.read(themeNotifierProvider.notifier).toggleDarkMode();
+        },
+        icon: Icon(
+            isDarkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined),
+        color: colors.primary,
+      ),
+
+      // Icono para las conversaciones
+      actions: correo != null
+          ? [
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Cerrar sesión'),
+                        content: const Text(
+                            '¿Estás seguro de que quieres cerrar sesión?'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancelar'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Aceptar'),
+                            onPressed: () async {
+                              // Delete the token
+                              await ref
+                                  .read(tokenProvider.notifier)
+                                  .deleteToken();
+                              Snackbar().mensaje(context,
+                                  'Sesión cerrada... Volviendo al login');
+                              // Redirect the user to the login screen
+                              Navigator.of(context).pop();
+                              GoRouter.of(context).go('/login');
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.logout_outlined),
+                color: Colors.red,
+              )
+            ]
+          : [
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Iniciar Sesión'),
+                        content: const Text(
+                            '¿Estás seguro de que quieres iniciar sesión?'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancelar'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Aceptar'),
+                            onPressed: () async {
+                              // Redirect the user to the login screen
+                              Navigator.of(context).pop();
+                              GoRouter.of(context).go('/login');
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.login_outlined),
+                color: Colors.blue,
+              )
+            ],
+    );
+  }
+
+  Widget _userView(WidgetRef ref, BuildContext context, nombre, correo, imagen,
+      isDarkMode, viajesFav, viajesComp) {
     final List<Color> colors = ref.watch(colorListProvider);
     final int selectedColor = ref.watch(themeNotifierProvider).selectedColor;
 
@@ -76,22 +179,33 @@ class UserScreenState extends State<UserScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        correo != null
-            ? _logOutButton(context, ref)
-            : _loginButton(context, ref, colors, selectedColor),
 
+        Text(correo != null ? nombre : 'Invitado',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            )),
+
+        const SizedBox(height: 5),
+
+        Text(correo ?? 'invitado@gmail.com',
+            style: TextStyle(
+              fontSize: 13,
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 169, 169, 169)
+                  : const Color.fromARGB(255, 84, 84, 84),
+            )),
+
+        const SizedBox(height: 20),
+        _numViajes(isDarkMode, viajesFav, viajesComp),
+        const SizedBox(height: 20),
         const SizedBox(height: 10),
         SingleChildScrollView(
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.5,
             child: ListView(
               children: [
-                correo != null && nombre != null
-                    ? _nombre(colors, selectedColor, nombre)
-                    : _nombre(colors, selectedColor, "INVITADO"),
-                correo != null
-                    ? _correo(colors, selectedColor, correo)
-                    : _correo(colors, selectedColor, "INVITADO@gmail.com"),
                 _colores(colors, selectedColor, ref),
                 _informacion(colors, selectedColor),
               ],
@@ -102,22 +216,83 @@ class UserScreenState extends State<UserScreen> {
     );
   }
 
-  Widget _nombre(List<Color> colors, int selectedColor, String nombre) {
-    return ListTile(
-      leading: Icon(
-        Icons.person,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "Nombre de usuario",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(
-        nombre,
-        style: const TextStyle(
-          fontSize: 15,
-        ),
+  Widget _numViajes(isDarkMode, viajesFav, viajesComp) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5), // Reduced padding
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? Colors.grey[850]
+                    : Colors.white, // Color depends on isDarkMode
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3, // Reduced spreadRadius
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text("Viajes favoritos",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDarkMode
+                            ? const Color.fromARGB(255, 169, 169, 169)
+                            : const Color.fromARGB(255, 84, 84, 84),
+                      )),
+                  Text(
+                    viajesFav.toString(),
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10), // Changed from height to width
+          Expanded(
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5), // Reduced padding
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? Colors.grey[850]
+                    : Colors.white, // Color depends on isDarkMode
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3, // Reduced spreadRadius
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text("Viajes totales",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDarkMode
+                            ? const Color.fromARGB(255, 169, 169, 169)
+                            : const Color.fromARGB(255, 84, 84, 84),
+                      )),
+                  Text(
+                    viajesComp.toString(),
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -137,31 +312,33 @@ class UserScreenState extends State<UserScreen> {
           if (snapshot.data != "") {
             //print('Image URL: ${snapshot.data}'); // print the image URL
             widget = Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colors[selectedColor],
-                  width: 3.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(
+                    color: colors[selectedColor],
+                    width: 3.0,
+                  ),
                 ),
-              ),
-              child: ClipOval(
-                child: snapshot.data!.contains('http')
-                    ? CachedNetworkImage(
-                        imageUrl: snapshot.data!,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      )
-                    : Image(
-                        image: FileImage(File(snapshot.data!)),
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            );
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(22), // Adjust the radius as needed
+                  child: snapshot.data!.contains('http')
+                      ? CachedNetworkImage(
+                          imageUrl: snapshot.data!,
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        )
+                      : Image(
+                          image: FileImage(File(snapshot.data!)),
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                ));
           } else {
             widget =
                 Icon(Icons.person, size: 100, color: colors[selectedColor]);
@@ -174,24 +351,6 @@ class UserScreenState extends State<UserScreen> {
           ],
         );
       },
-    );
-  }
-
-  Widget _correo(List<Color> colors, int selectedColor, String correo) {
-    return ListTile(
-      leading: Icon(
-        Icons.email,
-        color: colors[selectedColor],
-        size: 30,
-      ),
-      title: const Text(
-        "Correo electrónico",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(correo,
-          style: const TextStyle(
-            fontSize: 15,
-          )),
     );
   }
 
@@ -331,7 +490,7 @@ class UserScreenState extends State<UserScreen> {
         size: 30,
       ),
       title: const Text(
-        "Apariencia de la aplicación",
+        "Apariencia de la app",
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       children: [
@@ -360,122 +519,6 @@ class UserScreenState extends State<UserScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _logOutButton(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: 200, // Set the width to your desired value
-      child: ElevatedButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Cerrar sesión'),
-                content:
-                    const Text('¿Estás seguro de que quieres cerrar sesión?'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Cancelar'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('Aceptar'),
-                    onPressed: () async {
-                      // Delete the token
-                      await ref.read(tokenProvider.notifier).deleteToken();
-                      Snackbar().mensaje(
-                          context, 'Sesión cerrada... Volviendo al login');
-                      // Redirect the user to the login screen
-                      Navigator.of(context).pop();
-                      GoRouter.of(context).go('/login');
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-          padding: MaterialStateProperty.all<EdgeInsets>(
-            const EdgeInsets.symmetric(
-                horizontal: 20, vertical: 10), // Reduced padding
-          ),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-          ),
-        ),
-        child: const Text(
-          "Cerrar sesión",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _loginButton(BuildContext context, WidgetRef ref, List<Color> colors,
-      int selectedColor) {
-    return SizedBox(
-      width: 200, // Set the width to your desired value
-      child: ElevatedButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Iniciar Sesión'),
-                content:
-                    const Text('¿Estás seguro de que quieres iniciar sesión?'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Cancelar'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('Aceptar'),
-                    onPressed: () async {
-                      // Redirect the user to the login screen
-                      Navigator.of(context).pop();
-                      GoRouter.of(context).go('/login');
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all<Color>(colors[selectedColor]),
-          padding: MaterialStateProperty.all<EdgeInsets>(
-            const EdgeInsets.symmetric(
-                horizontal: 20, vertical: 10), // Reduced padding
-          ),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-          ),
-        ),
-        child: const Text(
-          "Iniciar sesión",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ),
     );
   }
 }

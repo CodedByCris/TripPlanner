@@ -313,6 +313,7 @@ class NewScreenState extends ConsumerState<NewScreen> {
                           Snackbar()
                               .mensaje(context, 'Viaje creado correctamente');
                         });
+                        ref.read(completedTripsProvider.notifier).refresh();
                         Navigator.of(context).pop();
                       },
                     ),
