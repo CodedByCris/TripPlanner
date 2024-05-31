@@ -283,6 +283,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   FavoriteDetails(
+                                                isDarkMode: isDarkMode,
                                                 idViaje: viaje['IdViaje'],
                                                 correo2: viaje['Correo'],
                                               ),

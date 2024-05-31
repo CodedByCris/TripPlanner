@@ -76,6 +76,8 @@ flutter:
     - assets/images/nubes.gif
     - assets/images/Logo.png
     - assets/images/avion.jpg
+    - assets/images/avion_details.jpg
+    - assets/images/avion_details_noche.jpg
     - assets/images/avion_noche.jpg
     - assets/images/cielo.jpg
     - assets/images/user.jpg

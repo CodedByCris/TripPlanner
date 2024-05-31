@@ -7,8 +7,10 @@ import '../../functions/mes_mapa.dart';
 import '../details_screens/favorites_details.dart';
 
 class SearchScreen extends StatefulWidget {
+  final isDarkMode;
   final Results resultViaje;
-  const SearchScreen({super.key, required this.resultViaje});
+  const SearchScreen(
+      {super.key, required this.resultViaje, required this.isDarkMode});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -75,6 +77,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => FavoriteDetails(
+                          isDarkMode: widget.isDarkMode,
                           idViaje: viaje['IdViaje'],
                           correo2: viaje['Correo'],
                         ),

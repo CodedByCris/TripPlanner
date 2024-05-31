@@ -9,11 +9,15 @@ import '../../functions/snackbars.dart';
 import '../../providers/token_provider.dart';
 
 class FavoriteDetails extends StatefulWidget {
+  final isDarkMode;
   final int idViaje;
   final String correo2;
 
   const FavoriteDetails(
-      {super.key, required this.idViaje, required this.correo2});
+      {super.key,
+      required this.idViaje,
+      required this.correo2,
+      required this.isDarkMode});
 
   @override
   State<FavoriteDetails> createState() => _FavoriteDetailsState();
@@ -58,7 +62,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
   // Crea una nueva función fetchData
   Future<void> fetchData() async {
     resultViaje = await conn!.query(
-        'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
+        'SELECT idViaje, Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
     resultRuta = await conn!.query(
         'SELECT Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje}');
     resultGastos = await conn!.query(
@@ -85,7 +89,6 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   @override
   Widget build(BuildContext context) {
-    //print('FAVORITOS_DETAILS');
     return Consumer(builder: (context, ref, child) {
       return FutureBuilder(
         future: setupConnection().then((_) => fetchData()),
@@ -94,9 +97,13 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
             return Scaffold(
               appBar: AppBar(
                 centerTitle: true,
-                title: const Text(
+                title: Text(
                   'DETALLES DEL VIAJE',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: widget.isDarkMode
+                          ? Colors.white
+                          : const Color.fromARGB(255, 29, 29, 29)),
                 ),
               ),
               body: const Center(child: CircularProgressIndicator()),
@@ -105,9 +112,13 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
             return Scaffold(
               appBar: AppBar(
                 centerTitle: true,
-                title: const Text(
+                title: Text(
                   'DETALLES DEL VIAJE',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: widget.isDarkMode
+                          ? Colors.white
+                          : const Color.fromARGB(255, 26, 26, 26)),
                 ),
                 actions: <Widget>[
                   if (miCorreo != null)
@@ -125,30 +136,62 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                     ),
                 ],
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 20),
-                    const Text('Datos del viaje:',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    viaje(resultViaje),
-                    const Divider(height: 40),
-                    const Text('Rutas:',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    rutas(resultRuta),
-                    const Divider(height: 40),
-                    const Text('Gastos:',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    gastos(resultGastos),
-                  ],
-                ),
+              body: Stack(
+                children: [
+                  LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return Image.asset(
+                        widget.isDarkMode
+                            ? 'assets/images/avion_details_noche.jpg'
+                            : 'assets/images/avion_details.jpg',
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                      );
+                    },
+                  ),
+                  DraggableScrollableSheet(
+                    initialChildSize: 0.8,
+                    maxChildSize: 0.8,
+                    minChildSize: 0.8,
+                    builder: (BuildContext context,
+                        ScrollController scrollController) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color:
+                              !widget.isDarkMode ? Colors.white : Colors.black,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: DefaultTabController(
+                          length: 3,
+                          child: Column(
+                            children: [
+                              const TabBar(
+                                tabs: [
+                                  Tab(text: 'Viaje'),
+                                  Tab(text: 'Rutas'),
+                                  Tab(text: 'Gastos'),
+                                ],
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    viaje(resultViaje),
+                                    rutas(resultRuta),
+                                    gastos(resultGastos),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             );
           }
@@ -159,7 +202,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 
   Widget viaje(resultViaje) {
     if (resultViaje == null || resultViaje!.isEmpty) {
-      return const Text('No hay datos del viaje');
+      return const Center(child: Text('No hay datos del viaje'));
     } else {
       List<ResultRow> rows = resultViaje!.toList();
       return ListView.builder(
@@ -167,39 +210,73 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
         itemCount: rows.length,
         itemBuilder: (context, index) {
           ResultRow row = rows[index];
-          return GestureDetector(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListTile(
-                    leading: const Icon(Icons.flight,
-                        size: 40.0), // Add your icon here
-                    title: Text(
-                      '${row['Origen']} - ${row['Destino']}',
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.flight, size: 20.0), // Add your icon here
+                    Text(
+                      '${row['idViaje']}',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 19),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        const SizedBox(height: 20),
+                        const Icon(Icons.flight_takeoff_rounded, size: 25.0),
+                        const SizedBox(width: 20),
                         Text(
-                          '${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          '${row['NotasViaje']}',
-                          style:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
+                          '${row['Origen']}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 19),
                         ),
                       ],
                     ),
-                  ),
+                    Text(
+                      "${row['FechaSalida'].toIso8601String().substring(0, 10)}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 19),
+                    )
+                  ],
                 ),
-              ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.flag, size: 25.0),
+                        const SizedBox(width: 20),
+                        Text(
+                          '${row['Destino']}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 19),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "${row['FechaLlegada'].toIso8601String().substring(0, 10)}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 19),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Divider(),
+                const SizedBox(height: 20),
+                Text(
+                  '${row['NotasViaje']}',
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
             ),
           );
         },
@@ -210,20 +287,19 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 // Crea un widget llamado rutas
   Widget rutas(resultRuta) {
     if (resultRuta == null || resultRuta!.isEmpty) {
-      return const Text('No hay datos de las rutas');
+      return const Center(child: Text('No hay datos de las rutas'));
     } else {
       List<ResultRow> rows = resultRuta!.toList();
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 300),
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         child: ListView.builder(
           shrinkWrap: true,
           itemCount: rows.length,
           itemBuilder: (context, index) {
             ResultRow row = rows[index];
-            return GestureDetector(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
+            return Column(
+              children: [
+                GestureDetector(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: ListTile(
@@ -246,7 +322,8 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                     ),
                   ),
                 ),
-              ),
+                const Divider(), // This is the divider
+              ],
             );
           },
         ),
@@ -257,53 +334,50 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
 // Crea un widget llamado gastos
   Widget gastos(resultGastos) {
     if (resultGastos == null || resultGastos!.isEmpty) {
-      return const Text('No hay datos de los gastos');
+      return const Center(child: Text('No hay datos de los gastos'));
     } else {
       List<ResultRow> rows = resultGastos!.toList();
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 300),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: rows.length,
-          itemBuilder: (context, index) {
-            ResultRow row = rows[index];
-            return GestureDetector(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListTile(
-                      leading: const Icon(Icons.money,
-                          size: 40.0), // Add your icon here
-                      title: Text(
-                        'Importe: ${row['Cantidad']}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 19),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            'Notas: ${row['Descripción']}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: rows.length,
+        itemBuilder: (context, index) {
+          ResultRow row = rows[index];
+          return Column(
+            children: [
+              GestureDetector(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    leading: const Icon(Icons.money,
+                        size: 40.0), // Add your icon here
+                    title: Text(
+                      'Importe: ${row['Cantidad']}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 19),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Text(
+                          'Notas: ${row['Descripción']}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            );
-          },
-        ),
+              const Divider(),
+            ],
+          );
+        },
       );
     }
   }

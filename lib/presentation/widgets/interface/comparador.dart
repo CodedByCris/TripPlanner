@@ -115,7 +115,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
                       const SizedBox(height: 50),
 
                       //!Botón de buscar
-                      _btnBuscar(colors),
+                      _btnBuscar(colors, isDarkMode),
                     ],
                   ),
                 ),
@@ -170,7 +170,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
     );
   }
 
-  Widget _btnBuscar(ColorScheme colors) {
+  Widget _btnBuscar(ColorScheme colors, isDarkMode) {
     //print("Correo$correo");
     return ElevatedButton.icon(
       onPressed: () async {
@@ -204,6 +204,7 @@ class _ComparadorWidgetState extends State<ComparadorWidget> {
               context,
               MaterialPageRoute(
                 builder: (context) => SearchScreen(
+                  isDarkMode: isDarkMode,
                   resultViaje: resultViaje!,
                 ),
               ),
