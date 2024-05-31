@@ -296,7 +296,7 @@ class UserScreenState extends State<UserScreen> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Versión 2.0',
+                  'Versión 1.4',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -316,7 +316,7 @@ class UserScreenState extends State<UserScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      subtitle: const Text("Version 1.3",
+      subtitle: const Text("Version 1.4",
           style: TextStyle(
             fontSize: 15,
           )),

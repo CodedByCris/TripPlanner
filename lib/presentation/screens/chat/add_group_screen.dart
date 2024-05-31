@@ -24,8 +24,8 @@ class AddGroupScreenState extends State<AddGroupScreen> {
   final descriptionController = TextEditingController();
   final groupNameController = TextEditingController();
   String? selectedUser;
-  String selectedGroupType = 'Nuevo Chat';
-  List<String> groupTypes = ['Nuevo Chat', 'Nuevo Grupo'];
+  String selectedGroupType = 'Chat';
+  List<String> groupTypes = ['Chat', 'Grupo'];
 
   // Change users to a Map
   Map<String, String> users = {};
@@ -91,12 +91,12 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, selecciona un tipo de grupo';
+                      return 'Por favor, selecciona un tipo de chat';
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
-                    labelText: 'Tipo de grupo',
+                    labelText: 'Tipo de chat',
                   ),
                 ),
                 DropdownButtonFormField<String>(
@@ -125,7 +125,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                     labelText: 'Usuario',
                   ),
                 ),
-                if (selectedGroupType.compareTo('Nuevo Chat') != 0) ...[
+                if (selectedGroupType.compareTo('Chat') != 0) ...[
                   TextFormField(
                     controller: groupNameController,
                     decoration:
@@ -181,7 +181,7 @@ class AddGroupScreenState extends State<AddGroupScreen> {
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Crear grupo'),
+                  child: const Text('CREAR CONVERSACIÓN'),
                 ),
               ]),
             ),
