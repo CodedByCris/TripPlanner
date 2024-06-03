@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_ruta.dart';
@@ -141,6 +142,11 @@ class _ActualDetailsState extends State<ActualDetails> {
                                   Tab(text: 'Rutas'),
                                   Tab(text: 'Gastos'),
                                 ],
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                "Mantén pulsado sobre algún dato para interactuar.",
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               Expanded(
                                 child: TabBarView(
@@ -293,9 +299,6 @@ class _ActualDetailsState extends State<ActualDetails> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  const Text(
-                    "Mantén pulsado sobre las tarjetas para interactuar.",
-                  ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -360,6 +363,26 @@ class _ActualDetailsState extends State<ActualDetails> {
                     '${row['NotasViaje']}',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 20),
+                  QrImageView(
+                    data:
+                        "Datos del viaje: \n Origen: ${row['Origen']} \t Destino: ${row['Destino']} \n Fecha de salida:  \t Fecha de llegada: ${row['FechaLlegada'].toIso8601String().substring(0, 10)}",
+                    version: 5,
+                    size: 120,
+                    gapless: false,
+                    errorStateBuilder: (cxt, err) {
+                      return Container(
+                        child: const Center(
+                          child: Text(
+                            'Algo ha salido mal...',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    },
+                  )
                 ],
               ),
             ),
@@ -507,61 +530,72 @@ class _ActualDetailsState extends State<ActualDetails> {
       List<ResultRow> rows = resultRuta!.toList();
       return ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 300),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: rows.length,
-          itemBuilder: (context, index) {
-            ResultRow row = rows[index];
-            return GestureDetector(
-                onLongPress: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return _dialog(context, 'ruta', row);
-                    },
-                  );
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddRuta(
+                        idViaje: widget.idViaje,
+                      ),
+                    ),
+                  ).then((value) {
+                    setState(() {
+                      fetchData();
+                    });
+                  });
                 },
-                child: Column(children: [
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddRuta(
-                            idViaje: widget.idViaje,
-                          ),
-                        ),
-                      ).then((value) {
-                        setState(() {
-                          fetchData();
-                        });
-                      });
-                    },
-                  ),
-                  GestureDetector(
-                      child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ListTile(
-                            leading: const Icon(Icons.map, size: 40.0),
-                            title: Text(
-                              '${row['Ubicacion']}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 19),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                Text(
-                                  '  ${row['NotasRuta']}',
-                                  style: const TextStyle(fontSize: 16),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(), // Add this line
+
+                itemCount: rows.length,
+                itemBuilder: (context, index) {
+                  ResultRow row = rows[index];
+                  return GestureDetector(
+                      onLongPress: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return _dialog(context, 'ruta', row);
+                          },
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: ListTile(
+                                leading: const Icon(Icons.map, size: 40.0),
+                                title: Text(
+                                  '${row['Ubicacion']}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19),
                                 ),
-                              ],
-                            ),
-                          )))
-                ]));
-          },
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      '  ${row['NotasRuta']}',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                          const Divider(),
+                        ],
+                      ));
+                },
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -604,79 +638,85 @@ class _ActualDetailsState extends State<ActualDetails> {
       List<ResultRow> rows = resultGastos!.toList();
       return ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 300),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: rows.length,
-          itemBuilder: (context, index) {
-            ResultRow row = rows[index];
-            return GestureDetector(
-                onLongPress: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return _dialog(context, 'gasto', row);
-                    },
-                  );
-                },
-                child: Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                        // DateTime fechaInicio =
-                        //     resultViaje!.first.values![2] as DateTime;
-                        // DateTime fechaFin =
-                        //     resultViaje!.first.values![3] as DateTime;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddGasto(
-                              idViaje: widget.idViaje,
-                              // fechaInicio: fechaInicio,
-                              // fechaFin: fechaFin,
-                            ),
-                          ),
-                        ).then((value) {
-                          setState(() {
-                            fetchData();
-                          });
-                        });
-                      },
-                    ),
-                    GestureDetector(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          leading: const Icon(Icons.money,
-                              size: 40.0), // Add your icon here
-                          title: Text(
-                            ' ${row['Cantidad']}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 19),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 20),
-                              Text(
-                                '  ${row['Descripción']}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  // DateTime fechaInicio =
+                  //     resultViaje!.first.values![2] as DateTime;
+                  // DateTime fechaFin =
+                  //     resultViaje!.first.values![3] as DateTime;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddGasto(
+                        idViaje: widget.idViaje,
+                        // fechaInicio: fechaInicio,
+                        // fechaFin: fechaFin,
                       ),
                     ),
-                    const Divider(),
-                  ],
-                ));
-          },
+                  ).then((value) {
+                    setState(() {
+                      fetchData();
+                    });
+                  });
+                },
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(), // Add this line
+
+                itemCount: rows.length,
+                itemBuilder: (context, index) {
+                  ResultRow row = rows[index];
+                  return GestureDetector(
+                      onLongPress: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return _dialog(context, 'gasto', row);
+                          },
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              leading: const Icon(Icons.money,
+                                  size: 40.0), // Add your icon here
+                              title: Text(
+                                ' ${row['Cantidad']}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 19),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    '  ${row['Descripción']}',
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const Divider(),
+                        ],
+                      ));
+                },
+              ),
+            ],
+          ),
         ),
       );
     }

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 
 import '../../functions/snackbars.dart';
@@ -118,7 +119,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                       fontSize: 20,
                       color: widget.isDarkMode
                           ? Colors.white
-                          : Color.fromARGB(255, 0, 0, 0)),
+                          : const Color.fromARGB(255, 0, 0, 0)),
                 ),
                 actions: <Widget>[
                   if (miCorreo != null)
@@ -276,6 +277,24 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                   '${row['NotasViaje']}',
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
+                const SizedBox(height: 20),
+                const Divider(),
+                const SizedBox(height: 20),
+                QrImageView(
+                  data:
+                      "Datos del viaje: \n Origen: ${row['Origen']} \t Destino: ${row['Destino']} \n Fecha de salida:  \t Fecha de llegada: ${row['FechaLlegada'].toIso8601String().substring(0, 10)}",
+                  version: 5,
+                  size: 120,
+                  gapless: false,
+                  errorStateBuilder: (cxt, err) {
+                    return const Center(
+                      child: Text(
+                        'Algo ha salido mal...',
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                )
               ],
             ),
           );
@@ -292,40 +311,44 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
       List<ResultRow> rows = resultRuta!.toList();
       return SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: rows.length,
-          itemBuilder: (context, index) {
-            ResultRow row = rows[index];
-            return Column(
-              children: [
-                GestureDetector(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListTile(
-                      leading: const Icon(Icons.map, size: 40.0),
-                      title: Text(
-                        '${row['Ubicacion']}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 19),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            '  ${row['NotasRuta']}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
+        child: SingleChildScrollView(
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(), // Add this line
+
+            itemCount: rows.length,
+            itemBuilder: (context, index) {
+              ResultRow row = rows[index];
+              return Column(
+                children: [
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ListTile(
+                        leading: const Icon(Icons.map, size: 40.0),
+                        title: Text(
+                          '${row['Ubicacion']}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 19),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            Text(
+                              '  ${row['NotasRuta']}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const Divider(), // This is the divider
-              ],
-            );
-          },
+                  const Divider(), // This is the divider
+                ],
+              );
+            },
+          ),
         ),
       );
     }
@@ -337,47 +360,50 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
       return const Center(child: Text('No hay datos de los gastos'));
     } else {
       List<ResultRow> rows = resultGastos!.toList();
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: rows.length,
-        itemBuilder: (context, index) {
-          ResultRow row = rows[index];
-          return Column(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    leading: const Icon(Icons.money,
-                        size: 40.0), // Add your icon here
-                    title: Text(
-                      ' ${row['Cantidad']}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 19),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          '  ${row['Descripción']}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
-                          style:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
+      return SingleChildScrollView(
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: rows.length,
+          itemBuilder: (context, index) {
+            ResultRow row = rows[index];
+            return Column(
+              children: [
+                GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.money,
+                          size: 40.0), // Add your icon here
+                      title: Text(
+                        ' ${row['Cantidad']}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          Text(
+                            '  ${row['Descripción']}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const Divider(),
-            ],
-          );
-        },
+                const Divider(),
+              ],
+            );
+          },
+        ),
       );
     }
   }
