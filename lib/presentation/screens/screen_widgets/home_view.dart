@@ -245,6 +245,7 @@ class _HomeViewState extends State<HomeView> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ActualDetails(
+                                        isDarkMode: isDarkMode,
                                         idViaje: viaje['idViaje'],
                                       ),
                                     ),

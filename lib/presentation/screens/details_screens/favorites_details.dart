@@ -118,7 +118,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                       fontSize: 20,
                       color: widget.isDarkMode
                           ? Colors.white
-                          : const Color.fromARGB(255, 26, 26, 26)),
+                          : Color.fromARGB(255, 0, 0, 0)),
                 ),
                 actions: <Widget>[
                   if (miCorreo != null)
@@ -314,7 +314,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                         children: [
                           const SizedBox(height: 20),
                           Text(
-                            'Notas: ${row['NotasRuta']}',
+                            '  ${row['NotasRuta']}',
                             style: const TextStyle(fontSize: 16),
                           ),
                         ],
@@ -351,7 +351,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                     leading: const Icon(Icons.money,
                         size: 40.0), // Add your icon here
                     title: Text(
-                      'Importe: ${row['Cantidad']}',
+                      ' ${row['Cantidad']}',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 19),
                     ),
@@ -360,7 +360,7 @@ class _FavoriteDetailsState extends State<FavoriteDetails> {
                       children: [
                         const SizedBox(height: 20),
                         Text(
-                          'Notas: ${row['Descripción']}',
+                          '  ${row['Descripción']}',
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 20),

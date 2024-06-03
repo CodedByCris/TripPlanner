@@ -482,7 +482,7 @@
 //                         children: [
 //                           const SizedBox(height: 20),
 //                           Text(
-//                             'Notas: ${row['NotasRuta']}',
+//                             '  ${row['NotasRuta']}',
 //                             style: const TextStyle(fontSize: 16),
 //                           ),
 //                         ],
@@ -529,7 +529,7 @@
 //                       leading: const Icon(Icons.money,
 //                           size: 40.0), // Add your icon here
 //                       title: Text(
-//                         'Importe: ${row['Cantidad']}',
+//                         ' ${row['Cantidad']}',
 //                         style: const TextStyle(
 //                             fontWeight: FontWeight.bold, fontSize: 19),
 //                       ),
@@ -538,7 +538,7 @@
 //                         children: [
 //                           const SizedBox(height: 20),
 //                           Text(
-//                             'Notas: ${row['Descripción']}',
+//                             '  ${row['Descripción']}',
 //                             style: const TextStyle(fontSize: 16),
 //                           ),
 //                           const SizedBox(height: 20),

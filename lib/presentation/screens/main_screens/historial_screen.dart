@@ -199,6 +199,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   ActualDetails(
+                                                isDarkMode: isDarkMode,
                                                 idViaje: viaje['IdViaje'],
                                               ),
                                             ),

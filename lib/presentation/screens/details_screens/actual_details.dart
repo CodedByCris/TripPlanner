@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:trip_planner/presentation/Database/connections.dart';
 import 'package:trip_planner/presentation/screens/screen_widgets/add_gasto.dart';
@@ -10,8 +11,10 @@ import '../../functions/snackbars.dart';
 
 class ActualDetails extends StatefulWidget {
   final int idViaje;
+  final isDarkMode;
 
-  const ActualDetails({super.key, required this.idViaje});
+  const ActualDetails(
+      {super.key, required this.idViaje, required this.isDarkMode});
 
   @override
   State<ActualDetails> createState() => _ActualDetailsState();
@@ -46,7 +49,7 @@ class _ActualDetailsState extends State<ActualDetails> {
     //print('Consultas');
 
     resultViaje = await conn!.query(
-        'SELECT Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
+        'SELECT idViaje, Destino, Origen, FechaSalida, FechaLlegada, NotasViaje FROM Viaje WHERE idViaje = ${widget.idViaje}');
     resultRuta = await conn!.query(
         'SELECT IdRuta, Ubicacion, NotasRuta, Orden FROM Ruta WHERE idViaje = ${widget.idViaje} ORDER BY Orden ASC');
     resultGastos = await conn!.query(
@@ -59,132 +62,121 @@ class _ActualDetailsState extends State<ActualDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: setupConnection().then((_) => fetchData()),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: const Text(
-                'DETALLES DEL VIAJE',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: const Text(
-                'DETALLES DEL VIAJE',
-                style: TextStyle(fontSize: 20),
-              ),
-              actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: () {
-                    shareData(resultViaje);
-                  },
+    return Consumer(builder: (context, ref, child) {
+      return FutureBuilder(
+        future: setupConnection().then((_) => fetchData()),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: Text(
+                  'DETALLES DEL VIAJE',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: widget.isDarkMode
+                          ? Colors.white
+                          : const Color.fromARGB(255, 29, 29, 29)),
                 ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: ListView(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Mantén pulsado sobre las tarjetas para interactuar.",
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+              ),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: Text(
+                  'DETALLES DEL VIAJE',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: widget.isDarkMode
+                          ? Colors.white
+                          : const Color.fromARGB(255, 0, 0, 0)),
+                ),
+                actions: <Widget>[
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: () {
+                      shareData(resultViaje);
+                    },
                   ),
-                  const SizedBox(height: 20),
-                  const Text('Datos del viaje:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  viaje(resultViaje),
-                  const Divider(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Rutas:',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddRuta(
-                                idViaje: widget.idViaje,
-                              ),
-                            ),
-                          ).then((value) {
-                            setState(() {
-                              fetchData();
-                            });
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  rutas(resultRuta),
-                  const Divider(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Gastos:',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          DateTime fechaInicio =
-                              resultViaje!.first.values![2] as DateTime;
-                          DateTime fechaFin =
-                              resultViaje!.first.values![3] as DateTime;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddGasto(
-                                idViaje: widget.idViaje,
-                                fechaInicio: fechaInicio,
-                                fechaFin: fechaFin,
-                              ),
-                            ),
-                          ).then((value) {
-                            setState(() {
-                              fetchData();
-                            });
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  gastos(resultGastos),
                 ],
               ),
-            ),
-          );
-        }
-      },
-    );
+              body: Stack(
+                children: [
+                  LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return Image.asset(
+                        widget.isDarkMode
+                            ? 'assets/images/avion_details_noche.jpg'
+                            : 'assets/images/avion_details.jpg',
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                      );
+                    },
+                  ),
+                  DraggableScrollableSheet(
+                    initialChildSize: 0.8,
+                    maxChildSize: 0.8,
+                    minChildSize: 0.8,
+                    builder: (BuildContext context,
+                        ScrollController scrollController) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color:
+                              !widget.isDarkMode ? Colors.white : Colors.black,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: DefaultTabController(
+                          length: 3,
+                          child: Column(
+                            children: [
+                              const TabBar(
+                                tabs: [
+                                  Tab(text: 'Viaje'),
+                                  Tab(text: 'Rutas'),
+                                  Tab(text: 'Gastos'),
+                                ],
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    viaje(resultViaje),
+                                    rutas(resultRuta),
+                                    gastos(resultGastos),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+      );
+    });
   }
 
   Widget viaje(resultViaje) {
     final formKey = GlobalKey<FormState>();
 
     if (resultViaje == null || resultViaje!.isEmpty) {
-      return const Text('No hay datos del viaje');
+      return const Column(
+        children: [
+          Center(
+            child: Text('No hay datos del viaje'),
+          ),
+        ],
+      );
     } else {
       List<ResultRow> rows = resultViaje!.toList();
       return ListView.builder(
@@ -298,36 +290,77 @@ class _ActualDetailsState extends State<ActualDetails> {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListTile(
-                    leading: const Icon(Icons.flight,
-                        size: 40.0), // Add your icon here
-                    title: Text(
-                      '${row['Origen']} - ${row['Destino']}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 19),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          '${row['FechaSalida'].toIso8601String().substring(0, 10)} - ${row['FechaLlegada'].toIso8601String().substring(0, 10)}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          '${row['NotasViaje']}',
-                          style:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  const Text(
+                    "Mantén pulsado sobre las tarjetas para interactuar.",
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.flight,
+                          size: 20.0), // Add your icon here
+                      Text(
+                        '${row['idViaje']}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.flight_takeoff_rounded, size: 25.0),
+                          const SizedBox(width: 20),
+                          Text(
+                            '${row['Origen']}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 19),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        "${row['FechaSalida'].toIso8601String().substring(0, 10)}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.flag, size: 25.0),
+                          const SizedBox(width: 20),
+                          Text(
+                            '${row['Destino']}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 19),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        "${row['FechaLlegada'].toIso8601String().substring(0, 10)}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 19),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 20),
+                  Text(
+                    '${row['NotasViaje']}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
               ),
             ),
           );
@@ -446,7 +479,30 @@ class _ActualDetailsState extends State<ActualDetails> {
 // Crea un widget llamado rutas
   Widget rutas(resultRuta) {
     if (resultRuta == null || resultRuta!.isEmpty) {
-      return const Text('No hay datos de las rutas');
+      return Column(
+        children: [
+          const Center(
+            child: Text('No hay datos del viaje'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddRuta(
+                    idViaje: widget.idViaje,
+                  ),
+                ),
+              ).then((value) {
+                setState(() {
+                  fetchData();
+                });
+              });
+            },
+          ),
+        ],
+      );
     } else {
       List<ResultRow> rows = resultRuta!.toList();
       return ConstrainedBox(
@@ -457,41 +513,54 @@ class _ActualDetailsState extends State<ActualDetails> {
           itemBuilder: (context, index) {
             ResultRow row = rows[index];
             return GestureDetector(
-              onLongPress: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _dialog(context, 'ruta', row);
-                  },
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListTile(
-                      leading: const Icon(Icons.map, size: 40.0),
-                      title: Text(
-                        '${row['Ubicacion']}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 19),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            'Notas: ${row['NotasRuta']}',
-                            style: const TextStyle(fontSize: 16),
+                onLongPress: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _dialog(context, 'ruta', row);
+                    },
+                  );
+                },
+                child: Column(children: [
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddRuta(
+                            idViaje: widget.idViaje,
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ).then((value) {
+                        setState(() {
+                          fetchData();
+                        });
+                      });
+                    },
                   ),
-                ),
-              ),
-            );
+                  GestureDetector(
+                      child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ListTile(
+                            leading: const Icon(Icons.map, size: 40.0),
+                            title: Text(
+                              '${row['Ubicacion']}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 19),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 20),
+                                Text(
+                                  '  ${row['NotasRuta']}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          )))
+                ]));
           },
         ),
       );
@@ -501,7 +570,34 @@ class _ActualDetailsState extends State<ActualDetails> {
 // Crea un widget llamado gastos
   Widget gastos(resultGastos) {
     if (resultGastos == null || resultGastos!.isEmpty) {
-      return const Text('No hay datos de los gastos');
+      return Column(
+        children: [
+          const Center(
+            child: Text('No hay datos del viaje'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              DateTime fechaInicio = resultViaje!.first.values![2] as DateTime;
+              DateTime fechaFin = resultViaje!.first.values![3] as DateTime;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddGasto(
+                    idViaje: widget.idViaje,
+                    fechaInicio: fechaInicio,
+                    fechaFin: fechaFin,
+                  ),
+                ),
+              ).then((value) {
+                setState(() {
+                  fetchData();
+                });
+              });
+            },
+          ),
+        ],
+      );
     } else {
       List<ResultRow> rows = resultGastos!.toList();
       return ConstrainedBox(
@@ -512,48 +608,72 @@ class _ActualDetailsState extends State<ActualDetails> {
           itemBuilder: (context, index) {
             ResultRow row = rows[index];
             return GestureDetector(
-              onLongPress: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _dialog(context, 'gasto', row);
-                  },
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListTile(
-                      leading: const Icon(Icons.money,
-                          size: 40.0), // Add your icon here
-                      title: Text(
-                        'Importe: ${row['Cantidad']}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 19),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            'Notas: ${row['Descripción']}',
-                            style: const TextStyle(fontSize: 16),
+                onLongPress: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _dialog(context, 'gasto', row);
+                    },
+                  );
+                },
+                child: Column(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        DateTime fechaInicio =
+                            resultViaje!.first.values![2] as DateTime;
+                        DateTime fechaFin =
+                            resultViaje!.first.values![3] as DateTime;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddGasto(
+                              idViaje: widget.idViaje,
+                              fechaInicio: fechaInicio,
+                              fechaFin: fechaFin,
+                            ),
                           ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                        ).then((value) {
+                          setState(() {
+                            fetchData();
+                          });
+                        });
+                      },
+                    ),
+                    GestureDetector(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          leading: const Icon(Icons.money,
+                              size: 40.0), // Add your icon here
+                          title: Text(
+                            ' ${row['Cantidad']}',
                             style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
+                                fontWeight: FontWeight.bold, fontSize: 19),
                           ),
-                        ],
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              Text(
+                                '  ${row['Descripción']}',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(height: 20),
+                              Text(
+                                'Fecha: ${row['FechaGasto'].toIso8601String().substring(0, 10)}',
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-            );
+                    const Divider(),
+                  ],
+                ));
           },
         ),
       );
