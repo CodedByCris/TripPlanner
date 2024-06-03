@@ -7,14 +7,15 @@ import 'package:intl/intl.dart';
 import '../../Database/connections.dart';
 
 class AddGasto extends ConsumerStatefulWidget {
-  final DateTime fechaInicio;
-  final DateTime fechaFin;
+  // final DateTime fechaInicio;
+  // final DateTime fechaFin;
   final int idViaje;
-  const AddGasto(
-      {super.key,
-      required this.idViaje,
-      required this.fechaInicio,
-      required this.fechaFin});
+  const AddGasto({
+    super.key,
+    required this.idViaje,
+    // required this.fechaInicio,
+    // required this.fechaFin
+  });
 
   @override
   NewScreenState createState() => NewScreenState();
@@ -210,9 +211,9 @@ class NewScreenState extends ConsumerState<AddGasto> {
           onPressed: () async {
             final DateTime? picked = await showDatePicker(
               context: context,
-              initialDate: widget.fechaInicio,
-              firstDate: widget.fechaInicio,
-              lastDate: widget.fechaFin,
+              initialDate: DateTime.now(),
+              firstDate: DateTime.now().add(const Duration(days: -365)),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
             );
             if (picked != null) {
               fechaController.text = DateFormat('yyyy-MM-dd').format(picked);
@@ -220,16 +221,16 @@ class NewScreenState extends ConsumerState<AddGasto> {
           },
         ),
       ),
-      validator: (value) {
-        if (value!.isNotEmpty) {
-          DateTime? fecha = DateFormat('yyyy-MM-dd').parse(value, true);
-          if (fecha.isBefore(widget.fechaInicio) ||
-              fecha.isAfter(widget.fechaFin)) {
-            return 'Por favor ingrese una fecha entre ${DateFormat('yyyy-MM-dd').format(widget.fechaInicio)} y ${DateFormat('yyyy-MM-dd').format(widget.fechaFin)}';
-          }
-        }
-        return null;
-      },
+      // validator: (value) {
+      //   if (value!.isNotEmpty) {
+      //     DateTime? fecha = DateFormat('yyyy-MM-dd').parse(value, true);
+      //     if (fecha.isBefore(widget.fechaInicio) ||
+      //         fecha.isAfter(widget.fechaFin)) {
+      //       return 'Por favor ingrese una fecha entre ${DateFormat('yyyy-MM-dd').format(widget.fechaInicio)} y ${DateFormat('yyyy-MM-dd').format(widget.fechaFin)}';
+      //     }
+      //   }
+      //   return null;
+      // },
     );
   }
 }

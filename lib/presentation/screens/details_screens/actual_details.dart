@@ -11,7 +11,7 @@ import '../../functions/snackbars.dart';
 
 class ActualDetails extends StatefulWidget {
   final int idViaje;
-  final isDarkMode;
+  final bool isDarkMode;
 
   const ActualDetails(
       {super.key, required this.idViaje, required this.isDarkMode});
@@ -482,7 +482,7 @@ class _ActualDetailsState extends State<ActualDetails> {
       return Column(
         children: [
           const Center(
-            child: Text('No hay datos del viaje'),
+            child: Text('No hay datos de las rutas'),
           ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -573,20 +573,22 @@ class _ActualDetailsState extends State<ActualDetails> {
       return Column(
         children: [
           const Center(
-            child: Text('No hay datos del viaje'),
+            child: Text('No hay datos de los gastos'),
           ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              DateTime fechaInicio = resultViaje!.first.values![2] as DateTime;
-              DateTime fechaFin = resultViaje!.first.values![3] as DateTime;
+              // DateTime fechaInicio =
+              //     DateTime.parse(resultViaje!.first.values![2] as String);
+              // DateTime fechaFin =
+              //     DateTime.parse(resultViaje!.first.values![3] as String);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => AddGasto(
                     idViaje: widget.idViaje,
-                    fechaInicio: fechaInicio,
-                    fechaFin: fechaFin,
+                    // fechaInicio: fechaInicio,
+                    // fechaFin: fechaFin,
                   ),
                 ),
               ).then((value) {
@@ -621,17 +623,17 @@ class _ActualDetailsState extends State<ActualDetails> {
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () {
-                        DateTime fechaInicio =
-                            resultViaje!.first.values![2] as DateTime;
-                        DateTime fechaFin =
-                            resultViaje!.first.values![3] as DateTime;
+                        // DateTime fechaInicio =
+                        //     resultViaje!.first.values![2] as DateTime;
+                        // DateTime fechaFin =
+                        //     resultViaje!.first.values![3] as DateTime;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => AddGasto(
                               idViaje: widget.idViaje,
-                              fechaInicio: fechaInicio,
-                              fechaFin: fechaFin,
+                              // fechaInicio: fechaInicio,
+                              // fechaFin: fechaFin,
                             ),
                           ),
                         ).then((value) {
